@@ -51,9 +51,12 @@ Real feed screen states: distinct loading/empty/error treatments, pull-to-refres
 Optional contextual overlays over content (ADR-002). `Project` entity + `content_project` many-to-many join table. `POST/GET /projects`, `DELETE /projects/{id}`, `POST/DELETE /projects/{id}/content/{contentId}`, `GET /projects/{id}/content`. Content has zero knowledge of projects; deleting a project never touches content. Backend only, no mobile UI yet.
 **Archived:** `openspec/changes/archive/2026-07-06-projects/`
 
+### 12. search
+Full-text search over saved content — title, extracted text, summary, author, url, topics — ranked by relevance via Postgres FTS (`GENERATED` `search_vector` column + GIN index, `ts_rank`). `GET /content/search?q=`. Semantic/vector search (pgvector) stays deferred per STACK.md. Backend only.
+**Archived:** `openspec/changes/archive/2026-07-06-search/`
+
 ## Optional / deferred (not urgent, per original roadmap)
 
-- **search** — full-text/semantic search over saved content
 - **recommendations** — surfacing related/suggested content
 
 ## Stack in use so far
