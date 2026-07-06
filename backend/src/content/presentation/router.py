@@ -44,6 +44,20 @@ def get_content(content_id: UUID, session: Session = Depends(get_session)) -> Co
     return ContentResponse.from_entity(content)
 
 
+@router.get("/content/{content_id}/related", response_model=list[ContentResponse])
+def get_related_content(
+    content_id: UUID,
+    limit: int = Query(default=5, le=20, gt=0),
+    session: Session = Depends(get_session),
+) -> list[ContentResponse]:
+    repository = SqlAlchemyContentRepository(session)
+    if repository.get_by_id(content_id) is None:
+        raise HTTPException(status_code=404, detail="Content not found")
+
+    items = repository.find_related(content_id, limit)
+    return [ContentResponse.from_entity(item) for item in items]
+
+
 @router.get("/content", response_model=list[ContentResponse])
 def list_content(
     limit: int = Query(default=20, le=100, gt=0),
