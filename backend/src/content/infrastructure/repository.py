@@ -3,7 +3,8 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from uuid import UUID
 
-from sqlalchemy import func
+from sqlalchemy import String, cast, func
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Session
 
 from ..domain.content import Content
@@ -97,6 +98,28 @@ class SqlAlchemyContentRepository:
             .all()
         )
         return [to_entity(model) for model in models]
+
+    def find_related(self, content_id: UUID, limit: int) -> list[Content]:
+        source = self._session.get(ContentModel, content_id)
+        if source is None or not source.topics:
+            return []
+
+        source_topics = source.topics
+        candidates = (
+            self._session.query(ContentModel)
+            .filter(
+                ContentModel.status == ContentStatus.READY,
+                ContentModel.id != content_id,
+                ContentModel.topics.op("?|")(cast(source_topics, ARRAY(String))),
+            )
+            .all()
+        )
+
+        def overlap(model: ContentModel) -> int:
+            return len(set(source_topics) & set(model.topics))
+
+        ranked = sorted(candidates, key=overlap, reverse=True)
+        return [to_entity(model) for model in ranked[:limit]]
 
     def get_by_id(self, content_id: UUID) -> Content | None:
         model = self._session.get(ContentModel, content_id)
