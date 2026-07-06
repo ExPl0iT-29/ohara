@@ -47,9 +47,12 @@ Real feed screen states: distinct loading/empty/error treatments, pull-to-refres
 
 (none — all originally planned features are built)
 
+### 11. projects
+Optional contextual overlays over content (ADR-002). `Project` entity + `content_project` many-to-many join table. `POST/GET /projects`, `DELETE /projects/{id}`, `POST/DELETE /projects/{id}/content/{contentId}`, `GET /projects/{id}/content`. Content has zero knowledge of projects; deleting a project never touches content. Backend only, no mobile UI yet.
+**Archived:** `openspec/changes/archive/2026-07-06-projects/`
+
 ## Optional / deferred (not urgent, per original roadmap)
 
-- **projects** — contextual overlays over content (never own content, per ADR-002)
 - **search** — full-text/semantic search over saved content
 - **recommendations** — surfacing related/suggested content
 
