@@ -2,7 +2,7 @@
 
 Tracks every OpenSpec change: what it does, where it lives, and current status.
 
-## Built (backend)
+## Built
 
 ### 1. content-model
 Unified `Content` domain entity used for every saved item (blog, website, doc, PDF, paper, YouTube, GitHub, book, tweet, Reddit, other). Defines which fields are immutable at capture (`id`, `url`, `source`, `savedAt`) vs. replaceable by later processing (`title`, `summary`, `topics`, `readingTime`, `status`, etc.). Persisted via SQLAlchemy + Alembic migration to a Postgres `content` table (JSONB for `metadata`/`topics`, DB-level enums for `contentType`/`status`). No relationship to projects — content never references a project (ADR-002).
@@ -20,19 +20,22 @@ Background worker that picks up `pending` content and actually extracts it: web 
 Adds the AI layer on top of extracted text: `summary` + `topics`, via a swappable `AIProvider` interface (OpenAI or Gemini, chosen by `AI_PROVIDER` env var; Ollama reserved for later). Runs as a second worker pass after extraction — never blocks or duplicates extraction, and a failed/missing AI call never reverts a `ready` item back to `failed`. Reading works with or without AI ("AI is invisible infrastructure" per PRODUCT_VISION.md).
 **Archived:** `openspec/changes/archive/2026-07-06-ai-enrichment/`
 
-## Not built yet (planned)
-
 ### 5. reader-api
-GET endpoints to actually retrieve saved content — single item and list. Currently you can only write (`POST /content`); there's no way to read anything back over HTTP yet.
+GET endpoints to actually retrieve saved content — single item and list, with pagination and status/contentType filters. `GET /content`, `GET /content/{id}`.
+**Archived:** `openspec/changes/archive/2026-07-06-reader-api/`
 
 ### 6. home-feed
 ~~Feed/list logic on top of reader-api — sorting by savedAt, filtering by status/type.~~ Folded into reader-api's `GET /content` (already sorts by savedAt, filters by status/contentType). No separate change needed.
 
 ### 7. mobile-app-shell
-Expo/React Native project scaffold, navigation, API client. Zero frontend code exists yet — everything so far is backend-only.
+Expo Router + TypeScript app scaffold, NativeWind, React Query, typed API client, placeholder feed/reader screens.
+**Archived:** `openspec/changes/archive/2026-07-06-mobile-app-shell/`
 
 ### 8. reader-view
-The actual reading screen — the core of the product experience per PRODUCT_VISION.md.
+The real reading screen: hero image, title, byline, optional AI summary, full body text with reading typography. Branches explicitly on `ContentStatus` (pending/processing/failed/ready) plus distinct loading/not-found states.
+**Archived:** `openspec/changes/archive/2026-07-06-reader-view/`
+
+## Not built yet (planned)
 
 ### 9. capture-ui
 Save-URL flow from inside the app itself (today, capture only works via raw `POST /content`).
