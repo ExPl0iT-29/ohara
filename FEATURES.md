@@ -39,12 +39,15 @@ The real reading screen: hero image, title, byline, optional AI summary, full bo
 In-app URL capture: FAB on the feed opens a modal with a URL input + content-type chips, wired to `POST /content`. Inline error handling for malformed URLs/network failures.
 **Archived:** `openspec/changes/archive/2026-07-06-capture-ui/`
 
+### 10. home-feed-ui
+Real feed screen states: distinct loading/empty/error treatments, pull-to-refresh, calm human-readable status labels in place of raw `ContentStatus` strings.
+**Archived:** `openspec/changes/archive/2026-07-06-home-feed-ui/`
+
 ## Not built yet (planned)
 
-### 10. home-feed-ui
-List/feed screen in the app, consuming reader-api/home-feed.
+(none — all originally planned features are built)
 
-## Deferred (not urgent, per original roadmap)
+## Optional / deferred (not urgent, per original roadmap)
 
 - **projects** — contextual overlays over content (never own content, per ADR-002)
 - **search** — full-text/semantic search over saved content
