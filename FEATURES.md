@@ -35,10 +35,11 @@ Expo Router + TypeScript app scaffold, NativeWind, React Query, typed API client
 The real reading screen: hero image, title, byline, optional AI summary, full body text with reading typography. Branches explicitly on `ContentStatus` (pending/processing/failed/ready) plus distinct loading/not-found states.
 **Archived:** `openspec/changes/archive/2026-07-06-reader-view/`
 
-## Not built yet (planned)
-
 ### 9. capture-ui
-Save-URL flow from inside the app itself (today, capture only works via raw `POST /content`).
+In-app URL capture: FAB on the feed opens a modal with a URL input + content-type chips, wired to `POST /content`. Inline error handling for malformed URLs/network failures.
+**Archived:** `openspec/changes/archive/2026-07-06-capture-ui/`
+
+## Not built yet (planned)
 
 ### 10. home-feed-ui
 List/feed screen in the app, consuming reader-api/home-feed.
