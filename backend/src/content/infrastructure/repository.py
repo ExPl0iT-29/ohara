@@ -6,7 +6,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from ..domain.content import Content
-from ..domain.enums import ContentStatus
+from ..domain.enums import ContentStatus, ContentType
 from .mapping import to_entity, to_model
 from .models import ContentModel
 
@@ -57,6 +57,26 @@ class SqlAlchemyContentRepository:
                 ContentModel.extracted_text.isnot(None),
             )
             .order_by(ContentModel.saved_at)
+            .limit(limit)
+            .all()
+        )
+        return [to_entity(model) for model in models]
+
+    def list_content(
+        self,
+        limit: int,
+        offset: int,
+        status: ContentStatus | None = None,
+        content_type: ContentType | None = None,
+    ) -> list[Content]:
+        query = self._session.query(ContentModel)
+        if status is not None:
+            query = query.filter(ContentModel.status == status)
+        if content_type is not None:
+            query = query.filter(ContentModel.content_type == content_type)
+        models = (
+            query.order_by(ContentModel.saved_at.desc())
+            .offset(offset)
             .limit(limit)
             .all()
         )

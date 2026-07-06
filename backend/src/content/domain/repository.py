@@ -4,6 +4,7 @@ from typing import Protocol
 from uuid import UUID
 
 from .content import Content
+from .enums import ContentStatus, ContentType
 
 
 class ContentRepository(Protocol):
@@ -16,3 +17,11 @@ class ContentRepository(Protocol):
     def get_pending_batch(self, limit: int) -> list[Content]: ...
 
     def get_ready_unenriched_batch(self, limit: int) -> list[Content]: ...
+
+    def list_content(
+        self,
+        limit: int,
+        offset: int,
+        status: ContentStatus | None = None,
+        content_type: ContentType | None = None,
+    ) -> list[Content]: ...
