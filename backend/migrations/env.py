@@ -10,6 +10,7 @@ from alembic import context
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from content.infrastructure.models import Base  # noqa: E402
+from projects.infrastructure.models import ProjectModel, content_project  # noqa: E402, F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
