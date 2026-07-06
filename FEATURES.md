@@ -55,9 +55,14 @@ Optional contextual overlays over content (ADR-002). `Project` entity + `content
 Full-text search over saved content — title, extracted text, summary, author, url, topics — ranked by relevance via Postgres FTS (`GENERATED` `search_vector` column + GIN index, `ts_rank`). `GET /content/search?q=`. Semantic/vector search (pgvector) stays deferred per STACK.md. Backend only.
 **Archived:** `openspec/changes/archive/2026-07-06-search/`
 
+### 13. recommendations
+Related-content-by-shared-topics: `GET /content/{id}/related`, ranked by topic-overlap count over existing AI-generated `topics`. No embeddings/ML — the non-semantic stopgap for the "recommendation engine" deferred in PRODUCT_SPECIFICATIONS.md. No topics on the source item means empty results, not an error. Backend only.
+**Archived:** `openspec/changes/archive/2026-07-06-recommendations/`
+
 ## Optional / deferred (not urgent, per original roadmap)
 
-- **recommendations** — surfacing related/suggested content
+- **semantic search** (pgvector-based) — explicitly deferred per STACK.md; `search` (full-text) is built
+- **AI-based recommendation engine** (embeddings/collaborative filtering) — explicitly deferred per PRODUCT_SPECIFICATIONS.md; topic-overlap `recommendations` is built as the non-ML stopgap
 
 ## Stack in use so far
 
