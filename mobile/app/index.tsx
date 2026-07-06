@@ -29,6 +29,13 @@ export default function FeedScreen() {
           </Pressable>
         )}
       />
+
+      <Pressable
+        className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-blue-600"
+        onPress={() => router.push("/capture")}
+      >
+        <Text className="text-3xl leading-none text-white">+</Text>
+      </Pressable>
     </SafeAreaView>
   );
 }
