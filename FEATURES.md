@@ -26,7 +26,7 @@ Adds the AI layer on top of extracted text: `summary` + `topics`, via a swappabl
 GET endpoints to actually retrieve saved content — single item and list. Currently you can only write (`POST /content`); there's no way to read anything back over HTTP yet.
 
 ### 6. home-feed
-Feed/list logic on top of reader-api — sorting by savedAt, filtering by status/type. May end up folded into reader-api rather than being its own change.
+~~Feed/list logic on top of reader-api — sorting by savedAt, filtering by status/type.~~ Folded into reader-api's `GET /content` (already sorts by savedAt, filters by status/contentType). No separate change needed.
 
 ### 7. mobile-app-shell
 Expo/React Native project scaffold, navigation, API client. Zero frontend code exists yet — everything so far is backend-only.
