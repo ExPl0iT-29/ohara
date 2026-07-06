@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from uuid import UUID
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from ..domain.content import Content
@@ -77,6 +78,21 @@ class SqlAlchemyContentRepository:
         models = (
             query.order_by(ContentModel.saved_at.desc())
             .offset(offset)
+            .limit(limit)
+            .all()
+        )
+        return [to_entity(model) for model in models]
+
+    def search(self, query: str, limit: int) -> list[Content]:
+        if not query or not query.strip():
+            return []
+
+        tsquery = func.plainto_tsquery("english", query)
+        rank = func.ts_rank(ContentModel.search_vector, tsquery)
+        models = (
+            self._session.query(ContentModel)
+            .filter(ContentModel.search_vector.op("@@")(tsquery))
+            .order_by(rank.desc())
             .limit(limit)
             .all()
         )

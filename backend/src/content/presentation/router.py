@@ -24,6 +24,17 @@ def capture_content(
     return CaptureContentResponse.from_entity(content)
 
 
+@router.get("/content/search", response_model=list[ContentResponse])
+def search_content(
+    q: str = Query(default=""),
+    limit: int = Query(default=20, le=100, gt=0),
+    session: Session = Depends(get_session),
+) -> list[ContentResponse]:
+    repository = SqlAlchemyContentRepository(session)
+    items = repository.search(q, limit)
+    return [ContentResponse.from_entity(item) for item in items]
+
+
 @router.get("/content/{content_id}", response_model=ContentResponse)
 def get_content(content_id: UUID, session: Session = Depends(get_session)) -> ContentResponse:
     repository = SqlAlchemyContentRepository(session)

@@ -3,8 +3,8 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, Integer, String, Text
-from sqlalchemy.dialects.postgresql import JSONB, UUID as PGUUID
+from sqlalchemy import Computed, DateTime, Enum, Integer, String, Text
+from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR, UUID as PGUUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from ..domain.enums import ContentStatus, ContentType
@@ -44,3 +44,9 @@ class ContentModel(Base):
     )
     updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # Actual generation expression lives in the migration (raw SQL); this Computed()
+    # marker only tells the ORM the column is DB-managed, so it's excluded from INSERT/UPDATE.
+    search_vector: Mapped[str | None] = mapped_column(
+        TSVECTOR, Computed(""), nullable=True, deferred=True
+    )
