@@ -75,7 +75,7 @@ def enrich_ready_content(repository: SqlAlchemyContentRepository) -> int:
 
 
 def run() -> None:
-    engine = create_engine(os.environ["DATABASE_URL"])
+    engine = create_engine(os.environ["DATABASE_URL"], pool_pre_ping=True, pool_recycle=300)
     session_factory = sessionmaker(bind=engine)
 
     while True:

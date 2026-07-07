@@ -13,8 +13,16 @@ interface FeedListItemProps {
 function FeedListItemBase({ item, onPress }: FeedListItemProps) {
   return (
     <Animated.View entering={FadeInDown}>
-      <Pressable className="rounded-lg border border-gray-200 p-3" onPress={() => onPress(item.id)}>
-        <Text className="font-semibold">{item.title ?? item.url}</Text>
+      <Pressable
+        className="gap-2 rounded-card border border-line bg-white p-4 active:opacity-70"
+        onPress={() => onPress(item.id)}
+      >
+        <Text className="text-body font-semibold text-ink" numberOfLines={2}>
+          {item.title ?? item.url}
+        </Text>
+        <Text className="text-caption text-ink-faint" numberOfLines={1}>
+          {item.url}
+        </Text>
         <FeedStatusBadge status={item.status} />
       </Pressable>
     </Animated.View>

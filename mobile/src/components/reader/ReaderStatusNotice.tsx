@@ -12,10 +12,14 @@ const COPY = {
 
 export function ReaderStatusNotice({ variant, url }: ReaderStatusNoticeProps) {
   return (
-    <View className="gap-3 rounded-lg bg-gray-50 p-4">
-      <Text className="text-base text-gray-600">{COPY[variant]}</Text>
+    <View
+      className={`gap-3 rounded-card border p-4 ${
+        variant === "failed" ? "border-danger-light bg-danger-light/40" : "border-line bg-white"
+      }`}
+    >
+      <Text className="text-body text-ink-soft">{COPY[variant]}</Text>
       <Pressable onPress={() => Linking.openURL(url)}>
-        <Text className="font-semibold text-blue-600">Open original ↗</Text>
+        <Text className="text-body font-semibold text-brand">Open original ↗</Text>
       </Pressable>
     </View>
   );
