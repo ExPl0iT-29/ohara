@@ -8,8 +8,8 @@ const queryClient = new QueryClient();
 export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Stack>
-        <Stack.Screen name="capture" options={{ presentation: "modal", title: "Save a link" }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="capture" options={{ presentation: "modal", headerShown: true, title: "Save a link" }} />
       </Stack>
     </QueryClientProvider>
   );
