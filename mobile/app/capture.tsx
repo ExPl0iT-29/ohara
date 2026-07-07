@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -22,7 +22,8 @@ const CONTENT_TYPES: ContentType[] = [
 
 export default function CaptureScreen() {
   const router = useRouter();
-  const [url, setUrl] = useState("");
+  const { url: sharedUrl } = useLocalSearchParams<{ url?: string }>();
+  const [url, setUrl] = useState(sharedUrl ?? "");
   const [contentType, setContentType] = useState<ContentType | undefined>(undefined);
   const mutation = useCaptureContent();
 
