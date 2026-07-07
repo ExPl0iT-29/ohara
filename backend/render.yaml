@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: ohara-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install uv && uv sync --frozen
+    startCommand: uv run uvicorn main:app --host 0.0.0.0 --port $PORT --app-dir src
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: AI_PROVIDER
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: FIRECRAWL_API_KEY
+        sync: false
+
+  - type: worker
+    name: ohara-worker
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install uv && uv sync --frozen
+    startCommand: cd src && uv run python -m content.worker
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: AI_PROVIDER
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: FIRECRAWL_API_KEY
+        sync: false
