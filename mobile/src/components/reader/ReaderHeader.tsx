@@ -1,4 +1,5 @@
-import { Image, Text, View } from "react-native";
+import { Image } from "expo-image";
+import { Text, View } from "react-native";
 
 interface ReaderHeaderProps {
   title: string | null;
@@ -24,7 +25,13 @@ export function ReaderHeader({
   return (
     <View className="gap-3">
       {heroImage && (
-        <Image source={{ uri: heroImage }} className="h-48 w-full rounded-lg" resizeMode="cover" />
+        <Image
+          source={{ uri: heroImage }}
+          style={{ height: 192, width: "100%", borderRadius: 8 }}
+          contentFit="cover"
+          cachePolicy="memory-disk"
+          transition={150}
+        />
       )}
       <Text className="text-2xl font-bold leading-tight">{title ?? url}</Text>
       {byline.length > 0 && <Text className="text-sm text-gray-500">{byline}</Text>}

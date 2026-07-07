@@ -7,5 +7,6 @@ export function useContentItem(id: string) {
     queryKey: ["content", "item", id],
     queryFn: () => getContent(id),
     enabled: Boolean(id),
+    staleTime: 30_000,
   });
 }

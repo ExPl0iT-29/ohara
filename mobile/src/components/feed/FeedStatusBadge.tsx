@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Text } from "react-native";
 
 import type { ContentStatus } from "../../api/content";
@@ -7,9 +8,11 @@ interface FeedStatusBadgeProps {
   status: ContentStatus;
 }
 
-export function FeedStatusBadge({ status }: FeedStatusBadgeProps) {
+function FeedStatusBadgeBase({ status }: FeedStatusBadgeProps) {
   const label = STATUS_LABELS[status];
   if (!label) return null;
 
   return <Text className="text-sm text-gray-500">{label}</Text>;
 }
+
+export const FeedStatusBadge = memo(FeedStatusBadgeBase);

@@ -6,5 +6,6 @@ export function useContentList(params: ListContentParams = {}) {
   return useQuery({
     queryKey: ["content", "list", params],
     queryFn: () => listContent(params),
+    staleTime: 30_000,
   });
 }

@@ -28,55 +28,31 @@ export default function ReaderScreen() {
     );
   }
 
-  if (data.status === "pending" || data.status === "processing") {
-    return (
-      <SafeAreaView className="flex-1 bg-white">
-        <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
-          <ReaderHeader
-            title={data.title}
-            url={data.url}
-            heroImage={data.heroImage}
-            author={data.author}
-            source={data.source}
-            readingTime={data.readingTime}
-          />
-          <ReaderStatusNotice variant="preparing" url={data.url} />
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
-
-  if (data.status === "failed") {
-    return (
-      <SafeAreaView className="flex-1 bg-white">
-        <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
-          <ReaderHeader
-            title={data.title}
-            url={data.url}
-            heroImage={data.heroImage}
-            author={data.author}
-            source={data.source}
-            readingTime={data.readingTime}
-          />
-          <ReaderStatusNotice variant="failed" url={data.url} />
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
+  const header = (
+    <ReaderHeader
+      title={data.title}
+      url={data.url}
+      heroImage={data.heroImage}
+      author={data.author}
+      source={data.source}
+      readingTime={data.readingTime}
+    />
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
-        <ReaderHeader
-          title={data.title}
-          url={data.url}
-          heroImage={data.heroImage}
-          author={data.author}
-          source={data.source}
-          readingTime={data.readingTime}
-        />
-        <ReaderSummary summary={data.summary} />
-        <ReaderBody extractedText={data.extractedText} />
+        {header}
+        {(data.status === "pending" || data.status === "processing") && (
+          <ReaderStatusNotice variant="preparing" url={data.url} />
+        )}
+        {data.status === "failed" && <ReaderStatusNotice variant="failed" url={data.url} />}
+        {data.status === "ready" && (
+          <>
+            <ReaderSummary summary={data.summary} />
+            <ReaderBody extractedText={data.extractedText} />
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
