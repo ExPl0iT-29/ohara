@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import time
@@ -74,21 +75,42 @@ def enrich_ready_content(repository: SqlAlchemyContentRepository) -> int:
     return len(unenriched)
 
 
+def run_iteration(session_factory) -> int:
+    session: Session = session_factory()
+    try:
+        repository = SqlAlchemyContentRepository(session)
+        processed = process_batch(repository)
+        enrich_ready_content(repository)
+        return processed
+    finally:
+        session.close()
+
+
 def run() -> None:
     engine = create_engine(os.environ["DATABASE_URL"], pool_pre_ping=True, pool_recycle=300)
     session_factory = sessionmaker(bind=engine)
 
     while True:
-        session: Session = session_factory()
-        try:
-            repository = SqlAlchemyContentRepository(session)
-            processed = process_batch(repository)
-            enrich_ready_content(repository)
-        finally:
-            session.close()
-
+        processed = run_iteration(session_factory)
         if processed == 0:
             time.sleep(POLL_INTERVAL_SECONDS)
+
+
+async def run_forever_async() -> None:
+    """Runs the same polling loop as `run()`, but as a background asyncio task
+    inside the web process instead of a separate process — avoids needing a
+    paid Render worker service for a single-user app."""
+    engine = create_engine(os.environ["DATABASE_URL"], pool_pre_ping=True, pool_recycle=300)
+    session_factory = sessionmaker(bind=engine)
+
+    while True:
+        try:
+            processed = await asyncio.to_thread(run_iteration, session_factory)
+        except Exception:
+            log.exception("Worker iteration failed")
+            processed = 0
+        if processed == 0:
+            await asyncio.sleep(POLL_INTERVAL_SECONDS)
 
 
 if __name__ == "__main__":
