@@ -9,9 +9,12 @@ export class ApiError extends Error {
   }
 }
 
+const REQUEST_TIMEOUT_MS = 10_000;
+
 export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: { "Content-Type": "application/json" },
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     ...init,
   });
 
