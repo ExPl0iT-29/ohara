@@ -27,12 +27,12 @@ export default function FeedScreen() {
   const keyExtractor = useCallback((item: ContentItem) => item.id, []);
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <Text className="px-4 pt-4 text-2xl font-bold">Ohara</Text>
+    <SafeAreaView className="flex-1 bg-paper">
+      <Text className="px-5 pb-2 pt-4 text-display text-ink">Ohara</Text>
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator />
+          <ActivityIndicator color="#0F766E" />
         </View>
       ) : error ? (
         <FeedErrorState onRetry={() => refetch()} />
@@ -42,14 +42,14 @@ export default function FeedScreen() {
         <FlatList
           data={data}
           keyExtractor={keyExtractor}
-          contentContainerStyle={{ padding: 16, gap: 8 }}
-          refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
+          contentContainerStyle={{ padding: 20, gap: 12 }}
+          refreshControl={<RefreshControl tintColor="#0F766E" refreshing={isFetching} onRefresh={refetch} />}
           renderItem={renderItem}
         />
       )}
 
       <AnimatedPressable
-        className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-blue-600"
+        className="absolute bottom-8 right-6 h-14 w-14 items-center justify-center rounded-full bg-brand shadow-lg"
         style={fabStyle}
         onPressIn={() => {
           fabScale.value = withSpring(0.9);

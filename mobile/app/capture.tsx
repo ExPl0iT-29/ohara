@@ -34,11 +34,12 @@ export default function CaptureScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+    <SafeAreaView className="flex-1 bg-paper">
+      <ScrollView contentContainerStyle={{ padding: 20, gap: 20 }}>
         <TextInput
-          className="rounded-lg border border-gray-300 p-3 text-base"
+          className="rounded-card border border-line bg-white p-4 text-body text-ink"
           placeholder="https://example.com/article"
+          placeholderTextColor="#A8A29E"
           autoCapitalize="none"
           autoCorrect={false}
           keyboardType="url"
@@ -51,11 +52,11 @@ export default function CaptureScreen() {
             <Pressable
               key={type}
               onPress={() => setContentType(contentType === type ? undefined : type)}
-              className={`rounded-full border px-3 py-1 ${
-                contentType === type ? "border-blue-600 bg-blue-600" : "border-gray-300"
+              className={`rounded-pill border px-3 py-1.5 ${
+                contentType === type ? "border-brand bg-brand" : "border-line bg-white"
               }`}
             >
-              <Text className={contentType === type ? "text-white" : "text-gray-700"}>
+              <Text className={contentType === type ? "text-caption text-white" : "text-caption text-ink-soft"}>
                 {type}
               </Text>
             </Pressable>
@@ -63,17 +64,17 @@ export default function CaptureScreen() {
         </View>
 
         {mutation.isError && (
-          <Text className="text-sm text-red-500">
+          <Text className="text-caption text-danger">
             Couldn't save that link. Check the URL and try again.
           </Text>
         )}
 
         <Pressable
-          className="rounded-lg bg-blue-600 p-3"
+          className="rounded-card bg-brand p-4 active:opacity-80 disabled:opacity-40"
           disabled={!url || mutation.isPending}
           onPress={handleSubmit}
         >
-          <Text className="text-center font-semibold text-white">
+          <Text className="text-center text-body font-semibold text-white">
             {mutation.isPending ? "Saving..." : "Save"}
           </Text>
         </Pressable>
