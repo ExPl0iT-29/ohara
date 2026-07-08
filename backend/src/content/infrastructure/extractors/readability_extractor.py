@@ -1,14 +1,29 @@
 from __future__ import annotations
 
-import re
-
 import requests
+from lxml.html.clean import Cleaner
 from readability import Document
 
 from ...domain.extraction import ContentExtractor, ExtractionResult
 
 _MIN_TEXT_LENGTH = 200
-_TAG_RE = re.compile(r"<[^>]+>")
+
+# ponytail: allowlist via lxml's Cleaner (already a readability-lxml transitive dep)
+# instead of pulling in bleach — strips script/style/on* attrs, keeps img/headings/etc.
+_CLEANER = Cleaner(
+    scripts=True,
+    javascript=True,
+    style=True,
+    inline_style=True,
+    embedded=True,
+    frames=True,
+    forms=True,
+    annoying_tags=True,
+    meta=True,
+    page_structure=True,
+    remove_unknown_tags=False,
+    safe_attrs_only=True,
+)
 
 
 class ReadabilityExtractor:
@@ -23,9 +38,8 @@ class ReadabilityExtractor:
 
         doc = Document(response.text)
         title = doc.short_title() or None
-        summary_html = doc.summary()
-        extracted_text = _TAG_RE.sub(" ", summary_html)
-        extracted_text = re.sub(r"\s+", " ", extracted_text).strip() or None
+        summary_html = _CLEANER.clean_html(doc.summary())
+        extracted_text = summary_html.strip() or None
 
         return ExtractionResult(
             title=title,
