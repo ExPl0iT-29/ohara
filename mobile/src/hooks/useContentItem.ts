@@ -8,5 +8,7 @@ export function useContentItem(id: string) {
     queryFn: () => getContent(id),
     enabled: Boolean(id),
     staleTime: 30_000,
+    refetchInterval: (query) =>
+      query.state.data?.status === "pending" || query.state.data?.status === "processing" ? 1000 : false,
   });
 }

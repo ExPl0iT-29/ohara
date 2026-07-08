@@ -28,7 +28,12 @@ export default function FeedScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-paper">
-      <Text className="px-5 pb-2 pt-4 text-display text-ink">Ohara</Text>
+      <View className="flex-row items-center justify-between px-5 pb-2 pt-4">
+        <Text className="text-display text-ink">Ohara</Text>
+        <Pressable onPress={() => router.push("/settings")}>
+          <Text className="text-caption text-ink-soft">Settings</Text>
+        </Pressable>
+      </View>
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">

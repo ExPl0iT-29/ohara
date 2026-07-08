@@ -1,4 +1,5 @@
-import { apiRequest } from "./client";
+import { getAllContentRows, getContentRow, insertContent, listContentRows } from "../db/contentRepository";
+import { processContent } from "../processing/processContent";
 
 export type ContentType =
   | "blog"
@@ -51,24 +52,26 @@ export interface ListContentParams {
   contentType?: ContentType;
 }
 
-export function captureContent(url: string, contentType?: ContentType) {
-  return apiRequest<CaptureContentResponse>("/content", {
-    method: "POST",
-    body: JSON.stringify({ url, contentType }),
-  });
+export async function captureContent(
+  url: string,
+  contentType: ContentType = "other",
+): Promise<CaptureContentResponse> {
+  const item = insertContent(url, contentType);
+  // ponytail: fire-and-forget in-app processing, no separate worker process needed for a single device
+  void processContent(item.id);
+  return { id: item.id, url: item.url, contentType: item.contentType, status: item.status, savedAt: item.savedAt };
 }
 
-export function listContent(params: ListContentParams = {}) {
-  const query = new URLSearchParams();
-  if (params.limit !== undefined) query.set("limit", String(params.limit));
-  if (params.offset !== undefined) query.set("offset", String(params.offset));
-  if (params.status) query.set("status", params.status);
-  if (params.contentType) query.set("contentType", params.contentType);
-
-  const queryString = query.toString();
-  return apiRequest<ContentItem[]>(`/content${queryString ? `?${queryString}` : ""}`);
+export async function listContent(params: ListContentParams = {}): Promise<ContentItem[]> {
+  return listContentRows(params);
 }
 
-export function getContent(id: string) {
-  return apiRequest<ContentItem>(`/content/${id}`);
+export async function getContent(id: string): Promise<ContentItem> {
+  const item = getContentRow(id);
+  if (!item) throw new Error("Content not found");
+  return item;
+}
+
+export function getAllContent(): ContentItem[] {
+  return getAllContentRows();
 }
