@@ -6,12 +6,15 @@ TBD
 ## Requirements
 
 ### Requirement: Pending Content Is Processed Asynchronously
-The system SHALL detect `Content` entities in `pending` status and process them without any involvement from the capture request path.
+The system SHALL process `Content` entities in `pending` status without blocking the capture UI, and SHALL sweep and retry any entity left in `pending` or `processing` on app launch (in case processing was interrupted, e.g. the app was killed mid-extraction).
 
-#### Scenario: Pending content picked up by worker
-- **WHEN** a `Content` entity exists with status `pending`
-- **THEN** the worker transitions its status to `processing` and begins extraction
-- **AND** no capture-endpoint request is involved in triggering this transition
+#### Scenario: Pending content picked up immediately after capture
+- **WHEN** a `Content` entity is captured
+- **THEN** the app transitions its status to `processing` and begins extraction in the background, without blocking the capture screen from closing
+
+#### Scenario: Interrupted processing is retried on next launch
+- **WHEN** the app launches and a `Content` entity is found in `pending` or `processing` status
+- **THEN** the app retries processing for that entity
 
 ### Requirement: Supported Content Types Are Extracted
 The system SHALL extract `title`, `description`, `heroImage`, `author`, `extractedText`, and (for video) `duration` for content types with a registered extractor.
@@ -49,13 +52,13 @@ The system SHALL mark `Content` entities with no registered extractor for their 
 - **THEN** the entity's status becomes `failed`
 - **AND** the failure reason is recorded on the entity
 
-### Requirement: Extraction Failure Does Not Crash The Worker
-The system SHALL catch extraction errors for a single Content entity, mark that entity `failed` with the error recorded, and continue processing other pending entities.
+### Requirement: Extraction Failure Does Not Crash Other Processing
+The system SHALL catch extraction errors for a single Content entity and mark that entity `failed` with the error recorded, without affecting processing of any other entity.
 
 #### Scenario: Extractor raises an error
 - **WHEN** an extractor raises an exception while processing a `pending` Content entity
 - **THEN** that entity's status becomes `failed` with the error reason recorded
-- **AND** the worker continues processing remaining `pending` entities
+- **AND** processing of other entities is unaffected
 
 ### Requirement: Processing Never Populates AI-Derived Fields
 The system SHALL NOT populate `summary` or `topics` during processing; those fields remain null after this pipeline runs.
