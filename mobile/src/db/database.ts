@@ -33,3 +33,9 @@ if (!columns.includes("archivedAt")) {
 if (!columns.includes("tags")) {
   db.execSync("ALTER TABLE content ADD COLUMN tags TEXT NOT NULL DEFAULT '[]';");
 }
+if (!columns.includes("scrollProgress")) {
+  db.execSync("ALTER TABLE content ADD COLUMN scrollProgress REAL;");
+}
+if (!columns.includes("highlights")) {
+  db.execSync("ALTER TABLE content ADD COLUMN highlights TEXT NOT NULL DEFAULT '[]';");
+}

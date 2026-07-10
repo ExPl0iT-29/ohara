@@ -7,6 +7,8 @@ import {
   listContentRows,
   updateContentRow,
 } from "../db/contentRepository";
+import * as Crypto from "expo-crypto";
+
 import { processContent } from "../processing/processContent";
 
 export type ContentType =
@@ -23,6 +25,13 @@ export type ContentType =
   | "other";
 
 export type ContentStatus = "pending" | "processing" | "ready" | "failed";
+
+export interface Highlight {
+  id: string;
+  quote: string;
+  note: string | null;
+  createdAt: string;
+}
 
 export interface ContentItem {
   id: string;
@@ -45,6 +54,8 @@ export interface ContentItem {
   updatedAt: string | null;
   completedAt: string | null;
   archivedAt: string | null;
+  scrollProgress: number | null;
+  highlights: Highlight[];
 }
 
 export interface CaptureContentResponse {
@@ -115,4 +126,26 @@ export function getAllTagsAndTopicsList(): string[] {
 
 export function getPresentContentTypesList(): ContentType[] {
   return getPresentContentTypes();
+}
+
+export function saveScrollProgress(id: string, progress: number): void {
+  updateContentRow(id, { scrollProgress: progress });
+}
+
+export function addHighlight(id: string, quote: string, note?: string): void {
+  const item = getContentRow(id);
+  if (!item) return;
+  const highlight: Highlight = {
+    id: Crypto.randomUUID(),
+    quote,
+    note: note ?? null,
+    createdAt: new Date().toISOString(),
+  };
+  updateContentRow(id, { highlights: [...item.highlights, highlight] });
+}
+
+export function removeHighlight(id: string, highlightId: string): void {
+  const item = getContentRow(id);
+  if (!item) return;
+  updateContentRow(id, { highlights: item.highlights.filter((h) => h.id !== highlightId) });
 }

@@ -1,10 +1,26 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { useRef, useState } from "react";
+import {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { addTag, archiveContent, removeTag, unarchiveContent } from "../../src/api/content";
+import {
+  addHighlight,
+  addTag,
+  archiveContent,
+  removeHighlight,
+  removeTag,
+  saveScrollProgress,
+  unarchiveContent,
+} from "../../src/api/content";
 import { ReaderBody } from "../../src/components/reader/ReaderBody";
 import { ReaderHeader } from "../../src/components/reader/ReaderHeader";
 import { ReaderStatusNotice } from "../../src/components/reader/ReaderStatusNotice";
@@ -16,8 +32,42 @@ export default function ReaderScreen() {
   const { data, isLoading, error } = useContentItem(id);
   const queryClient = useQueryClient();
   const [newTag, setNewTag] = useState("");
+  const [newQuote, setNewQuote] = useState("");
+  const [newNote, setNewNote] = useState("");
+  const scrollViewRef = useRef<ScrollView>(null);
+  const contentHeightRef = useRef(0);
+  const hasRestoredRef = useRef(false);
 
   const invalidate = () => void queryClient.invalidateQueries({ queryKey: ["content"] });
+
+  const handleContentSizeChange = (_width: number, height: number) => {
+    contentHeightRef.current = height;
+    if (hasRestoredRef.current) return;
+    if (data?.scrollProgress) {
+      scrollViewRef.current?.scrollTo({ y: data.scrollProgress * height, animated: false });
+    }
+    hasRestoredRef.current = true;
+  };
+
+  const handleScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (!data || !contentHeightRef.current) return;
+    const progress = event.nativeEvent.contentOffset.y / contentHeightRef.current;
+    saveScrollProgress(data.id, Math.max(0, Math.min(1, progress)));
+  };
+
+  const handleAddHighlight = () => {
+    if (!data || !newQuote.trim()) return;
+    addHighlight(data.id, newQuote.trim(), newNote.trim() || undefined);
+    setNewQuote("");
+    setNewNote("");
+    invalidate();
+  };
+
+  const handleRemoveHighlight = (highlightId: string) => {
+    if (!data) return;
+    removeHighlight(data.id, highlightId);
+    invalidate();
+  };
 
   const handleToggleArchive = () => {
     if (!data) return;
@@ -71,7 +121,13 @@ export default function ReaderScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-paper dark:bg-surface-dark">
-      <ScrollView contentContainerStyle={{ padding: 20, gap: 20 }}>
+      <ScrollView
+        ref={scrollViewRef}
+        contentContainerStyle={{ padding: 20, gap: 20 }}
+        onContentSizeChange={handleContentSizeChange}
+        onScrollEndDrag={handleScrollEnd}
+        onMomentumScrollEnd={handleScrollEnd}
+      >
         {header}
         <Pressable onPress={handleToggleArchive} className="self-start">
           <Text className="text-caption font-semibold text-brand">
@@ -114,6 +170,46 @@ export default function ReaderScreen() {
           <>
             <ReaderSummary summary={data.summary} />
             <ReaderBody extractedText={data.extractedText} />
+
+            <View className="gap-3 border-t border-line pt-4 dark:border-ink-soft">
+              <Text className="text-body font-semibold text-ink dark:text-paper">Highlights</Text>
+              {data.highlights.map((highlight) => (
+                <View
+                  key={highlight.id}
+                  className="gap-1 rounded-card border border-line p-3 dark:border-ink-soft"
+                >
+                  <Text className="text-body italic text-ink dark:text-paper">"{highlight.quote}"</Text>
+                  {highlight.note ? (
+                    <Text className="text-caption text-ink-soft dark:text-ink-faint">{highlight.note}</Text>
+                  ) : null}
+                  <Pressable onPress={() => handleRemoveHighlight(highlight.id)} className="self-start">
+                    <Text className="text-caption text-danger">Remove</Text>
+                  </Pressable>
+                </View>
+              ))}
+              <TextInput
+                value={newQuote}
+                onChangeText={setNewQuote}
+                placeholder="Quote"
+                placeholderTextColor="#A8A29E"
+                multiline
+                className="rounded-card border border-line p-3 text-body text-ink dark:border-ink-soft dark:text-paper"
+              />
+              <TextInput
+                value={newNote}
+                onChangeText={setNewNote}
+                placeholder="Note (optional)"
+                placeholderTextColor="#A8A29E"
+                multiline
+                className="rounded-card border border-line p-3 text-body text-ink dark:border-ink-soft dark:text-paper"
+              />
+              <Pressable
+                onPress={handleAddHighlight}
+                className="self-start rounded-pill bg-brand px-4 py-2"
+              >
+                <Text className="text-caption font-semibold text-white">Save highlight</Text>
+              </Pressable>
+            </View>
           </>
         )}
       </ScrollView>
