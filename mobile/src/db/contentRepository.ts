@@ -22,6 +22,7 @@ interface ContentRow {
   status: ContentStatus;
   updatedAt: string | null;
   completedAt: string | null;
+  archivedAt: string | null;
 }
 
 function rowToItem(row: ContentRow): ContentItem {
@@ -58,11 +59,12 @@ export function insertContent(url: string, contentType: ContentType): ContentIte
     status: "pending",
     updatedAt: null,
     completedAt: null,
+    archivedAt: null,
   });
 }
 
 export function listContentRows(params: ListContentParams = {}): ContentItem[] {
-  const { limit = 20, offset = 0, status, contentType } = params;
+  const { limit = 20, offset = 0, status, contentType, archived = false } = params;
   const clauses: string[] = [];
   const args: (string | number)[] = [];
   if (status) {
@@ -73,6 +75,7 @@ export function listContentRows(params: ListContentParams = {}): ContentItem[] {
     clauses.push("contentType = ?");
     args.push(contentType);
   }
+  clauses.push(archived ? "archivedAt IS NOT NULL" : "archivedAt IS NULL");
   const where = clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
   const rows = db.getAllSync<ContentRow>(
     `SELECT * FROM content ${where} ORDER BY savedAt DESC LIMIT ? OFFSET ?`,
@@ -110,14 +113,14 @@ export function updateContentRow(id: string, fields: Partial<ContentItem>): void
 
 export function upsertContentRow(item: ContentItem): void {
   db.runSync(
-    `INSERT INTO content (id, url, source, savedAt, contentType, title, description, summary, heroImage, author, extractedText, readingTime, duration, metadata, topics, status, updatedAt, completedAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `INSERT INTO content (id, url, source, savedAt, contentType, title, description, summary, heroImage, author, extractedText, readingTime, duration, metadata, topics, status, updatedAt, completedAt, archivedAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(id) DO UPDATE SET
        url=excluded.url, source=excluded.source, savedAt=excluded.savedAt, contentType=excluded.contentType,
        title=excluded.title, description=excluded.description, summary=excluded.summary, heroImage=excluded.heroImage,
        author=excluded.author, extractedText=excluded.extractedText, readingTime=excluded.readingTime,
        duration=excluded.duration, metadata=excluded.metadata, topics=excluded.topics, status=excluded.status,
-       updatedAt=excluded.updatedAt, completedAt=excluded.completedAt`,
+       updatedAt=excluded.updatedAt, completedAt=excluded.completedAt, archivedAt=excluded.archivedAt`,
     [
       item.id,
       item.url,
@@ -137,6 +140,7 @@ export function upsertContentRow(item: ContentItem): void {
       item.status,
       item.updatedAt,
       item.completedAt,
+      item.archivedAt,
     ],
   );
 }

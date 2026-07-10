@@ -1,4 +1,10 @@
-import { getAllContentRows, getContentRow, insertContent, listContentRows } from "../db/contentRepository";
+import {
+  getAllContentRows,
+  getContentRow,
+  insertContent,
+  listContentRows,
+  updateContentRow,
+} from "../db/contentRepository";
 import { processContent } from "../processing/processContent";
 
 export type ContentType =
@@ -35,6 +41,7 @@ export interface ContentItem {
   status: ContentStatus;
   updatedAt: string | null;
   completedAt: string | null;
+  archivedAt: string | null;
 }
 
 export interface CaptureContentResponse {
@@ -50,6 +57,7 @@ export interface ListContentParams {
   offset?: number;
   status?: ContentStatus;
   contentType?: ContentType;
+  archived?: boolean;
 }
 
 export async function captureContent(
@@ -74,4 +82,12 @@ export async function getContent(id: string): Promise<ContentItem> {
 
 export function getAllContent(): ContentItem[] {
   return getAllContentRows();
+}
+
+export function archiveContent(id: string): void {
+  updateContentRow(id, { archivedAt: new Date().toISOString() });
+}
+
+export function unarchiveContent(id: string): void {
+  updateContentRow(id, { archivedAt: null });
 }

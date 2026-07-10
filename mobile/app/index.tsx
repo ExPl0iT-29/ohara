@@ -1,10 +1,12 @@
 import { useRouter } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import type { ContentItem } from "../src/api/content";
+import { useQueryClient } from "@tanstack/react-query";
+
+import { archiveContent, unarchiveContent, type ContentItem } from "../src/api/content";
 import { FeedEmptyState } from "../src/components/feed/FeedEmptyState";
 import { FeedErrorState } from "../src/components/feed/FeedErrorState";
 import { FeedListItem } from "../src/components/feed/FeedListItem";
@@ -14,15 +16,30 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function FeedScreen() {
   const router = useRouter();
-  const { data, isLoading, isFetching, error, refetch } = useContentList();
+  const queryClient = useQueryClient();
+  const [archived, setArchived] = useState(false);
+  const { data, isLoading, isFetching, error, refetch } = useContentList({ archived });
   const fabScale = useSharedValue(1);
   const fabStyle = useAnimatedStyle(() => ({ transform: [{ scale: fabScale.value }] }));
 
   const handleOpenItem = useCallback((id: string) => router.push(`/content/${id}`), [router]);
   const handleOpenCapture = useCallback(() => router.push("/capture"), [router]);
+  const handleToggleArchive = useCallback(
+    (item: ContentItem) => {
+      if (item.archivedAt) {
+        unarchiveContent(item.id);
+      } else {
+        archiveContent(item.id);
+      }
+      void queryClient.invalidateQueries({ queryKey: ["content"] });
+    },
+    [queryClient],
+  );
   const renderItem = useCallback(
-    ({ item }: { item: ContentItem }) => <FeedListItem item={item} onPress={handleOpenItem} />,
-    [handleOpenItem],
+    ({ item }: { item: ContentItem }) => (
+      <FeedListItem item={item} onPress={handleOpenItem} onToggleArchive={handleToggleArchive} />
+    ),
+    [handleOpenItem, handleToggleArchive],
   );
   const keyExtractor = useCallback((item: ContentItem) => item.id, []);
 
@@ -35,6 +52,25 @@ export default function FeedScreen() {
         </Pressable>
       </View>
 
+      <View className="flex-row gap-2 px-5 pb-2">
+        <Pressable
+          className={`rounded-pill border px-4 py-1.5 ${archived ? "border-line dark:border-ink-soft" : "border-brand bg-brand"}`}
+          onPress={() => setArchived(false)}
+        >
+          <Text className={archived ? "text-caption text-ink-soft dark:text-ink-faint" : "text-caption font-semibold text-white"}>
+            Active
+          </Text>
+        </Pressable>
+        <Pressable
+          className={`rounded-pill border px-4 py-1.5 ${archived ? "border-brand bg-brand" : "border-line dark:border-ink-soft"}`}
+          onPress={() => setArchived(true)}
+        >
+          <Text className={archived ? "text-caption font-semibold text-white" : "text-caption text-ink-soft dark:text-ink-faint"}>
+            Archived
+          </Text>
+        </Pressable>
+      </View>
+
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator color="#0F766E" />
@@ -42,7 +78,13 @@ export default function FeedScreen() {
       ) : error ? (
         <FeedErrorState onRetry={() => refetch()} />
       ) : !data || data.length === 0 ? (
-        <FeedEmptyState />
+        archived ? (
+          <View className="flex-1 items-center justify-center p-8">
+            <Text className="text-center text-body text-ink-soft dark:text-ink-faint">Nothing archived yet.</Text>
+          </View>
+        ) : (
+          <FeedEmptyState />
+        )
       ) : (
         <FlatList
           data={data}
