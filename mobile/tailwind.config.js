@@ -7,6 +7,10 @@ module.exports = {
     extend: {
       colors: {
         paper: "#FAF9F6",
+        surface: {
+          DEFAULT: "#FAF9F6",
+          dark: "#161412",
+        },
         ink: {
           DEFAULT: "#1C1917",
           soft: "#57534E",

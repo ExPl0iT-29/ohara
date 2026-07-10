@@ -27,11 +27,11 @@ export default function FeedScreen() {
   const keyExtractor = useCallback((item: ContentItem) => item.id, []);
 
   return (
-    <SafeAreaView className="flex-1 bg-paper">
+    <SafeAreaView className="flex-1 bg-paper dark:bg-surface-dark">
       <View className="flex-row items-center justify-between px-5 pb-2 pt-4">
-        <Text className="text-display text-ink">Ohara</Text>
+        <Text className="text-display text-ink dark:text-paper">Ohara</Text>
         <Pressable onPress={() => router.push("/settings")}>
-          <Text className="text-caption text-ink-soft">Settings</Text>
+          <Text className="text-caption text-ink-soft dark:text-ink-faint">Settings</Text>
         </Pressable>
       </View>
 

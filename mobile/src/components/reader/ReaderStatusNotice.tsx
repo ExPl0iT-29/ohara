@@ -14,10 +14,12 @@ export function ReaderStatusNotice({ variant, url }: ReaderStatusNoticeProps) {
   return (
     <View
       className={`gap-3 rounded-card border p-4 ${
-        variant === "failed" ? "border-danger-light bg-danger-light/40" : "border-line bg-white"
+        variant === "failed"
+          ? "border-danger-light bg-danger-light/40 dark:border-danger/40 dark:bg-danger/10"
+          : "border-line bg-white dark:border-ink-soft dark:bg-surface-dark"
       }`}
     >
-      <Text className="text-body text-ink-soft">{COPY[variant]}</Text>
+      <Text className="text-body text-ink-soft dark:text-ink-faint">{COPY[variant]}</Text>
       <Pressable onPress={() => Linking.openURL(url)}>
         <Text className="text-body font-semibold text-brand">Open original ↗</Text>
       </Pressable>

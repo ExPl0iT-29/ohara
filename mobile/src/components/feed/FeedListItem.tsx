@@ -14,10 +14,10 @@ function FeedListItemBase({ item, onPress }: FeedListItemProps) {
   return (
     <Animated.View entering={FadeInDown}>
       <Pressable
-        className="gap-2 rounded-card border border-line bg-white p-4 active:opacity-70"
+        className="gap-2 rounded-card border border-line bg-white p-4 active:opacity-70 dark:border-ink-soft dark:bg-surface-dark"
         onPress={() => onPress(item.id)}
       >
-        <Text className="text-body font-semibold text-ink" numberOfLines={2}>
+        <Text className="text-body font-semibold text-ink dark:text-paper" numberOfLines={2}>
           {item.title ?? item.url}
         </Text>
         <Text className="text-caption text-ink-faint" numberOfLines={1}>
