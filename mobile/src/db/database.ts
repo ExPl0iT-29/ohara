@@ -24,3 +24,11 @@ db.execSync(`
     completedAt TEXT
   );
 `);
+
+const hasArchivedAt = db
+  .getAllSync<{ name: string }>("PRAGMA table_info(content);")
+  .some((column) => column.name === "archivedAt");
+
+if (!hasArchivedAt) {
+  db.execSync("ALTER TABLE content ADD COLUMN archivedAt TEXT;");
+}

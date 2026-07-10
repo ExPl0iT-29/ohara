@@ -1,7 +1,9 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { ScrollView, Text } from "react-native";
+import { Pressable, ScrollView, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { archiveContent, unarchiveContent } from "../../src/api/content";
 import { ReaderBody } from "../../src/components/reader/ReaderBody";
 import { ReaderHeader } from "../../src/components/reader/ReaderHeader";
 import { ReaderStatusNotice } from "../../src/components/reader/ReaderStatusNotice";
@@ -11,6 +13,17 @@ import { useContentItem } from "../../src/hooks/useContentItem";
 export default function ReaderScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data, isLoading, error } = useContentItem(id);
+  const queryClient = useQueryClient();
+
+  const handleToggleArchive = () => {
+    if (!data) return;
+    if (data.archivedAt) {
+      unarchiveContent(data.id);
+    } else {
+      archiveContent(data.id);
+    }
+    void queryClient.invalidateQueries({ queryKey: ["content"] });
+  };
 
   if (isLoading) {
     return (
@@ -43,6 +56,11 @@ export default function ReaderScreen() {
     <SafeAreaView className="flex-1 bg-paper dark:bg-surface-dark">
       <ScrollView contentContainerStyle={{ padding: 20, gap: 20 }}>
         {header}
+        <Pressable onPress={handleToggleArchive} className="self-start">
+          <Text className="text-caption font-semibold text-brand">
+            {data.archivedAt ? "Unarchive" : "Archive"}
+          </Text>
+        </Pressable>
         {(data.status === "pending" || data.status === "processing") && (
           <ReaderStatusNotice variant="preparing" url={data.url} />
         )}
