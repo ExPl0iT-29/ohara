@@ -5,6 +5,7 @@ import { Stack, useRouter } from "expo-router";
 import { useColorScheme } from "nativewind";
 import { useEffect } from "react";
 import { ShareIntentProvider, useShareIntentContext } from "expo-share-intent";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { getSetting } from "../src/db/settings";
 import { reprocessStuckContent } from "../src/processing/processContent";
@@ -48,18 +49,20 @@ export default function RootLayout() {
   };
 
   return (
-    <ShareIntentProvider>
-      <QueryClientProvider client={queryClient}>
-        <ShareIntentRedirect />
-        <Stack screenOptions={{ headerShown: false, ...headerOptions }}>
-          <Stack.Screen
-            name="capture"
-            options={{ presentation: "modal", headerShown: true, title: "Save a link", ...headerOptions }}
-          />
-          <Stack.Screen name="settings" options={{ headerShown: true, title: "Settings", ...headerOptions }} />
-          <Stack.Screen name="stats" options={{ headerShown: true, title: "Stats", ...headerOptions }} />
-        </Stack>
-      </QueryClientProvider>
-    </ShareIntentProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ShareIntentProvider>
+        <QueryClientProvider client={queryClient}>
+          <ShareIntentRedirect />
+          <Stack screenOptions={{ headerShown: false, ...headerOptions }}>
+            <Stack.Screen
+              name="capture"
+              options={{ presentation: "modal", headerShown: true, title: "Save a link", ...headerOptions }}
+            />
+            <Stack.Screen name="settings" options={{ headerShown: true, title: "Settings", ...headerOptions }} />
+            <Stack.Screen name="stats" options={{ headerShown: true, title: "Stats", ...headerOptions }} />
+          </Stack>
+        </QueryClientProvider>
+      </ShareIntentProvider>
+    </GestureHandlerRootView>
   );
 }
