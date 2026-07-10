@@ -1,5 +1,6 @@
 import {
   getAllContentRows,
+  getAllTagsAndTopics,
   getContentRow,
   insertContent,
   listContentRows,
@@ -38,6 +39,7 @@ export interface ContentItem {
   duration: number | null;
   metadata: Record<string, unknown>;
   topics: string[];
+  tags: string[];
   status: ContentStatus;
   updatedAt: string | null;
   completedAt: string | null;
@@ -58,6 +60,8 @@ export interface ListContentParams {
   status?: ContentStatus;
   contentType?: ContentType;
   archived?: boolean;
+  search?: string;
+  tagOrTopic?: string;
 }
 
 export async function captureContent(
@@ -90,4 +94,20 @@ export function archiveContent(id: string): void {
 
 export function unarchiveContent(id: string): void {
   updateContentRow(id, { archivedAt: null });
+}
+
+export function addTag(id: string, tag: string): void {
+  const item = getContentRow(id);
+  if (!item || item.tags.includes(tag)) return;
+  updateContentRow(id, { tags: [...item.tags, tag] });
+}
+
+export function removeTag(id: string, tag: string): void {
+  const item = getContentRow(id);
+  if (!item) return;
+  updateContentRow(id, { tags: item.tags.filter((t) => t !== tag) });
+}
+
+export function getAllTagsAndTopicsList(): string[] {
+  return getAllTagsAndTopics();
 }
