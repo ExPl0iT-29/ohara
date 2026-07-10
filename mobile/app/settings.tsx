@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import { useColorScheme } from "nativewind";
 import { useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
@@ -10,6 +11,7 @@ import { setSetting } from "../src/db/settings";
 const THEME_OPTIONS = ["light", "dark", "system"] as const;
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
   const { colorScheme, setColorScheme } = useColorScheme();
@@ -88,6 +90,13 @@ export default function SettingsScreen() {
           onPress={handleImport}
         >
           <Text className="text-center text-body font-semibold text-ink dark:text-paper">Import from file</Text>
+        </Pressable>
+
+        <Pressable
+          className="rounded-card border border-line bg-white p-4 active:opacity-80 dark:border-ink-soft dark:bg-surface-dark"
+          onPress={() => router.push("/stats")}
+        >
+          <Text className="text-center text-body font-semibold text-ink dark:text-paper">Library stats</Text>
         </Pressable>
       </View>
     </SafeAreaView>

@@ -130,6 +130,37 @@ export function getPresentContentTypes(): ContentType[] {
   return rows.map((row) => row.contentType);
 }
 
+export function findContentRowByUrl(url: string): ContentItem | null {
+  const row = db.getFirstSync<ContentRow>(`SELECT * FROM content WHERE url = ?`, [url]);
+  return row ? rowToItem(row) : null;
+}
+
+export interface LibraryStats {
+  total: number;
+  byStatus: Record<string, number>;
+  byContentType: Record<string, number>;
+  oldestUnread: { id: string; title: string | null; url: string; savedAt: string } | null;
+}
+
+export function getLibraryStats(): LibraryStats {
+  const total = db.getFirstSync<{ count: number }>(`SELECT COUNT(*) as count FROM content`)?.count ?? 0;
+  const statusRows = db.getAllSync<{ status: string; count: number }>(
+    `SELECT status, COUNT(*) as count FROM content GROUP BY status`,
+  );
+  const typeRows = db.getAllSync<{ contentType: string; count: number }>(
+    `SELECT contentType, COUNT(*) as count FROM content GROUP BY contentType`,
+  );
+  const oldestUnread = db.getFirstSync<{ id: string; title: string | null; url: string; savedAt: string }>(
+    `SELECT id, title, url, savedAt FROM content WHERE archivedAt IS NULL AND status != 'ready' ORDER BY savedAt ASC LIMIT 1`,
+  );
+  return {
+    total,
+    byStatus: Object.fromEntries(statusRows.map((r) => [r.status, r.count])),
+    byContentType: Object.fromEntries(typeRows.map((r) => [r.contentType, r.count])),
+    oldestUnread: oldestUnread ?? null,
+  };
+}
+
 export function updateContentRow(id: string, fields: Partial<ContentItem>): void {
   const keys = Object.keys(fields) as (keyof ContentItem)[];
   if (keys.length === 0) return;

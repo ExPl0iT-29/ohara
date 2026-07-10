@@ -1,11 +1,14 @@
 import {
+  findContentRowByUrl,
   getAllContentRows,
   getAllTagsAndTopics,
   getContentRow,
+  getLibraryStats,
   getPresentContentTypes,
   insertContent,
   listContentRows,
   updateContentRow,
+  type LibraryStats,
 } from "../db/contentRepository";
 import * as Crypto from "expo-crypto";
 
@@ -148,4 +151,16 @@ export function removeHighlight(id: string, highlightId: string): void {
   const item = getContentRow(id);
   if (!item) return;
   updateContentRow(id, { highlights: item.highlights.filter((h) => h.id !== highlightId) });
+}
+
+export function findByUrl(url: string): ContentItem | null {
+  return findContentRowByUrl(url);
+}
+
+export function getLibraryStatsSummary(): LibraryStats {
+  return getLibraryStats();
+}
+
+export function retryContent(id: string): void {
+  void processContent(id);
 }
