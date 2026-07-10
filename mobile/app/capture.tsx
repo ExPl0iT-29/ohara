@@ -35,10 +35,10 @@ export default function CaptureScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-paper">
+    <SafeAreaView className="flex-1 bg-paper dark:bg-surface-dark">
       <ScrollView contentContainerStyle={{ padding: 20, gap: 20 }}>
         <TextInput
-          className="rounded-card border border-line bg-white p-4 text-body text-ink"
+          className="rounded-card border border-line bg-white p-4 text-body text-ink dark:border-ink-soft dark:bg-surface-dark dark:text-paper"
           placeholder="https://example.com/article"
           placeholderTextColor="#A8A29E"
           autoCapitalize="none"
@@ -54,10 +54,18 @@ export default function CaptureScreen() {
               key={type}
               onPress={() => setContentType(contentType === type ? undefined : type)}
               className={`rounded-pill border px-3 py-1.5 ${
-                contentType === type ? "border-brand bg-brand" : "border-line bg-white"
+                contentType === type
+                  ? "border-brand bg-brand"
+                  : "border-line bg-white dark:border-ink-soft dark:bg-surface-dark"
               }`}
             >
-              <Text className={contentType === type ? "text-caption text-white" : "text-caption text-ink-soft"}>
+              <Text
+                className={
+                  contentType === type
+                    ? "text-caption text-white"
+                    : "text-caption text-ink-soft dark:text-ink-faint"
+                }
+              >
                 {type}
               </Text>
             </Pressable>

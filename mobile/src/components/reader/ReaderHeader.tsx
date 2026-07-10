@@ -36,7 +36,7 @@ export function ReaderHeader({
           />
         </Animated.View>
       )}
-      <Text className="text-display text-ink">{title ?? url}</Text>
+      <Text className="text-display text-ink dark:text-paper">{title ?? url}</Text>
       {byline.length > 0 && <Text className="text-caption text-ink-faint">{byline}</Text>}
     </View>
   );

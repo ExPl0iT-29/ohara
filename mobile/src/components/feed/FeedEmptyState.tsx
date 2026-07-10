@@ -7,8 +7,8 @@ export function FeedEmptyState() {
   return (
     <View className="flex-1 items-center justify-center gap-3 p-8">
       <View className="mb-2 h-14 w-14 rounded-full bg-brand-light" />
-      <Text className="text-center text-title text-ink">Nothing saved yet</Text>
-      <Text className="text-center text-body text-ink-soft">
+      <Text className="text-center text-title text-ink dark:text-paper">Nothing saved yet</Text>
+      <Text className="text-center text-body text-ink-soft dark:text-ink-faint">
         Save your first link to start reading.
       </Text>
       <Pressable

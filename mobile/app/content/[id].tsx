@@ -14,15 +14,15 @@ export default function ReaderScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-paper">
-        <Text className="p-5 text-body text-ink-soft">Loading...</Text>
+      <SafeAreaView className="flex-1 bg-paper dark:bg-surface-dark">
+        <Text className="p-5 text-body text-ink-soft dark:text-ink-faint">Loading...</Text>
       </SafeAreaView>
     );
   }
 
   if (error || !data) {
     return (
-      <SafeAreaView className="flex-1 bg-paper">
+      <SafeAreaView className="flex-1 bg-paper dark:bg-surface-dark">
         <Text className="p-5 text-body text-danger">Not found</Text>
       </SafeAreaView>
     );
@@ -40,7 +40,7 @@ export default function ReaderScreen() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-paper">
+    <SafeAreaView className="flex-1 bg-paper dark:bg-surface-dark">
       <ScrollView contentContainerStyle={{ padding: 20, gap: 20 }}>
         {header}
         {(data.status === "pending" || data.status === "processing") && (
