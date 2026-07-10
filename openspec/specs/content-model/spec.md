@@ -10,7 +10,7 @@ The system SHALL represent every saved item, regardless of source (blog, website
 
 #### Scenario: Content from any supported source uses the same shape
 - **WHEN** a Content entity is constructed for any supported source type
-- **THEN** it exposes the same core fields: id, url, contentType, title, description, summary, heroImage, author, source, extractedText, readingTime, duration, metadata, topics, status, savedAt, updatedAt, completedAt
+- **THEN** it exposes the same core fields: id, url, contentType, title, description, summary, heroImage, author, source, extractedText, readingTime, duration, metadata, topics, status, savedAt, updatedAt, completedAt, archivedAt
 
 ### Requirement: Content Type Is A Closed Set
 The system SHALL restrict `contentType` to a defined enumeration matching the supported content types in the product specification.
@@ -49,12 +49,16 @@ The system SHALL NOT store a project identifier or project relationship on the C
 - **THEN** no field references a project, directly or via foreign key
 
 ### Requirement: Content Persistence
-The system SHALL persist Content entities in an on-device SQLite table with a schema matching the domain entity's fields, with `metadata` and `topics` serialized as JSON text columns.
+The system SHALL persist Content entities in an on-device SQLite table with a schema matching the domain entity's fields, with `metadata` and `topics` serialized as JSON text columns and `archivedAt` stored as a nullable timestamp column.
 
 #### Scenario: Content entity round-trips through persistence
 - **WHEN** a Content entity is saved to the on-device SQLite database and then retrieved by id
-- **THEN** the retrieved entity has identical field values to the entity that was saved
+- **THEN** the retrieved entity has identical field values to the entity that was saved, including `archivedAt`
 
 #### Scenario: Library is portable across devices
 - **WHEN** a user exports their library
-- **THEN** the system SHALL produce a JSON file containing every Content entity, importable on another device to reconstruct the same library
+- **THEN** the system SHALL produce a JSON file containing every Content entity, including each item's `archivedAt` value, importable on another device to reconstruct the same library
+
+#### Scenario: Existing installs gain the archive column
+- **WHEN** the app launches on a device with a pre-existing `content` table that lacks an `archivedAt` column
+- **THEN** the system SHALL add the column without data loss to any existing row
