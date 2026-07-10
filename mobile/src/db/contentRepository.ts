@@ -24,6 +24,8 @@ interface ContentRow {
   updatedAt: string | null;
   completedAt: string | null;
   archivedAt: string | null;
+  scrollProgress: number | null;
+  highlights: string;
 }
 
 function rowToItem(row: ContentRow): ContentItem {
@@ -32,6 +34,7 @@ function rowToItem(row: ContentRow): ContentItem {
     metadata: JSON.parse(row.metadata),
     topics: JSON.parse(row.topics),
     tags: JSON.parse(row.tags),
+    highlights: JSON.parse(row.highlights),
   };
 }
 
@@ -63,6 +66,8 @@ export function insertContent(url: string, contentType: ContentType): ContentIte
     updatedAt: null,
     completedAt: null,
     archivedAt: null,
+    scrollProgress: null,
+    highlights: "[]",
   });
 }
 
@@ -132,7 +137,7 @@ export function updateContentRow(id: string, fields: Partial<ContentItem>): void
   const assignments = keys.map((key) => `${key} = ?`).join(", ");
   const values = keys.map((key) => {
     const value = fields[key];
-    if (key === "metadata" || key === "topics" || key === "tags") return JSON.stringify(value);
+    if (key === "metadata" || key === "topics" || key === "tags" || key === "highlights") return JSON.stringify(value);
     return value as string | number | null;
   });
 
@@ -145,14 +150,15 @@ export function updateContentRow(id: string, fields: Partial<ContentItem>): void
 
 export function upsertContentRow(item: ContentItem): void {
   db.runSync(
-    `INSERT INTO content (id, url, source, savedAt, contentType, title, description, summary, heroImage, author, extractedText, readingTime, duration, metadata, topics, tags, status, updatedAt, completedAt, archivedAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `INSERT INTO content (id, url, source, savedAt, contentType, title, description, summary, heroImage, author, extractedText, readingTime, duration, metadata, topics, tags, status, updatedAt, completedAt, archivedAt, scrollProgress, highlights)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(id) DO UPDATE SET
        url=excluded.url, source=excluded.source, savedAt=excluded.savedAt, contentType=excluded.contentType,
        title=excluded.title, description=excluded.description, summary=excluded.summary, heroImage=excluded.heroImage,
        author=excluded.author, extractedText=excluded.extractedText, readingTime=excluded.readingTime,
        duration=excluded.duration, metadata=excluded.metadata, topics=excluded.topics, tags=excluded.tags, status=excluded.status,
-       updatedAt=excluded.updatedAt, completedAt=excluded.completedAt, archivedAt=excluded.archivedAt`,
+       updatedAt=excluded.updatedAt, completedAt=excluded.completedAt, archivedAt=excluded.archivedAt,
+       scrollProgress=excluded.scrollProgress, highlights=excluded.highlights`,
     [
       item.id,
       item.url,
@@ -174,6 +180,8 @@ export function upsertContentRow(item: ContentItem): void {
       item.updatedAt,
       item.completedAt,
       item.archivedAt,
+      item.scrollProgress,
+      JSON.stringify(item.highlights),
     ],
   );
 }
