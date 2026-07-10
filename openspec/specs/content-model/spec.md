@@ -10,7 +10,7 @@ The system SHALL represent every saved item, regardless of source (blog, website
 
 #### Scenario: Content from any supported source uses the same shape
 - **WHEN** a Content entity is constructed for any supported source type
-- **THEN** it exposes the same core fields: id, url, contentType, title, description, summary, heroImage, author, source, extractedText, readingTime, duration, metadata, topics, tags, status, savedAt, updatedAt, completedAt, archivedAt
+- **THEN** it exposes the same core fields: id, url, contentType, title, description, summary, heroImage, author, source, extractedText, readingTime, duration, metadata, topics, tags, status, savedAt, updatedAt, completedAt, archivedAt, scrollProgress, highlights
 
 ### Requirement: Content Type Is A Closed Set
 The system SHALL restrict `contentType` to a defined enumeration matching the supported content types in the product specification.
@@ -49,15 +49,19 @@ The system SHALL NOT store a project identifier or project relationship on the C
 - **THEN** no field references a project, directly or via foreign key
 
 ### Requirement: Content Persistence
-The system SHALL persist Content entities in an on-device SQLite table with a schema matching the domain entity's fields, with `metadata`, `topics`, and `tags` serialized as JSON text columns and `archivedAt` stored as a nullable timestamp column.
+The system SHALL persist Content entities in an on-device SQLite table with a schema matching the domain entity's fields, with `metadata`, `topics`, `tags`, and `highlights` serialized as JSON text columns, `archivedAt` stored as a nullable timestamp column, and `scrollProgress` stored as a nullable float column.
 
 #### Scenario: Content entity round-trips through persistence
 - **WHEN** a Content entity is saved to the on-device SQLite database and then retrieved by id
-- **THEN** the retrieved entity has identical field values to the entity that was saved, including `archivedAt` and `tags`
+- **THEN** the retrieved entity has identical field values to the entity that was saved, including `archivedAt`, `tags`, `scrollProgress`, and `highlights`
 
 #### Scenario: Existing installs gain the tags column
 - **WHEN** the app launches on a device with a pre-existing `content` table that lacks a `tags` column
 - **THEN** the system SHALL add the column without data loss to any existing row
+
+#### Scenario: Existing installs gain the reading-progress and highlights columns
+- **WHEN** the app launches on a device with a pre-existing `content` table that lacks `scrollProgress` or `highlights` columns
+- **THEN** the system SHALL add the missing columns without data loss to any existing row
 
 #### Scenario: Library is portable across devices
 - **WHEN** a user exports their library
