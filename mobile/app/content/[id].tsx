@@ -1,9 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { Pressable, ScrollView, Text } from "react-native";
+import { useState } from "react";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { archiveContent, unarchiveContent } from "../../src/api/content";
+import { addTag, archiveContent, removeTag, unarchiveContent } from "../../src/api/content";
 import { ReaderBody } from "../../src/components/reader/ReaderBody";
 import { ReaderHeader } from "../../src/components/reader/ReaderHeader";
 import { ReaderStatusNotice } from "../../src/components/reader/ReaderStatusNotice";
@@ -14,6 +15,9 @@ export default function ReaderScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data, isLoading, error } = useContentItem(id);
   const queryClient = useQueryClient();
+  const [newTag, setNewTag] = useState("");
+
+  const invalidate = () => void queryClient.invalidateQueries({ queryKey: ["content"] });
 
   const handleToggleArchive = () => {
     if (!data) return;
@@ -22,7 +26,20 @@ export default function ReaderScreen() {
     } else {
       archiveContent(data.id);
     }
-    void queryClient.invalidateQueries({ queryKey: ["content"] });
+    invalidate();
+  };
+
+  const handleAddTag = () => {
+    if (!data || !newTag.trim()) return;
+    addTag(data.id, newTag.trim());
+    setNewTag("");
+    invalidate();
+  };
+
+  const handleRemoveTag = (tag: string) => {
+    if (!data) return;
+    removeTag(data.id, tag);
+    invalidate();
   };
 
   if (isLoading) {
@@ -61,6 +78,34 @@ export default function ReaderScreen() {
             {data.archivedAt ? "Unarchive" : "Archive"}
           </Text>
         </Pressable>
+
+        <View className="gap-2">
+          <View className="flex-row flex-wrap gap-2">
+            {data.tags.map((tag) => (
+              <Pressable
+                key={tag}
+                onPress={() => handleRemoveTag(tag)}
+                className="rounded-pill border border-line px-3 py-1 dark:border-ink-soft"
+              >
+                <Text className="text-caption text-ink-soft dark:text-ink-faint">{tag} ×</Text>
+              </Pressable>
+            ))}
+          </View>
+          <View className="flex-row gap-2">
+            <TextInput
+              value={newTag}
+              onChangeText={setNewTag}
+              onSubmitEditing={handleAddTag}
+              placeholder="Add tag"
+              placeholderTextColor="#A8A29E"
+              className="flex-1 rounded-pill border border-line px-3 py-1.5 text-caption text-ink dark:border-ink-soft dark:text-paper"
+            />
+            <Pressable onPress={handleAddTag} className="justify-center px-2">
+              <Text className="text-caption font-semibold text-brand">Add</Text>
+            </Pressable>
+          </View>
+        </View>
+
         {(data.status === "pending" || data.status === "processing") && (
           <ReaderStatusNotice variant="preparing" url={data.url} />
         )}

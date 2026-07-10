@@ -25,10 +25,11 @@ db.execSync(`
   );
 `);
 
-const hasArchivedAt = db
-  .getAllSync<{ name: string }>("PRAGMA table_info(content);")
-  .some((column) => column.name === "archivedAt");
+const columns = db.getAllSync<{ name: string }>("PRAGMA table_info(content);").map((c) => c.name);
 
-if (!hasArchivedAt) {
+if (!columns.includes("archivedAt")) {
   db.execSync("ALTER TABLE content ADD COLUMN archivedAt TEXT;");
+}
+if (!columns.includes("tags")) {
+  db.execSync("ALTER TABLE content ADD COLUMN tags TEXT NOT NULL DEFAULT '[]';");
 }

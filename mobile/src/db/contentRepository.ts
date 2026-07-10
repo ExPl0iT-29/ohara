@@ -19,6 +19,7 @@ interface ContentRow {
   duration: number | null;
   metadata: string;
   topics: string;
+  tags: string;
   status: ContentStatus;
   updatedAt: string | null;
   completedAt: string | null;
@@ -30,6 +31,7 @@ function rowToItem(row: ContentRow): ContentItem {
     ...row,
     metadata: JSON.parse(row.metadata),
     topics: JSON.parse(row.topics),
+    tags: JSON.parse(row.tags),
   };
 }
 
@@ -56,6 +58,7 @@ export function insertContent(url: string, contentType: ContentType): ContentIte
     duration: null,
     metadata: "{}",
     topics: "[]",
+    tags: "[]",
     status: "pending",
     updatedAt: null,
     completedAt: null,
@@ -64,7 +67,7 @@ export function insertContent(url: string, contentType: ContentType): ContentIte
 }
 
 export function listContentRows(params: ListContentParams = {}): ContentItem[] {
-  const { limit = 20, offset = 0, status, contentType, archived = false } = params;
+  const { limit = 20, offset = 0, status, contentType, archived = false, search, tagOrTopic } = params;
   const clauses: string[] = [];
   const args: (string | number)[] = [];
   if (status) {
@@ -76,6 +79,16 @@ export function listContentRows(params: ListContentParams = {}): ContentItem[] {
     args.push(contentType);
   }
   clauses.push(archived ? "archivedAt IS NOT NULL" : "archivedAt IS NULL");
+  if (search) {
+    clauses.push("(title LIKE ? OR summary LIKE ? OR extractedText LIKE ?)");
+    const needle = `%${search}%`;
+    args.push(needle, needle, needle);
+  }
+  if (tagOrTopic) {
+    clauses.push("(tags LIKE ? OR topics LIKE ?)");
+    const needle = `%"${tagOrTopic}"%`;
+    args.push(needle, needle);
+  }
   const where = clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
   const rows = db.getAllSync<ContentRow>(
     `SELECT * FROM content ${where} ORDER BY savedAt DESC LIMIT ? OFFSET ?`,
@@ -93,6 +106,18 @@ export function getAllContentRows(): ContentItem[] {
   return db.getAllSync<ContentRow>(`SELECT * FROM content ORDER BY savedAt DESC`).map(rowToItem);
 }
 
+export function getAllTagsAndTopics(): string[] {
+  const rows = db.getAllSync<{ tags: string; topics: string }>(
+    `SELECT tags, topics FROM content WHERE archivedAt IS NULL`,
+  );
+  const values = new Set<string>();
+  for (const row of rows) {
+    for (const value of JSON.parse(row.tags) as string[]) values.add(value);
+    for (const value of JSON.parse(row.topics) as string[]) values.add(value);
+  }
+  return [...values].sort();
+}
+
 export function updateContentRow(id: string, fields: Partial<ContentItem>): void {
   const keys = Object.keys(fields) as (keyof ContentItem)[];
   if (keys.length === 0) return;
@@ -100,7 +125,7 @@ export function updateContentRow(id: string, fields: Partial<ContentItem>): void
   const assignments = keys.map((key) => `${key} = ?`).join(", ");
   const values = keys.map((key) => {
     const value = fields[key];
-    if (key === "metadata" || key === "topics") return JSON.stringify(value);
+    if (key === "metadata" || key === "topics" || key === "tags") return JSON.stringify(value);
     return value as string | number | null;
   });
 
@@ -113,13 +138,13 @@ export function updateContentRow(id: string, fields: Partial<ContentItem>): void
 
 export function upsertContentRow(item: ContentItem): void {
   db.runSync(
-    `INSERT INTO content (id, url, source, savedAt, contentType, title, description, summary, heroImage, author, extractedText, readingTime, duration, metadata, topics, status, updatedAt, completedAt, archivedAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `INSERT INTO content (id, url, source, savedAt, contentType, title, description, summary, heroImage, author, extractedText, readingTime, duration, metadata, topics, tags, status, updatedAt, completedAt, archivedAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(id) DO UPDATE SET
        url=excluded.url, source=excluded.source, savedAt=excluded.savedAt, contentType=excluded.contentType,
        title=excluded.title, description=excluded.description, summary=excluded.summary, heroImage=excluded.heroImage,
        author=excluded.author, extractedText=excluded.extractedText, readingTime=excluded.readingTime,
-       duration=excluded.duration, metadata=excluded.metadata, topics=excluded.topics, status=excluded.status,
+       duration=excluded.duration, metadata=excluded.metadata, topics=excluded.topics, tags=excluded.tags, status=excluded.status,
        updatedAt=excluded.updatedAt, completedAt=excluded.completedAt, archivedAt=excluded.archivedAt`,
     [
       item.id,
@@ -137,6 +162,7 @@ export function upsertContentRow(item: ContentItem): void {
       item.duration,
       JSON.stringify(item.metadata),
       JSON.stringify(item.topics),
+      JSON.stringify(item.tags),
       item.status,
       item.updatedAt,
       item.completedAt,

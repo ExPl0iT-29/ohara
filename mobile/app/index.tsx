@@ -1,12 +1,12 @@
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useQueryClient } from "@tanstack/react-query";
 
-import { archiveContent, unarchiveContent, type ContentItem } from "../src/api/content";
+import { archiveContent, getAllTagsAndTopicsList, unarchiveContent, type ContentItem } from "../src/api/content";
 import { FeedEmptyState } from "../src/components/feed/FeedEmptyState";
 import { FeedErrorState } from "../src/components/feed/FeedErrorState";
 import { FeedListItem } from "../src/components/feed/FeedListItem";
@@ -18,7 +18,14 @@ export default function FeedScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [archived, setArchived] = useState(false);
-  const { data, isLoading, isFetching, error, refetch } = useContentList({ archived });
+  const [search, setSearch] = useState("");
+  const [tagOrTopic, setTagOrTopic] = useState<string | null>(null);
+  const { data, isLoading, isFetching, error, refetch } = useContentList({
+    archived,
+    search: search || undefined,
+    tagOrTopic: tagOrTopic ?? undefined,
+  });
+  const tagChips = useMemo(() => getAllTagsAndTopicsList(), [data]);
   const fabScale = useSharedValue(1);
   const fabStyle = useAnimatedStyle(() => ({ transform: [{ scale: fabScale.value }] }));
 
@@ -70,6 +77,47 @@ export default function FeedScreen() {
           </Text>
         </Pressable>
       </View>
+
+      <View className="px-5 pb-2">
+        <TextInput
+          value={search}
+          onChangeText={setSearch}
+          placeholder="Search your library"
+          placeholderTextColor="#A8A29E"
+          className="rounded-pill border border-line px-4 py-2 text-body text-ink dark:border-ink-soft dark:text-paper"
+        />
+      </View>
+
+      {tagChips.length > 0 && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ flexGrow: 0, height: 40 }}
+          className="px-5 pb-2"
+          contentContainerStyle={{ gap: 8, alignItems: "center" }}
+        >
+          {tagChips.map((chip) => {
+            const selected = tagOrTopic === chip;
+            return (
+              <Pressable
+                key={chip}
+                className={`rounded-pill border px-3 py-1 ${selected ? "border-brand bg-brand" : "border-line dark:border-ink-soft"}`}
+                onPress={() => setTagOrTopic(selected ? null : chip)}
+              >
+                <Text
+                  className={
+                    selected
+                      ? "text-caption font-semibold text-white"
+                      : "text-caption text-ink-soft dark:text-ink-faint"
+                  }
+                >
+                  {chip}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      )}
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
