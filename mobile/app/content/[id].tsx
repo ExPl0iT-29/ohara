@@ -18,6 +18,7 @@ import {
   archiveContent,
   removeHighlight,
   removeTag,
+  retryContent,
   saveScrollProgress,
   unarchiveContent,
 } from "../../src/api/content";
@@ -39,6 +40,12 @@ export default function ReaderScreen() {
   const hasRestoredRef = useRef(false);
 
   const invalidate = () => void queryClient.invalidateQueries({ queryKey: ["content"] });
+
+  const handleRetry = () => {
+    if (!data) return;
+    retryContent(data.id);
+    invalidate();
+  };
 
   const handleContentSizeChange = (_width: number, height: number) => {
     contentHeightRef.current = height;
@@ -165,7 +172,9 @@ export default function ReaderScreen() {
         {(data.status === "pending" || data.status === "processing") && (
           <ReaderStatusNotice variant="preparing" url={data.url} />
         )}
-        {data.status === "failed" && <ReaderStatusNotice variant="failed" url={data.url} />}
+        {data.status === "failed" && (
+          <ReaderStatusNotice variant="failed" url={data.url} onRetry={handleRetry} />
+        )}
         {data.status === "ready" && (
           <>
             <ReaderSummary summary={data.summary} />

@@ -3,6 +3,7 @@ import { Linking, Pressable, Text, View } from "react-native";
 interface ReaderStatusNoticeProps {
   variant: "preparing" | "failed";
   url: string;
+  onRetry?: () => void;
 }
 
 const COPY = {
@@ -10,7 +11,7 @@ const COPY = {
   failed: "This item couldn't be fully processed. You can still open the original.",
 };
 
-export function ReaderStatusNotice({ variant, url }: ReaderStatusNoticeProps) {
+export function ReaderStatusNotice({ variant, url, onRetry }: ReaderStatusNoticeProps) {
   return (
     <View
       className={`gap-3 rounded-card border p-4 ${
@@ -23,6 +24,11 @@ export function ReaderStatusNotice({ variant, url }: ReaderStatusNoticeProps) {
       <Pressable onPress={() => Linking.openURL(url)}>
         <Text className="text-body font-semibold text-brand">Open original ↗</Text>
       </Pressable>
+      {variant === "failed" && onRetry && (
+        <Pressable onPress={onRetry}>
+          <Text className="text-body font-semibold text-brand">Retry</Text>
+        </Pressable>
+      )}
     </View>
   );
 }

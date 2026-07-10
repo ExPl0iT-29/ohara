@@ -57,6 +57,7 @@ export default function RootLayout() {
             options={{ presentation: "modal", headerShown: true, title: "Save a link", ...headerOptions }}
           />
           <Stack.Screen name="settings" options={{ headerShown: true, title: "Settings", ...headerOptions }} />
+          <Stack.Screen name="stats" options={{ headerShown: true, title: "Stats", ...headerOptions }} />
         </Stack>
       </QueryClientProvider>
     </ShareIntentProvider>
