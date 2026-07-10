@@ -118,6 +118,13 @@ export function getAllTagsAndTopics(): string[] {
   return [...values].sort();
 }
 
+export function getPresentContentTypes(): ContentType[] {
+  const rows = db.getAllSync<{ contentType: ContentType }>(
+    `SELECT DISTINCT contentType FROM content WHERE archivedAt IS NULL ORDER BY contentType`,
+  );
+  return rows.map((row) => row.contentType);
+}
+
 export function updateContentRow(id: string, fields: Partial<ContentItem>): void {
   const keys = Object.keys(fields) as (keyof ContentItem)[];
   if (keys.length === 0) return;

@@ -2,6 +2,7 @@ import {
   getAllContentRows,
   getAllTagsAndTopics,
   getContentRow,
+  getPresentContentTypes,
   insertContent,
   listContentRows,
   updateContentRow,
@@ -110,4 +111,8 @@ export function removeTag(id: string, tag: string): void {
 
 export function getAllTagsAndTopicsList(): string[] {
   return getAllTagsAndTopics();
+}
+
+export function getPresentContentTypesList(): ContentType[] {
+  return getPresentContentTypes();
 }

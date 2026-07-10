@@ -6,7 +6,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useQueryClient } from "@tanstack/react-query";
 
-import { archiveContent, getAllTagsAndTopicsList, unarchiveContent, type ContentItem } from "../src/api/content";
+import {
+  archiveContent,
+  getAllTagsAndTopicsList,
+  getPresentContentTypesList,
+  unarchiveContent,
+  type ContentItem,
+  type ContentType,
+} from "../src/api/content";
+import { CONTENT_TYPE_LABELS } from "../src/constants/contentTypeLabels";
 import { FeedEmptyState } from "../src/components/feed/FeedEmptyState";
 import { FeedErrorState } from "../src/components/feed/FeedErrorState";
 import { FeedListItem } from "../src/components/feed/FeedListItem";
@@ -20,12 +28,15 @@ export default function FeedScreen() {
   const [archived, setArchived] = useState(false);
   const [search, setSearch] = useState("");
   const [tagOrTopic, setTagOrTopic] = useState<string | null>(null);
+  const [contentType, setContentType] = useState<ContentType | null>(null);
   const { data, isLoading, isFetching, error, refetch } = useContentList({
     archived,
     search: search || undefined,
     tagOrTopic: tagOrTopic ?? undefined,
+    contentType: contentType ?? undefined,
   });
   const tagChips = useMemo(() => getAllTagsAndTopicsList(), [data]);
+  const typeChips = useMemo(() => getPresentContentTypesList(), [data]);
   const fabScale = useSharedValue(1);
   const fabStyle = useAnimatedStyle(() => ({ transform: [{ scale: fabScale.value }] }));
 
@@ -88,7 +99,7 @@ export default function FeedScreen() {
         />
       </View>
 
-      {tagChips.length > 0 && (
+      {(typeChips.length > 0 || tagChips.length > 0) && (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -96,6 +107,26 @@ export default function FeedScreen() {
           className="px-5 pb-2"
           contentContainerStyle={{ gap: 8, alignItems: "center" }}
         >
+          {typeChips.map((type) => {
+            const selected = contentType === type;
+            return (
+              <Pressable
+                key={`type-${type}`}
+                className={`rounded-pill border px-3 py-1 ${selected ? "border-brand bg-brand" : "border-line dark:border-ink-soft"}`}
+                onPress={() => setContentType(selected ? null : type)}
+              >
+                <Text
+                  className={
+                    selected
+                      ? "text-caption font-semibold text-white"
+                      : "text-caption text-ink-soft dark:text-ink-faint"
+                  }
+                >
+                  {CONTENT_TYPE_LABELS[type]}
+                </Text>
+              </Pressable>
+            );
+          })}
           {tagChips.map((chip) => {
             const selected = tagOrTopic === chip;
             return (
