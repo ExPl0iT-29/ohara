@@ -1,6 +1,20 @@
+import { getSetting } from "../db/settings";
+
 export interface EnrichmentResult {
   summary: string;
   topics: string[];
+}
+
+function resolveProvider(): string {
+  return getSetting("aiProvider") || process.env.EXPO_PUBLIC_AI_PROVIDER || "gemini";
+}
+
+function resolveApiKey(provider: string): string | null {
+  const fromSettings = getSetting("aiApiKey");
+  if (fromSettings) return fromSettings;
+  if (provider === "openai") return process.env.EXPO_PUBLIC_OPENAI_API_KEY ?? null;
+  if (provider === "gemini") return process.env.EXPO_PUBLIC_GEMINI_API_KEY ?? null;
+  return null;
 }
 
 const PROMPT = (text: string) =>
@@ -49,14 +63,12 @@ async function enrichWithGemini(text: string, apiKey: string): Promise<Enrichmen
 }
 
 export async function enrichContent(text: string): Promise<EnrichmentResult | null> {
-  const provider = process.env.EXPO_PUBLIC_AI_PROVIDER ?? "gemini";
+  const provider = resolveProvider();
+  const apiKey = resolveApiKey(provider);
+  if (!apiKey) return null;
   try {
-    if (provider === "openai" && process.env.EXPO_PUBLIC_OPENAI_API_KEY) {
-      return await enrichWithOpenAI(text, process.env.EXPO_PUBLIC_OPENAI_API_KEY);
-    }
-    if (provider === "gemini" && process.env.EXPO_PUBLIC_GEMINI_API_KEY) {
-      return await enrichWithGemini(text, process.env.EXPO_PUBLIC_GEMINI_API_KEY);
-    }
+    if (provider === "openai") return await enrichWithOpenAI(text, apiKey);
+    if (provider === "gemini") return await enrichWithGemini(text, apiKey);
   } catch {
     return null;
   }
