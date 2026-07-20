@@ -39,3 +39,6 @@ if (!columns.includes("scrollProgress")) {
 if (!columns.includes("highlights")) {
   db.execSync("ALTER TABLE content ADD COLUMN highlights TEXT NOT NULL DEFAULT '[]';");
 }
+if (!columns.includes("isStub")) {
+  db.execSync("ALTER TABLE content ADD COLUMN isStub INTEGER NOT NULL DEFAULT 0;");
+}

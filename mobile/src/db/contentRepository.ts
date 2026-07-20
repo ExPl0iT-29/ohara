@@ -26,6 +26,7 @@ interface ContentRow {
   archivedAt: string | null;
   scrollProgress: number | null;
   highlights: string;
+  isStub: number;
 }
 
 function rowToItem(row: ContentRow): ContentItem {
@@ -35,6 +36,7 @@ function rowToItem(row: ContentRow): ContentItem {
     topics: JSON.parse(row.topics),
     tags: JSON.parse(row.tags),
     highlights: JSON.parse(row.highlights),
+    isStub: Boolean(row.isStub),
   };
 }
 
@@ -68,6 +70,7 @@ export function insertContent(url: string, contentType: ContentType): ContentIte
     archivedAt: null,
     scrollProgress: null,
     highlights: "[]",
+    isStub: 0,
   });
 }
 
@@ -169,6 +172,7 @@ export function updateContentRow(id: string, fields: Partial<ContentItem>): void
   const values = keys.map((key) => {
     const value = fields[key];
     if (key === "metadata" || key === "topics" || key === "tags" || key === "highlights") return JSON.stringify(value);
+    if (key === "isStub") return value ? 1 : 0;
     return value as string | number | null;
   });
 
