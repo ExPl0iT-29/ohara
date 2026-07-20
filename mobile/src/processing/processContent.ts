@@ -1,11 +1,13 @@
 import { enrichContent } from "../ai/enrich";
 import { extractArticle } from "../extraction/extractArticle";
+import { extractGoogleDoc, matchGoogleDocId } from "../extraction/extractGoogleDoc";
 import { extractYoutube } from "../extraction/extractYoutube";
 import { computeReadingTime } from "../extraction/readingTime";
 import { getContentRow, updateContentRow } from "../db/contentRepository";
 import type { ContentType } from "../api/content";
 
-function getExtractor(contentType: ContentType) {
+function getExtractor(url: string, contentType: ContentType) {
+  if (matchGoogleDocId(url)) return extractGoogleDoc;
   return contentType === "youtube" ? extractYoutube : extractArticle;
 }
 
@@ -16,7 +18,7 @@ export async function processContent(id: string): Promise<void> {
   updateContentRow(id, { status: "processing" });
 
   try {
-    const extractor = getExtractor(item.contentType);
+    const extractor = getExtractor(item.url, item.contentType);
     const result = await extractor(item.url);
 
     updateContentRow(id, {
