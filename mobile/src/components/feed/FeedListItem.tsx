@@ -48,38 +48,52 @@ function FeedListItemBase({ item, onPress, onToggleArchive }: FeedListItemProps)
 
   return (
     <Animated.View entering={FadeInDown}>
-      <GestureDetector gesture={pan}>
-        <Animated.View style={animatedStyle}>
-          <Pressable
-            className="gap-2 rounded-card border border-line bg-white p-4 active:opacity-70 dark:border-ink-soft dark:bg-surface-dark"
-            onPress={() => onPress(item.id)}
-          >
-            <Text className="text-body font-semibold text-ink dark:text-paper" numberOfLines={2}>
-              {item.title ?? item.url}
-            </Text>
-            <Text className="text-caption text-ink-faint" numberOfLines={1}>
-              {item.url}
-            </Text>
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center gap-2">
-                <View className="self-start rounded-pill bg-line/60 px-2 py-0.5 dark:bg-ink-soft/40">
-                  <Text className="text-caption font-medium text-ink-soft dark:text-ink-faint">
-                    {CONTENT_TYPE_LABELS[item.contentType]}
-                  </Text>
+      <View style={{ position: "relative" }}>
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            top: 4,
+            left: 4,
+            right: -4,
+            bottom: -4,
+            backgroundColor: "#1C1917",
+            borderRadius: 16,
+          }}
+        />
+        <GestureDetector gesture={pan}>
+          <Animated.View style={animatedStyle}>
+            <Pressable
+              className="gap-2 rounded-card border-3 border-ink bg-paper p-4 active:opacity-90 dark:bg-surface-dark"
+              onPress={() => onPress(item.id)}
+            >
+              <Text className="text-body font-bold text-ink dark:text-paper" numberOfLines={2}>
+                {item.title ?? item.url}
+              </Text>
+              <Text className="text-caption text-ink-faint" numberOfLines={1}>
+                {item.url}
+              </Text>
+              <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center gap-2">
+                  <View className="self-start rounded-pill border-2 border-ink bg-accent-yellow/50 px-2 py-0.5">
+                    <Text className="text-caption font-bold text-ink">
+                      {CONTENT_TYPE_LABELS[item.contentType]}
+                    </Text>
+                  </View>
+                  <FeedStatusBadge status={item.status} />
                 </View>
-                <FeedStatusBadge status={item.status} />
+                {onToggleArchive ? (
+                  <Pressable hitSlop={8} onPress={() => onToggleArchive(item)}>
+                    <Text className="text-caption font-bold text-ink underline">
+                      {isArchived ? "Unarchive" : "Archive"}
+                    </Text>
+                  </Pressable>
+                ) : null}
               </View>
-              {onToggleArchive ? (
-                <Pressable hitSlop={8} onPress={() => onToggleArchive(item)}>
-                  <Text className="text-caption text-ink-soft dark:text-ink-faint">
-                    {isArchived ? "Unarchive" : "Archive"}
-                  </Text>
-                </Pressable>
-              ) : null}
-            </View>
-          </Pressable>
-        </Animated.View>
-      </GestureDetector>
+            </Pressable>
+          </Animated.View>
+        </GestureDetector>
+      </View>
     </Animated.View>
   );
 }

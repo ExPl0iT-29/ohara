@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { captureContent, findByUrl, type ContentType } from "../src/api/content";
 import { useCaptureContent } from "../src/hooks/useCaptureContent";
+import { BrutalButton } from "../src/components/ui/BrutalButton";
 
 const CONTENT_TYPES: ContentType[] = [
   "blog",
@@ -58,7 +59,7 @@ export default function CaptureScreen() {
     <SafeAreaView className="flex-1 bg-paper dark:bg-surface-dark">
       <ScrollView contentContainerStyle={{ padding: 20, gap: 20 }}>
         <TextInput
-          className="rounded-card border border-line bg-white p-4 text-body text-ink dark:border-ink-soft dark:bg-surface-dark dark:text-paper"
+          className="rounded-card border-3 border-ink bg-paper p-4 text-body text-ink dark:bg-surface-dark dark:text-paper"
           placeholder="https://example.com/article&#10;(paste multiple, one per line)"
           placeholderTextColor="#A8A29E"
           autoCapitalize="none"
@@ -69,10 +70,10 @@ export default function CaptureScreen() {
         />
 
         {existing && (
-          <View className="gap-2 rounded-card border border-brand p-4">
-            <Text className="text-body text-ink dark:text-paper">Already saved.</Text>
+          <View className="gap-2 rounded-card border-3 border-ink bg-accent-mint/30 p-4">
+            <Text className="text-body font-semibold text-ink dark:text-paper">Already saved.</Text>
             <Pressable onPress={() => router.replace(`/content/${existing.id}`)} className="self-start">
-              <Text className="text-caption font-semibold text-brand">Open existing item</Text>
+              <Text className="text-caption font-bold text-ink underline">Open existing item</Text>
             </Pressable>
           </View>
         )}
@@ -83,21 +84,11 @@ export default function CaptureScreen() {
               <Pressable
                 key={type}
                 onPress={() => setContentType(contentType === type ? undefined : type)}
-                className={`rounded-pill border px-3 py-1.5 ${
-                  contentType === type
-                    ? "border-brand bg-brand"
-                    : "border-line bg-white dark:border-ink-soft dark:bg-surface-dark"
+                className={`rounded-pill border-3 border-ink px-3 py-1.5 ${
+                  contentType === type ? "bg-brand" : "bg-paper dark:bg-surface-dark"
                 }`}
               >
-                <Text
-                  className={
-                    contentType === type
-                      ? "text-caption text-white"
-                      : "text-caption text-ink-soft dark:text-ink-faint"
-                  }
-                >
-                  {type}
-                </Text>
+                <Text className="text-caption font-bold text-ink">{type}</Text>
               </Pressable>
             ))}
           </View>
@@ -110,20 +101,20 @@ export default function CaptureScreen() {
         )}
 
         {mutation.isError && (
-          <Text className="text-caption text-danger">
+          <Text className="text-caption font-bold text-danger">
             Couldn't save that link. Check the URL and try again.
           </Text>
         )}
 
-        <Pressable
-          className="rounded-card bg-brand p-4 active:opacity-80 disabled:opacity-40"
-          disabled={lines.length === 0 || mutation.isPending || isBulkSaving || !!existing}
+        <BrutalButton
+          variant="primary"
           onPress={handleSubmit}
+          disabled={lines.length === 0 || mutation.isPending || isBulkSaving || !!existing}
         >
-          <Text className="text-center text-body font-semibold text-white">
+          <Text className="text-center text-body font-extrabold text-ink">
             {mutation.isPending || isBulkSaving ? "Saving..." : isBulk ? `Save ${lines.length} links` : "Save"}
           </Text>
-        </Pressable>
+        </BrutalButton>
       </ScrollView>
     </SafeAreaView>
   );

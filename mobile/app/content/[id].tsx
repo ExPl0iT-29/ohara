@@ -28,6 +28,7 @@ import { ReaderHeader } from "../../src/components/reader/ReaderHeader";
 import { ReaderStatusNotice } from "../../src/components/reader/ReaderStatusNotice";
 import { ReaderSummary } from "../../src/components/reader/ReaderSummary";
 import { useContentItem } from "../../src/hooks/useContentItem";
+import { BrutalButton } from "../../src/components/ui/BrutalButton";
 
 export default function ReaderScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -137,11 +138,11 @@ export default function ReaderScreen() {
         onMomentumScrollEnd={handleScrollEnd}
       >
         {header}
-        <Pressable onPress={handleToggleArchive} className="self-start">
-          <Text className="text-caption font-semibold text-brand">
+        <BrutalButton pill onPress={handleToggleArchive} className="self-start px-3 py-1.5">
+          <Text className="text-caption font-bold text-ink">
             {data.archivedAt ? "Unarchive" : "Archive"}
           </Text>
-        </Pressable>
+        </BrutalButton>
 
         <View className="gap-2">
           <View className="flex-row flex-wrap gap-2">
@@ -149,9 +150,9 @@ export default function ReaderScreen() {
               <Pressable
                 key={tag}
                 onPress={() => handleRemoveTag(tag)}
-                className="rounded-pill border border-line px-3 py-1 dark:border-ink-soft"
+                className="rounded-pill border-2 border-ink bg-accent-violet/30 px-3 py-1"
               >
-                <Text className="text-caption text-ink-soft dark:text-ink-faint">{tag} ×</Text>
+                <Text className="text-caption font-bold text-ink">{tag} ×</Text>
               </Pressable>
             ))}
           </View>
@@ -162,10 +163,10 @@ export default function ReaderScreen() {
               onSubmitEditing={handleAddTag}
               placeholder="Add tag"
               placeholderTextColor="#A8A29E"
-              className="flex-1 rounded-pill border border-line px-3 py-1.5 text-caption text-ink dark:border-ink-soft dark:text-paper"
+              className="flex-1 rounded-pill border-2 border-ink px-3 py-1.5 text-caption text-ink dark:text-paper"
             />
             <Pressable onPress={handleAddTag} className="justify-center px-2">
-              <Text className="text-caption font-semibold text-brand">Add</Text>
+              <Text className="text-caption font-bold text-ink underline">Add</Text>
             </Pressable>
           </View>
         </View>
@@ -181,12 +182,9 @@ export default function ReaderScreen() {
             {data.description && (
               <Text className="text-body text-ink-soft dark:text-ink-faint">{data.description}</Text>
             )}
-            <Pressable
-              onPress={() => Linking.openURL(data.url)}
-              className="self-start rounded-pill bg-brand px-4 py-2"
-            >
-              <Text className="text-caption font-semibold text-white">Open original link</Text>
-            </Pressable>
+            <BrutalButton pill variant="primary" onPress={() => Linking.openURL(data.url)}>
+              <Text className="text-caption font-extrabold text-ink">Open original link</Text>
+            </BrutalButton>
           </View>
         )}
         {data.status === "ready" && !data.isStub && (
@@ -201,14 +199,14 @@ export default function ReaderScreen() {
             {data.highlights.map((highlight) => (
               <View
                 key={highlight.id}
-                className="gap-1 rounded-card border border-line p-3 dark:border-ink-soft"
+                className="gap-1 rounded-card border-3 border-ink bg-accent-yellow/20 p-3"
               >
                 <Text className="text-body italic text-ink dark:text-paper">"{highlight.quote}"</Text>
                 {highlight.note ? (
                   <Text className="text-caption text-ink-soft dark:text-ink-faint">{highlight.note}</Text>
                 ) : null}
                 <Pressable onPress={() => handleRemoveHighlight(highlight.id)} className="self-start">
-                  <Text className="text-caption text-danger">Remove</Text>
+                  <Text className="text-caption font-bold text-danger">Remove</Text>
                 </Pressable>
               </View>
             ))}
@@ -218,7 +216,7 @@ export default function ReaderScreen() {
               placeholder="Quote"
               placeholderTextColor="#A8A29E"
               multiline
-              className="rounded-card border border-line p-3 text-body text-ink dark:border-ink-soft dark:text-paper"
+              className="rounded-card border-3 border-ink p-3 text-body text-ink dark:text-paper"
             />
             <TextInput
               value={newNote}
@@ -226,14 +224,11 @@ export default function ReaderScreen() {
               placeholder="Note (optional)"
               placeholderTextColor="#A8A29E"
               multiline
-              className="rounded-card border border-line p-3 text-body text-ink dark:border-ink-soft dark:text-paper"
+              className="rounded-card border-3 border-ink p-3 text-body text-ink dark:text-paper"
             />
-            <Pressable
-              onPress={handleAddHighlight}
-              className="self-start rounded-pill bg-brand px-4 py-2"
-            >
-              <Text className="text-caption font-semibold text-white">Save highlight</Text>
-            </Pressable>
+            <BrutalButton pill variant="primary" onPress={handleAddHighlight} className="self-start">
+              <Text className="text-caption font-extrabold text-ink">Save highlight</Text>
+            </BrutalButton>
           </View>
         )}
       </ScrollView>

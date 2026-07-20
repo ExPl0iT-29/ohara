@@ -7,6 +7,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { exportBackup, importBackup } from "../src/backup/backup";
 import { setSetting } from "../src/db/settings";
+import { BrutalButton } from "../src/components/ui/BrutalButton";
+import { BrutalCard } from "../src/components/ui/BrutalCard";
 
 const THEME_OPTIONS = ["light", "dark", "system"] as const;
 
@@ -52,21 +54,13 @@ export default function SettingsScreen() {
                 setColorScheme(option);
                 setSetting("theme", option);
               }}
-              className={`rounded-pill border px-3 py-1.5 ${
+              className={`rounded-pill border-3 border-ink px-3 py-1.5 ${
                 colorScheme === option || (option === "system" && colorScheme === undefined)
-                  ? "border-brand bg-brand"
-                  : "border-line bg-white dark:border-ink-soft dark:bg-surface-dark"
+                  ? "bg-brand"
+                  : "bg-paper dark:bg-surface-dark"
               }`}
             >
-              <Text
-                className={
-                  colorScheme === option
-                    ? "text-caption text-white"
-                    : "text-caption text-ink-soft dark:text-ink-faint"
-                }
-              >
-                {option}
-              </Text>
+              <Text className="text-caption font-bold text-ink">{option}</Text>
             </Pressable>
           ))}
         </View>
@@ -76,28 +70,25 @@ export default function SettingsScreen() {
           Export your whole library as JSON, or import a backup (or a plain list of URLs saved from your PC).
         </Text>
 
-        <Pressable
-          className="rounded-card bg-brand p-4 active:opacity-80 disabled:opacity-40"
-          disabled={busy}
-          onPress={handleExport}
-        >
-          <Text className="text-center text-body font-semibold text-white">Export library</Text>
-        </Pressable>
+        <BrutalButton variant="primary" disabled={busy} onPress={handleExport}>
+          <Text className="text-center text-body font-extrabold text-ink">Export library</Text>
+        </BrutalButton>
 
-        <Pressable
-          className="rounded-card border border-line bg-white p-4 active:opacity-80 disabled:opacity-40 dark:border-ink-soft dark:bg-surface-dark"
-          disabled={busy}
-          onPress={handleImport}
-        >
-          <Text className="text-center text-body font-semibold text-ink dark:text-paper">Import from file</Text>
-        </Pressable>
+        <BrutalCard>
+          <Pressable
+            className="p-4 active:opacity-80 disabled:opacity-40"
+            disabled={busy}
+            onPress={handleImport}
+          >
+            <Text className="text-center text-body font-bold text-ink dark:text-paper">Import from file</Text>
+          </Pressable>
+        </BrutalCard>
 
-        <Pressable
-          className="rounded-card border border-line bg-white p-4 active:opacity-80 dark:border-ink-soft dark:bg-surface-dark"
-          onPress={() => router.push("/stats")}
-        >
-          <Text className="text-center text-body font-semibold text-ink dark:text-paper">Library stats</Text>
-        </Pressable>
+        <BrutalCard>
+          <Pressable className="p-4 active:opacity-80" onPress={() => router.push("/stats")}>
+            <Text className="text-center text-body font-bold text-ink dark:text-paper">Library stats</Text>
+          </Pressable>
+        </BrutalCard>
       </View>
     </SafeAreaView>
   );
