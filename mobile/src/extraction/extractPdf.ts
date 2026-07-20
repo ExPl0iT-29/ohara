@@ -1,8 +1,17 @@
 import * as FileSystem from "expo-file-system/legacy";
 import type { ExtractionResult } from "./extractArticle";
-import { getDocument } from "pdfjs-dist/legacy/build/pdf.js";
 
 const MAX_PAGES = 200;
+
+// React Native's minimal `navigator` global has no `.platform` — pdfjs-dist's
+// module-level KeyboardManager static field reads `navigator.platform.includes(...)`
+// as soon as it's imported, crashing at import time without this.
+function polyfillNavigatorPlatform() {
+  const nav = globalThis as { navigator?: { platform?: string } };
+  if (nav.navigator && nav.navigator.platform === undefined) {
+    nav.navigator.platform = "";
+  }
+}
 
 function filenameFromUrl(url: string): string | null {
   const last = url.split("?")[0].split("/").filter(Boolean).pop();
@@ -25,6 +34,8 @@ export async function extractPdf(url: string): Promise<ExtractionResult> {
 
     let doc;
     try {
+      polyfillNavigatorPlatform();
+      const { getDocument } = await import("pdfjs-dist/legacy/build/pdf.js");
       doc = await getDocument({ data, isEvalSupported: false }).promise;
     } catch {
       throw new Error("PDF is corrupted or could not be parsed");
