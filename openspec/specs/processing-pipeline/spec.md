@@ -27,6 +27,12 @@ The system SHALL extract `title`, `description`, `heroImage`, `author`, `extract
 - **THEN** the system extracts title, description, heroImage, author, and duration from the video
 - **AND** the entity's status becomes `ready`
 
+#### Scenario: PDF content extracted
+- **WHEN** a `pending` Content entity has contentType `pdf` and its source PDF contains extractable text
+- **THEN** the system extracts `extractedText` from the PDF, derives a `title` from PDF metadata (or the first heading-like line of text, or the URL filename if neither is available), and computes `readingTime` from the extracted text
+- **AND** `heroImage` and `author` are `null` unless present in PDF metadata
+- **AND** the entity's status becomes `ready`
+
 ### Requirement: Reading Time Computed From Extracted Text
 The system SHALL compute `readingTime` algorithmically from `extractedText` word count, ignoring HTML markup, without any AI involvement.
 
@@ -46,7 +52,7 @@ The system SHALL preserve an article's structural HTML (headings, paragraphs, li
 The system SHALL mark `Content` entities with no registered extractor for their contentType as `failed`, without leaving them stuck in `pending` or `processing`.
 
 #### Scenario: Content type has no extractor
-- **WHEN** a `pending` Content entity has contentType `pdf`, `paper`, `github`, `book`, `tweet`, or `reddit`
+- **WHEN** a `pending` Content entity has contentType `paper`, `github`, `book`, `tweet`, or `reddit`
 - **THEN** the entity's status becomes `failed`
 - **AND** the failure reason is recorded on the entity
 
@@ -56,7 +62,16 @@ The system SHALL catch extraction errors for a single Content entity and mark th
 #### Scenario: Extractor raises an error
 - **WHEN** an extractor raises an exception while processing a `pending` Content entity
 - **THEN** that entity's status becomes `failed` with the error reason recorded
-- **AND** processing of other entities is unaffected
+
+#### Scenario: PDF is corrupted or unparseable
+- **WHEN** a `pending` Content entity has contentType `pdf` and the source file cannot be parsed as a valid PDF
+- **THEN** the entity's status becomes `failed`
+- **AND** the failure reason is recorded on the entity
+
+#### Scenario: PDF has no extractable text
+- **WHEN** a `pending` Content entity has contentType `pdf` and text extraction across all pages yields no non-whitespace content (e.g. a scanned or image-only PDF)
+- **THEN** the entity's status becomes `failed` with a reason indicating no extractable text was found
+- **AND** the app does not attempt OCR
 
 ### Requirement: Processing Never Populates AI-Derived Fields
 The system SHALL NOT populate `summary` or `topics` during processing; those fields remain null after this pipeline runs.
@@ -84,4 +99,3 @@ The system SHALL detect URLs matching the Google Docs document pattern (`docs.go
 - **WHEN** a `pending` Content entity's URL matches the Google Docs document pattern and the doc is not publicly viewable
 - **THEN** the entity's status becomes `failed`
 - **AND** the failure reason indicates the doc is not publicly viewable
-
