@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Share, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   FadeInDown,
@@ -19,36 +19,109 @@ interface FeedListItemProps {
   onToggleArchive?: (item: ContentItem) => void;
 }
 
-const SWIPE_THRESHOLD = 80;
+const ACTION_SIZE = 52;
+const ACTION_GAP = 10;
+const REVEAL_WIDTH = ACTION_SIZE * 3 + ACTION_GAP * 4;
+const OPEN_THRESHOLD = REVEAL_WIDTH / 2;
+
+function ActionButton({
+  label,
+  bg,
+  onPress,
+}: {
+  label: string;
+  bg: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        width: ACTION_SIZE,
+        height: ACTION_SIZE,
+        borderRadius: ACTION_SIZE / 2,
+        borderWidth: 3,
+        borderColor: "#1C1917",
+        backgroundColor: bg,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Text className="text-caption font-extrabold text-ink">{label}</Text>
+    </Pressable>
+  );
+}
 
 function FeedListItemBase({ item, onPress, onToggleArchive }: FeedListItemProps) {
   const translateX = useSharedValue(0);
   const isArchived = !!item.archivedAt;
 
-  const triggerToggle = () => onToggleArchive?.(item);
+  const closeSwipe = () => {
+    translateX.value = withSpring(0);
+  };
+
+  const handleOpen = () => {
+    closeSwipe();
+    onPress(item.id);
+  };
+
+  const handleArchiveToggle = () => {
+    closeSwipe();
+    onToggleArchive?.(item);
+  };
+
+  const handleShare = () => {
+    closeSwipe();
+    void Share.share({ message: item.url, url: item.url });
+  };
 
   const pan = Gesture.Pan()
     .activeOffsetX([-10, 10])
     .failOffsetY([-10, 10])
     .onUpdate((event) => {
-      translateX.value = event.translationX;
+      translateX.value = Math.max(-REVEAL_WIDTH, Math.min(0, event.translationX));
     })
-    .onEnd((event) => {
-      const passedLeftThreshold = !isArchived && event.translationX < -SWIPE_THRESHOLD;
-      const passedRightThreshold = isArchived && event.translationX > SWIPE_THRESHOLD;
-      if (passedLeftThreshold || passedRightThreshold) {
-        runOnJS(triggerToggle)();
-      }
-      translateX.value = withSpring(0);
+    .onEnd(() => {
+      const shouldOpen = translateX.value < -OPEN_THRESHOLD;
+      translateX.value = withSpring(shouldOpen ? -REVEAL_WIDTH : 0);
     });
 
-  const animatedStyle = useAnimatedStyle(() => ({
+  const cardStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
+  }));
+
+  const actionsStyle = useAnimatedStyle(() => ({
+    opacity: Math.min(1, -translateX.value / OPEN_THRESHOLD),
   }));
 
   return (
     <Animated.View entering={FadeInDown}>
       <View style={{ position: "relative" }}>
+        <Animated.View
+          pointerEvents="box-none"
+          style={[
+            actionsStyle,
+            {
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              right: 0,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: ACTION_GAP,
+              paddingRight: ACTION_GAP,
+            },
+          ]}
+        >
+          <ActionButton label="Open" bg="#5B8DEF80" onPress={handleOpen} />
+          <ActionButton
+            label={isArchived ? "Unarc" : "Arc"}
+            bg="#FFC93380"
+            onPress={handleArchiveToggle}
+          />
+          <ActionButton label="Share" bg="#34D39980" onPress={handleShare} />
+        </Animated.View>
+
         <View
           pointerEvents="none"
           style={{
@@ -62,7 +135,7 @@ function FeedListItemBase({ item, onPress, onToggleArchive }: FeedListItemProps)
           }}
         />
         <GestureDetector gesture={pan}>
-          <Animated.View style={animatedStyle}>
+          <Animated.View style={cardStyle}>
             <Pressable
               className="gap-2 rounded-card border-3 border-ink bg-paper p-4 active:opacity-90 dark:bg-surface-dark"
               onPress={() => onPress(item.id)}
@@ -82,13 +155,6 @@ function FeedListItemBase({ item, onPress, onToggleArchive }: FeedListItemProps)
                   </View>
                   <FeedStatusBadge status={item.status} />
                 </View>
-                {onToggleArchive ? (
-                  <Pressable hitSlop={8} onPress={() => onToggleArchive(item)}>
-                    <Text className="text-caption font-bold text-ink underline">
-                      {isArchived ? "Unarchive" : "Archive"}
-                    </Text>
-                  </Pressable>
-                ) : null}
               </View>
             </Pressable>
           </Animated.View>
