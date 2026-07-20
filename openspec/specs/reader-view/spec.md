@@ -1,9 +1,7 @@
 ## Purpose
 
 The reading screen — the core experience of Ohara. Renders a saved content item for reading, handling every processing state (pending/processing/failed/ready) plus loading/not-found, so reading never depends on AI enrichment or full extraction succeeding.
-
 ## Requirements
-
 ### Requirement: Render a full reading experience for ready content
 The system SHALL render the content item's title, hero image (when present), author, source, reading time (when present), summary (when present), and full extracted text body using reading-optimized typography (comfortable line length, spacing, and font sizing) when a content item's status is `ready` and `extractedText` is present.
 
@@ -87,3 +85,16 @@ The system SHALL provide a retry control on the failure notice for a `failed` Co
 #### Scenario: Retrying a failed item
 - **WHEN** a user taps the retry control on a `failed` Content item
 - **THEN** the system re-runs processing for that item's existing id, and its status updates accordingly (`processing` then `ready` or `failed` again)
+
+### Requirement: Render A Distinct Preview For Stub Captures
+The system SHALL render a distinct "preview only" reading experience — title, description, hero image when present, and a prominent control to open the original URL — instead of an empty reader body, when a content item has `status: "ready"` and `isStub: true`.
+
+#### Scenario: Stub content with title and description
+- **WHEN** the reader screen loads a content item with `status: "ready"`, `isStub: true`, non-null `title`/`description`, and null `extractedText`
+- **THEN** the screen displays the title, description, and hero image (if present), plus a prominent "Open original link" control
+- **AND** the screen does not attempt to render a reader body or show it as empty/broken
+
+#### Scenario: Stub content with no metadata at all
+- **WHEN** the reader screen loads a content item with `status: "ready"`, `isStub: true`, and all of `title`/`description`/`heroImage` null
+- **THEN** the screen displays the item's `url` plus the same "preview only, open original link" treatment
+

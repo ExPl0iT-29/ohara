@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
 import {
+  Linking,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
@@ -175,51 +176,65 @@ export default function ReaderScreen() {
         {data.status === "failed" && (
           <ReaderStatusNotice variant="failed" url={data.url} onRetry={handleRetry} />
         )}
-        {data.status === "ready" && (
+        {data.status === "ready" && data.isStub && (
+          <View className="gap-4">
+            {data.description && (
+              <Text className="text-body text-ink-soft dark:text-ink-faint">{data.description}</Text>
+            )}
+            <Pressable
+              onPress={() => Linking.openURL(data.url)}
+              className="self-start rounded-pill bg-brand px-4 py-2"
+            >
+              <Text className="text-caption font-semibold text-white">Open original link</Text>
+            </Pressable>
+          </View>
+        )}
+        {data.status === "ready" && !data.isStub && (
           <>
             <ReaderSummary summary={data.summary} />
             <ReaderBody extractedText={data.extractedText} />
-
-            <View className="gap-3 border-t border-line pt-4 dark:border-ink-soft">
-              <Text className="text-body font-semibold text-ink dark:text-paper">Highlights</Text>
-              {data.highlights.map((highlight) => (
-                <View
-                  key={highlight.id}
-                  className="gap-1 rounded-card border border-line p-3 dark:border-ink-soft"
-                >
-                  <Text className="text-body italic text-ink dark:text-paper">"{highlight.quote}"</Text>
-                  {highlight.note ? (
-                    <Text className="text-caption text-ink-soft dark:text-ink-faint">{highlight.note}</Text>
-                  ) : null}
-                  <Pressable onPress={() => handleRemoveHighlight(highlight.id)} className="self-start">
-                    <Text className="text-caption text-danger">Remove</Text>
-                  </Pressable>
-                </View>
-              ))}
-              <TextInput
-                value={newQuote}
-                onChangeText={setNewQuote}
-                placeholder="Quote"
-                placeholderTextColor="#A8A29E"
-                multiline
-                className="rounded-card border border-line p-3 text-body text-ink dark:border-ink-soft dark:text-paper"
-              />
-              <TextInput
-                value={newNote}
-                onChangeText={setNewNote}
-                placeholder="Note (optional)"
-                placeholderTextColor="#A8A29E"
-                multiline
-                className="rounded-card border border-line p-3 text-body text-ink dark:border-ink-soft dark:text-paper"
-              />
-              <Pressable
-                onPress={handleAddHighlight}
-                className="self-start rounded-pill bg-brand px-4 py-2"
-              >
-                <Text className="text-caption font-semibold text-white">Save highlight</Text>
-              </Pressable>
-            </View>
           </>
+        )}
+        {data.status === "ready" && (
+          <View className="gap-3 border-t border-line pt-4 dark:border-ink-soft">
+            <Text className="text-body font-semibold text-ink dark:text-paper">Highlights</Text>
+            {data.highlights.map((highlight) => (
+              <View
+                key={highlight.id}
+                className="gap-1 rounded-card border border-line p-3 dark:border-ink-soft"
+              >
+                <Text className="text-body italic text-ink dark:text-paper">"{highlight.quote}"</Text>
+                {highlight.note ? (
+                  <Text className="text-caption text-ink-soft dark:text-ink-faint">{highlight.note}</Text>
+                ) : null}
+                <Pressable onPress={() => handleRemoveHighlight(highlight.id)} className="self-start">
+                  <Text className="text-caption text-danger">Remove</Text>
+                </Pressable>
+              </View>
+            ))}
+            <TextInput
+              value={newQuote}
+              onChangeText={setNewQuote}
+              placeholder="Quote"
+              placeholderTextColor="#A8A29E"
+              multiline
+              className="rounded-card border border-line p-3 text-body text-ink dark:border-ink-soft dark:text-paper"
+            />
+            <TextInput
+              value={newNote}
+              onChangeText={setNewNote}
+              placeholder="Note (optional)"
+              placeholderTextColor="#A8A29E"
+              multiline
+              className="rounded-card border border-line p-3 text-body text-ink dark:border-ink-soft dark:text-paper"
+            />
+            <Pressable
+              onPress={handleAddHighlight}
+              className="self-start rounded-pill bg-brand px-4 py-2"
+            >
+              <Text className="text-caption font-semibold text-white">Save highlight</Text>
+            </Pressable>
+          </View>
         )}
       </ScrollView>
     </SafeAreaView>

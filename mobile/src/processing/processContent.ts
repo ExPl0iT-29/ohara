@@ -4,6 +4,8 @@ import { extractGoogleDoc, matchGoogleDocId } from "../extraction/extractGoogleD
 import { extractPdf } from "../extraction/extractPdf";
 import { extractYoutube } from "../extraction/extractYoutube";
 import { computeReadingTime } from "../extraction/readingTime";
+
+const STUB_TEXT_MIN_LENGTH = 150;
 import { getContentRow, updateContentRow } from "../db/contentRepository";
 import type { ContentType } from "../api/content";
 
@@ -32,6 +34,7 @@ export async function processContent(id: string): Promise<void> {
       extractedText: result.extractedText,
       duration: result.duration,
       readingTime: result.extractedText ? computeReadingTime(result.extractedText) : null,
+      isStub: (result.extractedText?.trim().length ?? 0) < STUB_TEXT_MIN_LENGTH,
       status: "ready",
       completedAt: new Date().toISOString(),
     });
