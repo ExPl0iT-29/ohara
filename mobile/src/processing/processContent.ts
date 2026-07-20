@@ -1,12 +1,15 @@
 import { enrichContent } from "../ai/enrich";
 import { extractArticle } from "../extraction/extractArticle";
+import { extractPdf } from "../extraction/extractPdf";
 import { extractYoutube } from "../extraction/extractYoutube";
 import { computeReadingTime } from "../extraction/readingTime";
 import { getContentRow, updateContentRow } from "../db/contentRepository";
 import type { ContentType } from "../api/content";
 
 function getExtractor(contentType: ContentType) {
-  return contentType === "youtube" ? extractYoutube : extractArticle;
+  if (contentType === "youtube") return extractYoutube;
+  if (contentType === "pdf") return extractPdf;
+  return extractArticle;
 }
 
 export async function processContent(id: string): Promise<void> {
