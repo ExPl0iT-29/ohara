@@ -9,6 +9,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { getSetting } from "../src/db/settings";
 import { reprocessStuckContent } from "../src/processing/processContent";
+import { logSinceBundleStart } from "../src/perf";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,8 @@ export default function RootLayout() {
   const isDark = colorScheme === "dark";
 
   useEffect(() => {
+    logSinceBundleStart("RootLayout mounted");
+
     // ponytail: if the app was killed mid-extraction, sweep and retry stuck rows on next launch
     void reprocessStuckContent();
 

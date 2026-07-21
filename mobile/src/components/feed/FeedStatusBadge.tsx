@@ -25,8 +25,8 @@ function FeedStatusBadgeBase({ status }: FeedStatusBadgeProps) {
   if (!label) return null;
 
   return (
-    <View className={`self-start rounded-pill px-2 py-0.5 ${BADGE_STYLES[status]}`}>
-      <Text className={`text-caption font-medium ${BADGE_TEXT_STYLES[status]}`}>{label}</Text>
+    <View className={`self-start rounded-pill border-2 border-ink px-2 py-0.5 ${BADGE_STYLES[status]}`}>
+      <Text className={`text-caption font-bold ${BADGE_TEXT_STYLES[status]}`}>{label}</Text>
     </View>
   );
 }

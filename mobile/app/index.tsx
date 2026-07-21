@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,6 +19,7 @@ import { FeedEmptyState } from "../src/components/feed/FeedEmptyState";
 import { FeedErrorState } from "../src/components/feed/FeedErrorState";
 import { FeedListItem } from "../src/components/feed/FeedListItem";
 import { useContentList } from "../src/hooks/useContentList";
+import { logSinceBundleStart } from "../src/perf";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -39,6 +40,10 @@ export default function FeedScreen() {
   const typeChips = useMemo(() => getPresentContentTypesList(), [data]);
   const fabScale = useSharedValue(1);
   const fabStyle = useAnimatedStyle(() => ({ transform: [{ scale: fabScale.value }] }));
+
+  useEffect(() => {
+    if (!isLoading) logSinceBundleStart("Feed screen: first content rendered");
+  }, [isLoading]);
 
   const handleOpenItem = useCallback((id: string) => router.push(`/content/${id}`), [router]);
   const handleOpenCapture = useCallback(() => router.push("/capture"), [router]);
@@ -152,7 +157,7 @@ export default function FeedScreen() {
           data={data}
           keyExtractor={keyExtractor}
           contentContainerStyle={{ padding: 20, gap: 12 }}
-          refreshControl={<RefreshControl tintColor="#0F766E" refreshing={isFetching} onRefresh={refetch} />}
+          refreshControl={<RefreshControl tintColor="#1C1917" refreshing={isFetching} onRefresh={refetch} />}
           renderItem={renderItem}
         />
       )}

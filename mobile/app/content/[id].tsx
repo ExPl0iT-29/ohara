@@ -194,7 +194,7 @@ export default function ReaderScreen() {
           </>
         )}
         {data.status === "ready" && (
-          <View className="gap-3 border-t border-line pt-4 dark:border-ink-soft">
+          <View className="gap-3 border-t-3 border-ink pt-4">
             <Text className="text-body font-semibold text-ink dark:text-paper">Highlights</Text>
             {data.highlights.map((highlight) => (
               <View
