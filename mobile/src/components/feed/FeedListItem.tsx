@@ -106,6 +106,8 @@ function FeedListItemBase({ item, onPress, onToggleArchive }: FeedListItemProps)
               top: 0,
               bottom: 0,
               right: 0,
+              zIndex: 1,
+              elevation: 1,
               flexDirection: "row",
               alignItems: "center",
               gap: ACTION_GAP,
@@ -135,7 +137,7 @@ function FeedListItemBase({ item, onPress, onToggleArchive }: FeedListItemProps)
           }}
         />
         <GestureDetector gesture={pan}>
-          <Animated.View style={cardStyle}>
+          <Animated.View style={[cardStyle, { zIndex: 2 }]}>
             <Pressable
               className="gap-2 rounded-card border-3 border-ink bg-paper p-4 active:opacity-90 dark:bg-surface-dark"
               onPress={() => onPress(item.id)}
