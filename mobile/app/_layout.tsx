@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import { useColorScheme } from "nativewind";
 import { useEffect } from "react";
+import { InteractionManager } from "react-native";
 import { ShareIntentProvider, useShareIntentContext } from "expo-share-intent";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -36,13 +37,18 @@ export default function RootLayout() {
   useEffect(() => {
     logSinceBundleStart("RootLayout mounted");
 
-    // ponytail: if the app was killed mid-extraction, sweep and retry stuck rows on next launch
-    void reprocessStuckContent();
+    // Deferred until after first paint/interactions so the initial feed render isn't
+    // competing with network fetches + AI enrichment for stuck rows on launch.
+    const task = InteractionManager.runAfterInteractions(() => {
+      void reprocessStuckContent();
+    });
 
     const savedTheme = getSetting("theme");
     if (savedTheme === "light" || savedTheme === "dark" || savedTheme === "system") {
       setColorScheme(savedTheme);
     }
+
+    return () => task.cancel();
   }, [setColorScheme]);
 
   const headerOptions = {
