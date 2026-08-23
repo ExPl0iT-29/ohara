@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,6 +19,7 @@ import { FeedEmptyState } from "../src/components/feed/FeedEmptyState";
 import { FeedErrorState } from "../src/components/feed/FeedErrorState";
 import { FeedListItem } from "../src/components/feed/FeedListItem";
 import { useContentList } from "../src/hooks/useContentList";
+import { logSinceBundleStart } from "../src/perf";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -39,6 +40,10 @@ export default function FeedScreen() {
   const typeChips = useMemo(() => getPresentContentTypesList(), [data]);
   const fabScale = useSharedValue(1);
   const fabStyle = useAnimatedStyle(() => ({ transform: [{ scale: fabScale.value }] }));
+
+  useEffect(() => {
+    if (!isLoading) logSinceBundleStart("Feed screen: first content rendered");
+  }, [isLoading]);
 
   const handleOpenItem = useCallback((id: string) => router.push(`/content/${id}`), [router]);
   const handleOpenCapture = useCallback(() => router.push("/capture"), [router]);
@@ -72,20 +77,16 @@ export default function FeedScreen() {
 
       <View className="flex-row gap-2 px-5 pb-2">
         <Pressable
-          className={`rounded-pill border px-4 py-1.5 ${archived ? "border-line dark:border-ink-soft" : "border-brand bg-brand"}`}
+          className={`rounded-pill border-3 border-ink px-4 py-1.5 ${archived ? "bg-paper dark:bg-surface-dark" : "bg-brand"}`}
           onPress={() => setArchived(false)}
         >
-          <Text className={archived ? "text-caption text-ink-soft dark:text-ink-faint" : "text-caption font-semibold text-white"}>
-            Active
-          </Text>
+          <Text className="text-caption font-bold text-ink">Active</Text>
         </Pressable>
         <Pressable
-          className={`rounded-pill border px-4 py-1.5 ${archived ? "border-brand bg-brand" : "border-line dark:border-ink-soft"}`}
+          className={`rounded-pill border-3 border-ink px-4 py-1.5 ${archived ? "bg-brand" : "bg-paper dark:bg-surface-dark"}`}
           onPress={() => setArchived(true)}
         >
-          <Text className={archived ? "text-caption font-semibold text-white" : "text-caption text-ink-soft dark:text-ink-faint"}>
-            Archived
-          </Text>
+          <Text className="text-caption font-bold text-ink">Archived</Text>
         </Pressable>
       </View>
 
@@ -95,7 +96,7 @@ export default function FeedScreen() {
           onChangeText={setSearch}
           placeholder="Search your library"
           placeholderTextColor="#A8A29E"
-          className="rounded-pill border border-line px-4 py-2 text-body text-ink dark:border-ink-soft dark:text-paper"
+          className="rounded-pill border-3 border-ink px-4 py-2 text-body text-ink dark:text-paper"
         />
       </View>
 
@@ -112,18 +113,10 @@ export default function FeedScreen() {
             return (
               <Pressable
                 key={`type-${type}`}
-                className={`rounded-pill border px-3 py-1 ${selected ? "border-brand bg-brand" : "border-line dark:border-ink-soft"}`}
+                className={`rounded-pill border-2 border-ink px-3 py-1 ${selected ? "bg-brand" : "bg-paper dark:bg-surface-dark"}`}
                 onPress={() => setContentType(selected ? null : type)}
               >
-                <Text
-                  className={
-                    selected
-                      ? "text-caption font-semibold text-white"
-                      : "text-caption text-ink-soft dark:text-ink-faint"
-                  }
-                >
-                  {CONTENT_TYPE_LABELS[type]}
-                </Text>
+                <Text className="text-caption font-bold text-ink">{CONTENT_TYPE_LABELS[type]}</Text>
               </Pressable>
             );
           })}
@@ -132,18 +125,10 @@ export default function FeedScreen() {
             return (
               <Pressable
                 key={chip}
-                className={`rounded-pill border px-3 py-1 ${selected ? "border-brand bg-brand" : "border-line dark:border-ink-soft"}`}
+                className={`rounded-pill border-2 border-ink px-3 py-1 ${selected ? "bg-accent-violet" : "bg-paper dark:bg-surface-dark"}`}
                 onPress={() => setTagOrTopic(selected ? null : chip)}
               >
-                <Text
-                  className={
-                    selected
-                      ? "text-caption font-semibold text-white"
-                      : "text-caption text-ink-soft dark:text-ink-faint"
-                  }
-                >
-                  {chip}
-                </Text>
+                <Text className="text-caption font-bold text-ink">{chip}</Text>
               </Pressable>
             );
           })}
@@ -151,8 +136,11 @@ export default function FeedScreen() {
       )}
 
       {isLoading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#0F766E" />
+        <View className="flex-1 items-center justify-center gap-3">
+          <ActivityIndicator color="#1C1917" size="large" />
+          <Text className="text-caption font-bold text-ink-soft dark:text-ink-faint">
+            Loading your library...
+          </Text>
         </View>
       ) : error ? (
         <FeedErrorState onRetry={() => refetch()} />
@@ -169,24 +157,38 @@ export default function FeedScreen() {
           data={data}
           keyExtractor={keyExtractor}
           contentContainerStyle={{ padding: 20, gap: 12 }}
-          refreshControl={<RefreshControl tintColor="#0F766E" refreshing={isFetching} onRefresh={refetch} />}
+          refreshControl={<RefreshControl tintColor="#1C1917" refreshing={isFetching} onRefresh={refetch} />}
           renderItem={renderItem}
         />
       )}
 
-      <AnimatedPressable
-        className="absolute bottom-8 right-6 h-14 w-14 items-center justify-center rounded-full bg-brand shadow-lg"
-        style={fabStyle}
-        onPressIn={() => {
-          fabScale.value = withSpring(0.9);
-        }}
-        onPressOut={() => {
-          fabScale.value = withSpring(1);
-        }}
-        onPress={handleOpenCapture}
-      >
-        <Text className="text-3xl leading-none text-white">+</Text>
-      </AnimatedPressable>
+      <View pointerEvents="box-none" className="absolute bottom-8 right-6">
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            top: 5,
+            left: 5,
+            right: -5,
+            bottom: -5,
+            backgroundColor: "#1C1917",
+            borderRadius: 999,
+          }}
+        />
+        <AnimatedPressable
+          className="h-14 w-14 items-center justify-center rounded-full border-3 border-ink bg-brand"
+          style={fabStyle}
+          onPressIn={() => {
+            fabScale.value = withSpring(0.9);
+          }}
+          onPressOut={() => {
+            fabScale.value = withSpring(1);
+          }}
+          onPress={handleOpenCapture}
+        >
+          <Text className="text-3xl font-extrabold leading-none text-ink">+</Text>
+        </AnimatedPressable>
+      </View>
     </SafeAreaView>
   );
 }

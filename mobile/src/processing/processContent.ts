@@ -1,12 +1,19 @@
 import { enrichContent } from "../ai/enrich";
 import { extractArticle } from "../extraction/extractArticle";
+import { extractGoogleDoc, matchGoogleDocId } from "../extraction/extractGoogleDoc";
+import { extractPdf } from "../extraction/extractPdf";
 import { extractYoutube } from "../extraction/extractYoutube";
 import { computeReadingTime } from "../extraction/readingTime";
+
+const STUB_TEXT_MIN_LENGTH = 150;
 import { getContentRow, updateContentRow } from "../db/contentRepository";
 import type { ContentType } from "../api/content";
 
-function getExtractor(contentType: ContentType) {
-  return contentType === "youtube" ? extractYoutube : extractArticle;
+function getExtractor(url: string, contentType: ContentType) {
+  if (matchGoogleDocId(url)) return extractGoogleDoc;
+  if (contentType === "youtube") return extractYoutube;
+  if (contentType === "pdf") return extractPdf;
+  return extractArticle;
 }
 
 export async function processContent(id: string): Promise<void> {
@@ -16,7 +23,7 @@ export async function processContent(id: string): Promise<void> {
   updateContentRow(id, { status: "processing" });
 
   try {
-    const extractor = getExtractor(item.contentType);
+    const extractor = getExtractor(item.url, item.contentType);
     const result = await extractor(item.url);
 
     updateContentRow(id, {
@@ -27,6 +34,7 @@ export async function processContent(id: string): Promise<void> {
       extractedText: result.extractedText,
       duration: result.duration,
       readingTime: result.extractedText ? computeReadingTime(result.extractedText) : null,
+      isStub: (result.extractedText?.trim().length ?? 0) < STUB_TEXT_MIN_LENGTH,
       status: "ready",
       completedAt: new Date().toISOString(),
     });

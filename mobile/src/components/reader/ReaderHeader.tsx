@@ -1,6 +1,5 @@
 import { Image } from "expo-image";
-import { Text, View } from "react-native";
-import Animated, { FadeIn } from "react-native-reanimated";
+import { Linking, Pressable, Text, View } from "react-native";
 
 interface ReaderHeaderProps {
   title: string | null;
@@ -22,11 +21,12 @@ export function ReaderHeader({
   const byline = [author, source, readingTime ? `${readingTime} min read` : null]
     .filter(Boolean)
     .join(" · ");
+  const openOriginal = () => void Linking.openURL(url);
 
   return (
     <View className="gap-3">
       {heroImage && (
-        <Animated.View entering={FadeIn}>
+        <Pressable onPress={openOriginal}>
           <Image
             source={{ uri: heroImage }}
             style={{ height: 192, width: "100%", borderRadius: 8 }}
@@ -34,9 +34,11 @@ export function ReaderHeader({
             cachePolicy="memory-disk"
             transition={150}
           />
-        </Animated.View>
+        </Pressable>
       )}
-      <Text className="text-display text-ink dark:text-paper">{title ?? url}</Text>
+      <Pressable onPress={openOriginal}>
+        <Text className="text-display text-ink dark:text-paper">{title ?? url}</Text>
+      </Pressable>
       {byline.length > 0 && <Text className="text-caption text-ink-faint">{byline}</Text>}
     </View>
   );

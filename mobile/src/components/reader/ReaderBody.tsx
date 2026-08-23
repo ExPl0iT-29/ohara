@@ -7,8 +7,8 @@ interface ReaderBodyProps {
 }
 
 const PALETTE = {
-  light: { text: "#1C1917", soft: "#57534E", link: "#0F766E" },
-  dark: { text: "#FAF9F6", soft: "#A8A29E", link: "#5EEAD4" },
+  light: { text: "#1C1917", soft: "#57534E", link: "#3B6FD6" },
+  dark: { text: "#FAF9F6", soft: "#A8A29E", link: "#8FB4F5" },
 };
 
 function buildTagsStyles(theme: "light" | "dark") {

@@ -4,11 +4,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import { useColorScheme } from "nativewind";
 import { useEffect } from "react";
+import { InteractionManager } from "react-native";
 import { ShareIntentProvider, useShareIntentContext } from "expo-share-intent";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { getSetting } from "../src/db/settings";
 import { reprocessStuckContent } from "../src/processing/processContent";
+import { logSinceBundleStart } from "../src/perf";
 
 const queryClient = new QueryClient();
 
@@ -33,13 +35,20 @@ export default function RootLayout() {
   const isDark = colorScheme === "dark";
 
   useEffect(() => {
-    // ponytail: if the app was killed mid-extraction, sweep and retry stuck rows on next launch
-    void reprocessStuckContent();
+    logSinceBundleStart("RootLayout mounted");
+
+    // Deferred until after first paint/interactions so the initial feed render isn't
+    // competing with network fetches + AI enrichment for stuck rows on launch.
+    const task = InteractionManager.runAfterInteractions(() => {
+      void reprocessStuckContent();
+    });
 
     const savedTheme = getSetting("theme");
     if (savedTheme === "light" || savedTheme === "dark" || savedTheme === "system") {
       setColorScheme(savedTheme);
     }
+
+    return () => task.cancel();
   }, [setColorScheme]);
 
   const headerOptions = {
@@ -53,7 +62,7 @@ export default function RootLayout() {
       <ShareIntentProvider>
         <QueryClientProvider client={queryClient}>
           <ShareIntentRedirect />
-          <Stack screenOptions={{ headerShown: false, ...headerOptions }}>
+          <Stack screenOptions={{ headerShown: false, animation: "none", ...headerOptions }}>
             <Stack.Screen
               name="capture"
               options={{ presentation: "modal", headerShown: true, title: "Save a link", ...headerOptions }}

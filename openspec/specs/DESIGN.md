@@ -12,21 +12,15 @@ Whenever designing a screen or component, refer to this document before implemen
 
 # Design Mission
 
-Ohara should feel like a modern personal library.
+Ohara should feel like a bold, tactile personal library — playful and confident, not quiet and beige.
 
-Not a productivity application.
+It is a save-and-read app, and it should look proud of that: chunky borders, punchy color, cards that feel like physical objects you can grab.
 
-Not an AI dashboard.
+Opening Ohara should feel energizing, like flipping through a well-organized sticker book, not like tiptoeing into a reading room.
 
-Not a bookmark manager.
+The interface has personality. It doesn't disappear — it invites.
 
-Opening Ohara should feel similar to entering a quiet reading room.
-
-The interface should disappear behind the content.
-
-The user should never feel overwhelmed.
-
-The goal is to make reading irresistible.
+The goal is to make saving and reading fast, satisfying, and a little fun.
 
 ---
 
@@ -34,22 +28,20 @@ The goal is to make reading irresistible.
 
 Every screen should evoke:
 
-* Calm
-* Curiosity
-* Warmth
-* Focus
-* Trust
+* Energy
+* Playfulness
+* Confidence
+* Clarity
+* Delight
 
 Avoid creating feelings of:
 
-* Stress
-* Urgency
-* Information overload
-* Productivity guilt
+* Sterility
+* Corporate blandness
+* Visual timidity
+* Overload from clutter (bold ≠ busy)
 
-Ohara should never pressure the user.
-
-Instead it should quietly invite them back.
+Ohara should feel like a tool the user is excited to open.
 
 ---
 
@@ -124,65 +116,27 @@ Advanced metadata, AI features, projects, and relationships should stay out of t
 
 ## Personality
 
-Imagine a blend of:
+Neo-brutalist: thick black borders, hard offset drop shadows (no blur), bold saturated accent colors, chunky rounded-but-square shapes, confident condensed display type for headings.
 
-Apple Books
-
-*
-
-Kindle
-
-*
-
-Linear's simplicity
-
-*
-
-Arc Browser's polish
-
-*
-
-The atmosphere of an old library
-
-Without copying any of them.
+Think a well-made sticker or a physical folder with a colored tab — every element should look like it has weight and could be picked up.
 
 ---
 
 ## Typography
 
-Typography is the primary design element.
+Headings use a bold, condensed, high-contrast display face — confident, a little loud.
 
-Prioritize readability over uniqueness.
+Body/reading text stays highly readable — the reader view is the one place restraint wins over personality (see Reader Experience below).
 
-Headings should feel confident.
-
-Body text should disappear into the reading experience.
-
-Line length should encourage long-form reading.
-
-Generous spacing is mandatory.
-
-Never compress text.
+Generous spacing still applies. Never compress text in the reader.
 
 ---
 
 ## Color Philosophy
 
-Colors should support reading.
+Bold and saturated, not muted. A small palette of confident accent colors (e.g. warm yellow, hot pink, violet, mint) used deliberately per collection/category, against a warm off-white (not stark white) base and true-black borders/text.
 
-Avoid overly saturated interfaces.
-
-Prefer:
-
-Warm neutrals
-
-Soft grays
-
-Muted accent colors
-
-Natural surfaces
-
-Dark mode should feel like reading under warm light rather than looking at a terminal.
+Dark mode should keep the same energy — bold accents against a near-black surface, not a dimmed-down version of light mode.
 
 ---
 
@@ -198,7 +152,7 @@ Whenever available:
 * PDF preview
 * Repository avatar
 
-Cards should feel alive.
+Cards are folder-tab shaped where they represent a collection, and image-forward where they represent content. Cards should feel like physical, grabbable objects — border + hard shadow, never flat.
 
 Avoid walls of text.
 
@@ -460,31 +414,21 @@ The application should never make the user feel guilty for not reading.
 
 Products:
 
-Apple Books
+Tuckii
 
-Readwise Reader
+Pop-art / neo-brutalist web design
 
-Arc Browser
+Duolingo (confidence, color, character)
 
-Linear
+Physical objects:
 
-Notion (simplicity only)
+Sticker books
 
-Kindle
+Folder tabs and physical filing
 
-Physical spaces:
+Zines
 
-Libraries
-
-Bookstores
-
-Reading rooms
-
-University archives
-
-Museums
-
-The goal is to create the feeling of wandering through a thoughtfully curated library rather than managing digital files.
+The goal is to create the feeling of a tactile, colorful, personal collection — not a sterile productivity tool.
 
 ---
 
@@ -492,16 +436,14 @@ The goal is to create the feeling of wandering through a thoughtfully curated li
 
 When opening Ohara, the user should feel:
 
-"I've been looking forward to reading."
+"This is satisfying to use."
 
 Not:
 
-"I have so much to catch up on."
+"This feels like a spreadsheet."
 
-Curiosity should replace guilt.
+Confidence should replace timidity.
 
-Reading should replace collecting.
-
-Knowledge should replace clutter.
+Personality should replace blandness.
 
 If a design decision moves the product away from this feeling, it is the wrong decision.

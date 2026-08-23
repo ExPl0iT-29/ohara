@@ -59,6 +59,7 @@ export interface ContentItem {
   archivedAt: string | null;
   scrollProgress: number | null;
   highlights: Highlight[];
+  isStub: boolean;
 }
 
 export interface CaptureContentResponse {
