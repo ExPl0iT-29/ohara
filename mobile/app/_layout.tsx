@@ -30,6 +30,22 @@ function ShareIntentRedirect() {
   return null;
 }
 
+function OnboardingRedirect() {
+  const router = useRouter();
+  const { hasShareIntent } = useShareIntentContext();
+
+  useEffect(() => {
+    // ponytail: skips onboarding for this launch if a share intent is already in flight,
+    // to avoid competing with ShareIntentRedirect's push to /capture.
+    if (hasShareIntent) return;
+    if (getSetting("onboarding_complete") !== "1") {
+      router.replace("/onboarding");
+    }
+  }, [hasShareIntent, router]);
+
+  return null;
+}
+
 export default function RootLayout() {
   const { setColorScheme, colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -62,6 +78,7 @@ export default function RootLayout() {
       <ShareIntentProvider>
         <QueryClientProvider client={queryClient}>
           <ShareIntentRedirect />
+          <OnboardingRedirect />
           <Stack screenOptions={{ headerShown: false, animation: "none", ...headerOptions }}>
             <Stack.Screen
               name="capture"

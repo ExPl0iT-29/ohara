@@ -16,6 +16,9 @@ export function FeedEmptyState() {
       <BrutalButton pill variant="primary" onPress={() => router.push("/capture")} className="mt-2">
         <Text className="text-body font-extrabold text-ink">Save a link</Text>
       </BrutalButton>
+      <Text className="text-center text-caption text-ink-faint">
+        Or share a link into Ohara from any app.
+      </Text>
     </View>
   );
 }
