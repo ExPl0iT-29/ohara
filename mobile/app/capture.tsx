@@ -70,7 +70,7 @@ export default function CaptureScreen() {
         />
 
         {existing && (
-          <View className="gap-2 rounded-card border-3 border-ink bg-accent-mint/30 p-4">
+          <View className="gap-2 rounded-card border-3 border-ink bg-accent-mintLight p-4">
             <Text className="text-body font-semibold text-ink dark:text-paper">Already saved.</Text>
             <Pressable onPress={() => router.replace(`/content/${existing.id}`)} className="self-start">
               <Text className="text-caption font-bold text-ink underline">Open existing item</Text>

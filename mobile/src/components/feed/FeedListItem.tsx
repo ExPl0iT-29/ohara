@@ -115,13 +115,13 @@ function FeedListItemBase({ item, onPress, onToggleArchive }: FeedListItemProps)
             },
           ]}
         >
-          <ActionButton label="Open" bg="#5B8DEF80" onPress={handleOpen} />
+          <ActionButton label="Open" bg="#5B8DEF" onPress={handleOpen} />
           <ActionButton
             label={isArchived ? "Unarc" : "Arc"}
-            bg="#FFC93380"
+            bg="#FFC933"
             onPress={handleArchiveToggle}
           />
-          <ActionButton label="Share" bg="#34D39980" onPress={handleShare} />
+          <ActionButton label="Share" bg="#34D399" onPress={handleShare} />
         </Animated.View>
 
         <View
@@ -150,7 +150,7 @@ function FeedListItemBase({ item, onPress, onToggleArchive }: FeedListItemProps)
               </Text>
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center gap-2">
-                  <View className="self-start rounded-pill border-2 border-ink bg-accent-yellow/50 px-2 py-0.5">
+                  <View className="self-start rounded-pill border-2 border-ink bg-accent-yellow px-2 py-0.5">
                     <Text className="text-caption font-bold text-ink">
                       {CONTENT_TYPE_LABELS[item.contentType]}
                     </Text>

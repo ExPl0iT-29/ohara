@@ -150,7 +150,7 @@ export default function ReaderScreen() {
               <Pressable
                 key={tag}
                 onPress={() => handleRemoveTag(tag)}
-                className="rounded-pill border-2 border-ink bg-accent-violet/30 px-3 py-1"
+                className="rounded-pill border-2 border-ink bg-accent-violetLight px-3 py-1"
               >
                 <Text className="text-caption font-bold text-ink">{tag} ×</Text>
               </Pressable>
@@ -199,7 +199,7 @@ export default function ReaderScreen() {
             {data.highlights.map((highlight) => (
               <View
                 key={highlight.id}
-                className="gap-1 rounded-card border-3 border-ink bg-accent-yellow/20 p-3"
+                className="gap-1 rounded-card border-3 border-ink bg-accent-yellowLight p-3"
               >
                 <Text className="text-body italic text-ink dark:text-paper">"{highlight.quote}"</Text>
                 {highlight.note ? (

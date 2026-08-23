@@ -23,10 +23,15 @@ module.exports = {
         },
         accent: {
           yellow: "#FFC933",
+          yellowLight: "#FFF3D1",
           pink: "#FF5C8A",
+          pinkLight: "#FFE1EA",
           violet: "#8B5CF6",
+          violetLight: "#EDE4FF",
           mint: "#34D399",
+          mintLight: "#D6F5E8",
           blue: "#5B8DEF",
+          blueLight: "#E1E9FB",
         },
         line: "#1C1917",
         danger: {

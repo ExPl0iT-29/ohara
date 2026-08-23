@@ -62,7 +62,7 @@ export default function RootLayout() {
       <ShareIntentProvider>
         <QueryClientProvider client={queryClient}>
           <ShareIntentRedirect />
-          <Stack screenOptions={{ headerShown: false, ...headerOptions }}>
+          <Stack screenOptions={{ headerShown: false, animation: "none", ...headerOptions }}>
             <Stack.Screen
               name="capture"
               options={{ presentation: "modal", headerShown: true, title: "Save a link", ...headerOptions }}
