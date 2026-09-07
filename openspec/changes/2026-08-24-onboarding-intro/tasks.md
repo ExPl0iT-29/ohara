@@ -14,5 +14,5 @@
 ## 4. Verification
 
 - [x] 4.1 `npx tsc --noEmit` clean
-- [ ] 4.2 On-device or emulator: fresh install shows onboarding once, "Get started" routes to feed, relaunching the app does not show onboarding again
+- [x] 4.2 On-device or emulator: fresh install shows onboarding once, "Get started" routes to feed, relaunching the app does not show onboarding again
 - [x] 4.3 Sync spec delta into `openspec/specs/onboarding/spec.md`, archive the change
