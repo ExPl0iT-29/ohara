@@ -81,6 +81,26 @@ No environment file or API keys are needed.
 
 <hr>
 
+## Releasing to Google Play
+
+Application ID: `com.ember.ohara` (permanent once uploaded). Version name is `expo.version`; bump `expo.android.versionCode` by one for every upload.
+
+```bash
+cd mobile
+npm install -g eas-cli
+eas build --platform android --profile production   # signed .aab for Play
+```
+
+Fallback without EAS: `npx expo prebuild --platform android`, then build a bundle from `mobile/android` with Gradle (`./gradlew bundleRelease`) using your own upload keystore. Never commit keystores or passwords.
+
+**Moving a library from the old private build (`com.explooit.mobile`):** the new ID installs as a separate app. In the old app go to Settings → Export library, save or share the JSON file, open the new app, go to Settings → Import from file, check your items, then uninstall the old app.
+
+**Privacy policy:** `docs/privacy/index.html`, served by GitHub Pages (enable Pages for the `main` branch `/docs` folder) at `https://expl0it-29.github.io/ohara/privacy/`. The in-app link lives in `mobile/src/constants/links.ts`. Any change that adds accounts, analytics, ads, cloud or AI must update the policy and the Play Data safety form first.
+
+The launch sequence (internal, closed, production testing, ASO, landing page) is in [`docs/launch/launch-plan.md`](docs/launch/launch-plan.md) on the `docs/launch-plan` branch.
+
+<hr>
+
 ## Git workflow
 
 Each OpenSpec change gets its own branch off `main`, merged back with `--no-ff` once done. Never commit feature work directly to `main`. See [`CLAUDE.md`](CLAUDE.md).

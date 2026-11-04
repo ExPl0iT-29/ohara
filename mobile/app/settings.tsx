@@ -1,4 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
+import Constants from "expo-constants";
+import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import { useColorScheme } from "nativewind";
 import { useState } from "react";
@@ -9,6 +11,7 @@ import { exportBackup, importBackup } from "../src/backup/backup";
 import { setSetting } from "../src/db/settings";
 import { BrutalButton } from "../src/components/ui/BrutalButton";
 import { BrutalCard } from "../src/components/ui/BrutalCard";
+import { PRIVACY_POLICY_URL } from "../src/constants/links";
 
 const THEME_OPTIONS = ["light", "dark", "system"] as const;
 
@@ -39,6 +42,14 @@ export default function SettingsScreen() {
       Alert.alert("Import failed", error instanceof Error ? error.message : String(error));
     } finally {
       setBusy(false);
+    }
+  };
+
+  const handleOpenPrivacy = async () => {
+    try {
+      await Linking.openURL(PRIVACY_POLICY_URL);
+    } catch {
+      Alert.alert("Couldn't open the privacy policy", `You can read it at ${PRIVACY_POLICY_URL}`);
     }
   };
 
@@ -89,6 +100,21 @@ export default function SettingsScreen() {
             <Text className="text-center text-body font-bold text-ink dark:text-paper">Library stats</Text>
           </Pressable>
         </BrutalCard>
+
+        <Text className="mt-4 text-title text-ink dark:text-paper">About</Text>
+        <Text className="text-body text-ink-soft dark:text-ink-faint">
+          Ohara keeps everything on your phone. No account, no ads, no tracking.
+        </Text>
+
+        <BrutalCard>
+          <Pressable className="p-4 active:opacity-80" onPress={handleOpenPrivacy}>
+            <Text className="text-center text-body font-bold text-ink dark:text-paper">Privacy policy</Text>
+          </Pressable>
+        </BrutalCard>
+
+        <Text className="text-center text-caption text-ink-soft dark:text-ink-faint">
+          Version {Constants.expoConfig?.version ?? "1.0.0"}
+        </Text>
       </View>
     </SafeAreaView>
   );
