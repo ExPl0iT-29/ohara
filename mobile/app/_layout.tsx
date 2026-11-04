@@ -54,7 +54,7 @@ export default function RootLayout() {
     logSinceBundleStart("RootLayout mounted");
 
     // Deferred until after first paint/interactions so the initial feed render isn't
-    // competing with network fetches + AI enrichment for stuck rows on launch.
+    // competing with network fetches for stuck rows on launch.
     const task = InteractionManager.runAfterInteractions(() => {
       void reprocessStuckContent();
     });

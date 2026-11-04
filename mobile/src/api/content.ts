@@ -1,7 +1,7 @@
 import {
   findContentRowByUrl,
   getAllContentRows,
-  getAllTagsAndTopics,
+  getAllTags,
   getContentRow,
   getLibraryStats,
   getPresentContentTypes,
@@ -77,7 +77,7 @@ export interface ListContentParams {
   contentType?: ContentType;
   archived?: boolean;
   search?: string;
-  tagOrTopic?: string;
+  tag?: string;
 }
 
 export async function captureContent(
@@ -124,8 +124,8 @@ export function removeTag(id: string, tag: string): void {
   updateContentRow(id, { tags: item.tags.filter((t) => t !== tag) });
 }
 
-export function getAllTagsAndTopicsList(): string[] {
-  return getAllTagsAndTopics();
+export function getAllTagsList(): string[] {
+  return getAllTags();
 }
 
 export function getPresentContentTypesList(): ContentType[] {

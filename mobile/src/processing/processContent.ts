@@ -1,4 +1,3 @@
-import { enrichContent } from "../ai/enrich";
 import { extractArticle } from "../extraction/extractArticle";
 import { extractGoogleDoc, matchGoogleDocId } from "../extraction/extractGoogleDoc";
 import { extractPdf } from "../extraction/extractPdf";
@@ -44,14 +43,6 @@ export async function processContent(id: string): Promise<void> {
       metadata: { processingError: error instanceof Error ? error.message : String(error) },
     });
     return;
-  }
-
-  const refreshed = getContentRow(id);
-  if (refreshed?.extractedText) {
-    const enrichment = await enrichContent(refreshed.extractedText);
-    if (enrichment) {
-      updateContentRow(id, { summary: enrichment.summary, topics: enrichment.topics });
-    }
   }
 }
 

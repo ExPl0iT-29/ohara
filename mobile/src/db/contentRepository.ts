@@ -75,7 +75,7 @@ export function insertContent(url: string, contentType: ContentType): ContentIte
 }
 
 export function listContentRows(params: ListContentParams = {}): ContentItem[] {
-  const { limit = 20, offset = 0, status, contentType, archived = false, search, tagOrTopic } = params;
+  const { limit = 20, offset = 0, status, contentType, archived = false, search, tag } = params;
   const clauses: string[] = [];
   const args: (string | number)[] = [];
   if (status) {
@@ -88,14 +88,13 @@ export function listContentRows(params: ListContentParams = {}): ContentItem[] {
   }
   clauses.push(archived ? "archivedAt IS NOT NULL" : "archivedAt IS NULL");
   if (search) {
-    clauses.push("(title LIKE ? OR summary LIKE ? OR extractedText LIKE ?)");
+    clauses.push("(title LIKE ? OR extractedText LIKE ?)");
     const needle = `%${search}%`;
-    args.push(needle, needle, needle);
-  }
-  if (tagOrTopic) {
-    clauses.push("(tags LIKE ? OR topics LIKE ?)");
-    const needle = `%"${tagOrTopic}"%`;
     args.push(needle, needle);
+  }
+  if (tag) {
+    clauses.push("tags LIKE ?");
+    args.push(`%"${tag}"%`);
   }
   const where = clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
   const rows = db.getAllSync<ContentRow>(
@@ -114,14 +113,11 @@ export function getAllContentRows(): ContentItem[] {
   return db.getAllSync<ContentRow>(`SELECT * FROM content ORDER BY savedAt DESC`).map(rowToItem);
 }
 
-export function getAllTagsAndTopics(): string[] {
-  const rows = db.getAllSync<{ tags: string; topics: string }>(
-    `SELECT tags, topics FROM content WHERE archivedAt IS NULL`,
-  );
+export function getAllTags(): string[] {
+  const rows = db.getAllSync<{ tags: string }>(`SELECT tags FROM content WHERE archivedAt IS NULL`);
   const values = new Set<string>();
   for (const row of rows) {
     for (const value of JSON.parse(row.tags) as string[]) values.add(value);
-    for (const value of JSON.parse(row.topics) as string[]) values.add(value);
   }
   return [...values].sort();
 }

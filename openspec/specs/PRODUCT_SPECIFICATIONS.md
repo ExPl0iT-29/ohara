@@ -116,6 +116,8 @@ Search is intended to act as memory rather than keyword lookup.
 
 ## AI Features
 
+> **Not part of the current product.** Ohara ships with no AI. This section describes possible future direction only. The app works entirely on-device with no accounts or cloud.
+
 Automatic:
 
 * metadata extraction

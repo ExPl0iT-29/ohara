@@ -26,7 +26,6 @@ import {
 import { ReaderBody } from "../../src/components/reader/ReaderBody";
 import { ReaderHeader } from "../../src/components/reader/ReaderHeader";
 import { ReaderStatusNotice } from "../../src/components/reader/ReaderStatusNotice";
-import { ReaderSummary } from "../../src/components/reader/ReaderSummary";
 import { useContentItem } from "../../src/hooks/useContentItem";
 import { BrutalButton } from "../../src/components/ui/BrutalButton";
 
@@ -189,7 +188,6 @@ export default function ReaderScreen() {
         )}
         {data.status === "ready" && !data.isStub && (
           <>
-            <ReaderSummary summary={data.summary} />
             <ReaderBody extractedText={data.extractedText} />
           </>
         )}
