@@ -32,3 +32,9 @@ Thumbs.db
 
 # Logs
 *.log
+
+# local-only files
+ohara_backup.db
+ohara_db.txt
+tracker
+/*.png
