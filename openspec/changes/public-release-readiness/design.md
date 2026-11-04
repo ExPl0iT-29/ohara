@@ -39,10 +39,10 @@ Per Google's Play requirement, new apps and updates must target at least API 36 
 After prebuild, list permissions from the merged manifest and remove extras with config. Expected set: `INTERNET` plus whatever `expo-share-intent` and `expo-sharing` require. Anything storage-wide, location, camera or microphone is a bug.
 
 ### D8. Privacy policy is a static page on a stable HTTPS URL
-A single static HTML file under `web/privacy/`, hosted wherever the landing page lives (GitHub Pages or Vercel are both free). The URL goes into the Play listing, the Data safety form and Settings. Writing it as plain language keeps it honest: the app has no backend, so it can say "no data is collected" truthfully.
+A single static HTML file under `docs/privacy/`, served by GitHub Pages from the `docs` folder (the repo is public) until a custom domain exists, then moved to the landing site. The URL goes into the Play listing, the Data safety form and Settings. Writing it as plain language keeps it honest: the app has no backend, so it can say "no data is collected" truthfully.
 
 ### D9. Settings opens the policy with the system browser
-Use the existing `expo-linking`; no in-app web view and no new dependency. If offline, show a calm message instead of failing.
+Use the existing `expo-linking`; no in-app web view and no new dependency. The browser shows its own offline page; the app only handles a failed open with a calm message.
 
 ### D10. Data safety answers are derived, not invented
 Answers follow from `local-only-operation`: no data collected, no data shared, no account, and the policy link supplied. Disclosure is kept consistent by a spec requirement that any future off-device data flow must update the policy and form first.
@@ -70,4 +70,4 @@ Play requires an icon (512x512), feature graphic (1024x500), at least two phone 
 
 ## Open Questions
 
-- Which domain hosts the policy and landing page, and what public contact address goes in the policy and store listing? Neither changes the specs or tasks; both are needed before the Data safety form is submitted. A dedicated address is preferable to a personal one.
+- Custom domain and a dedicated public contact address: the policy currently points contact to GitHub issues and the Play listing address, and the in-app link uses the GitHub Pages URL. Moving to a custom domain later means one constant (`mobile/src/constants/links.ts`) and one redirect, with no spec change.

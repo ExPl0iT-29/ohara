@@ -36,9 +36,9 @@ The system SHALL show an About and privacy entry in Settings that opens the poli
 - **WHEN** a user taps the privacy entry in Settings
 - **THEN** the policy opens in the system browser
 
-#### Scenario: Offline
-- **WHEN** the device has no connection and the user taps the privacy entry
-- **THEN** the app shows a calm message that the policy needs a connection, without crashing
+#### Scenario: Policy cannot be opened
+- **WHEN** the system cannot open the policy URL (for example no browser or no connection)
+- **THEN** the app shows a calm message with the policy address, without crashing
 
 ### Requirement: Data Safety Declaration Matches Behaviour
 The Play Data safety declaration SHALL state that the app collects and shares no user data, and SHALL stay consistent with the privacy policy and with `local-only-operation`.
