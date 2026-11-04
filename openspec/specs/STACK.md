@@ -14,9 +14,7 @@ Backend
 - Pydantic
 
 AI
-- OpenAI
-- Gemini
-- Ollama (future)
+- None in the current product (see `PRODUCT_SPECIFICATIONS.md`)
 
 Extraction
 - Firecrawl

@@ -8,7 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import {
   archiveContent,
-  getAllTagsAndTopicsList,
+  getAllTagsList,
   getPresentContentTypesList,
   unarchiveContent,
   type ContentItem,
@@ -28,15 +28,15 @@ export default function FeedScreen() {
   const queryClient = useQueryClient();
   const [archived, setArchived] = useState(false);
   const [search, setSearch] = useState("");
-  const [tagOrTopic, setTagOrTopic] = useState<string | null>(null);
+  const [tag, setTag] = useState<string | null>(null);
   const [contentType, setContentType] = useState<ContentType | null>(null);
   const { data, isLoading, isFetching, error, refetch } = useContentList({
     archived,
     search: search || undefined,
-    tagOrTopic: tagOrTopic ?? undefined,
+    tag: tag ?? undefined,
     contentType: contentType ?? undefined,
   });
-  const tagChips = useMemo(() => getAllTagsAndTopicsList(), [data]);
+  const tagChips = useMemo(() => getAllTagsList(), [data]);
   const typeChips = useMemo(() => getPresentContentTypesList(), [data]);
   const fabScale = useSharedValue(1);
   const fabStyle = useAnimatedStyle(() => ({ transform: [{ scale: fabScale.value }] }));
@@ -121,12 +121,12 @@ export default function FeedScreen() {
             );
           })}
           {tagChips.map((chip) => {
-            const selected = tagOrTopic === chip;
+            const selected = tag === chip;
             return (
               <Pressable
                 key={chip}
                 className={`rounded-pill border-2 border-ink px-3 py-1 ${selected ? "bg-accent-violet" : "bg-paper dark:bg-surface-dark"}`}
-                onPress={() => setTagOrTopic(selected ? null : chip)}
+                onPress={() => setTag(selected ? null : chip)}
               >
                 <Text className="text-caption font-bold text-ink">{chip}</Text>
               </Pressable>

@@ -1,7 +1,7 @@
 # content-search Specification
 
 ## Purpose
-Lets a user find saved content by free-text query against title, summary, and extracted body text.
+Lets a user find saved content by free-text query against title and extracted body text.
 
 ## Requirements
 

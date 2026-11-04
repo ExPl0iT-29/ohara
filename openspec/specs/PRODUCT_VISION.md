@@ -60,6 +60,8 @@ instead of
 
 ### AI Should Work Quietly
 
+> **Not part of the current product.** Ohara ships with no AI: no accounts, no cloud, no model calls. The principle below is kept as direction if AI is ever reintroduced.
+
 AI should reduce manual effort rather than introduce new workflows.
 
 It should automatically:

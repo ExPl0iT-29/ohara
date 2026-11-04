@@ -1,7 +1,7 @@
 # tagging Specification
 
 ## Purpose
-Lets a user organize saved content by freeform, user-defined tags, and filter the feed by either those tags or the AI-generated topics already produced during enrichment.
+Lets a user organize saved content by freeform, user-defined tags, and filter the feed by those tags.
 
 ## Requirements
 
