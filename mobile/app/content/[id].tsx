@@ -8,10 +8,8 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
   addHighlight,
@@ -27,7 +25,10 @@ import { ReaderBody } from "../../src/components/reader/ReaderBody";
 import { ReaderHeader } from "../../src/components/reader/ReaderHeader";
 import { ReaderStatusNotice } from "../../src/components/reader/ReaderStatusNotice";
 import { useContentItem } from "../../src/hooks/useContentItem";
-import { BrutalButton } from "../../src/components/ui/BrutalButton";
+import { Button } from "../../src/components/ui/Button";
+import { Tag } from "../../src/components/ui/Tag";
+import { TextField } from "../../src/components/ui/TextField";
+import { Screen } from "../../src/components/ui/Screen";
 
 export default function ReaderScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -102,17 +103,17 @@ export default function ReaderScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-paper dark:bg-surface-dark">
-        <Text className="p-5 text-body text-ink-soft dark:text-ink-faint">Loading...</Text>
-      </SafeAreaView>
+      <Screen>
+        <Text className="font-ui p-5 text-body text-ink-soft dark:text-ink-faint">Loading...</Text>
+      </Screen>
     );
   }
 
   if (error || !data) {
     return (
-      <SafeAreaView className="flex-1 bg-paper dark:bg-surface-dark">
-        <Text className="p-5 text-body text-danger">Not found</Text>
-      </SafeAreaView>
+      <Screen>
+        <Text className="font-ui p-5 text-body text-danger">Not found</Text>
+      </Screen>
     );
   }
 
@@ -128,7 +129,7 @@ export default function ReaderScreen() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-paper dark:bg-surface-dark">
+    <Screen>
       <ScrollView
         ref={scrollViewRef}
         contentContainerStyle={{ padding: 20, gap: 20 }}
@@ -137,35 +138,29 @@ export default function ReaderScreen() {
         onMomentumScrollEnd={handleScrollEnd}
       >
         {header}
-        <BrutalButton pill onPress={handleToggleArchive} className="self-start px-3 py-1.5">
-          <Text className="text-caption font-bold text-ink">
+        <Button pill onPress={handleToggleArchive} className="self-start px-3 py-1.5">
+          <Text className="font-ui text-caption font-bold text-ink">
             {data.archivedAt ? "Unarchive" : "Archive"}
           </Text>
-        </BrutalButton>
+        </Button>
 
         <View className="gap-2">
           <View className="flex-row flex-wrap gap-2">
             {data.tags.map((tag) => (
-              <Pressable
-                key={tag}
-                onPress={() => handleRemoveTag(tag)}
-                className="rounded-pill border-2 border-ink bg-accent-violetLight px-3 py-1"
-              >
-                <Text className="text-caption font-bold text-ink">{tag} ×</Text>
-              </Pressable>
+              <Tag key={tag} label={tag} onPress={() => handleRemoveTag(tag)} />
             ))}
           </View>
           <View className="flex-row gap-2">
-            <TextInput
+            <TextField
+              shape="pillSmall"
+              className="flex-1"
               value={newTag}
               onChangeText={setNewTag}
               onSubmitEditing={handleAddTag}
               placeholder="Add tag"
-              placeholderTextColor="#A8A29E"
-              className="flex-1 rounded-pill border-2 border-ink px-3 py-1.5 text-caption text-ink dark:text-paper"
             />
             <Pressable onPress={handleAddTag} className="justify-center px-2">
-              <Text className="text-caption font-bold text-ink underline">Add</Text>
+              <Text className="font-ui text-caption font-bold text-ink underline">Add</Text>
             </Pressable>
           </View>
         </View>
@@ -179,11 +174,11 @@ export default function ReaderScreen() {
         {data.status === "ready" && data.isStub && (
           <View className="gap-4">
             {data.description && (
-              <Text className="text-body text-ink-soft dark:text-ink-faint">{data.description}</Text>
+              <Text className="font-ui text-body text-ink-soft dark:text-ink-faint">{data.description}</Text>
             )}
-            <BrutalButton pill variant="primary" onPress={() => Linking.openURL(data.url)}>
-              <Text className="text-caption font-extrabold text-ink">Open original link</Text>
-            </BrutalButton>
+            <Button pill variant="primary" onPress={() => Linking.openURL(data.url)}>
+              <Text className="font-ui text-caption font-extrabold text-ink">Open original link</Text>
+            </Button>
           </View>
         )}
         {data.status === "ready" && !data.isStub && (
@@ -193,43 +188,29 @@ export default function ReaderScreen() {
         )}
         {data.status === "ready" && (
           <View className="gap-3 border-t-3 border-ink pt-4">
-            <Text className="text-body font-semibold text-ink dark:text-paper">Highlights</Text>
+            <Text className="font-ui text-body font-semibold text-ink dark:text-paper">Highlights</Text>
             {data.highlights.map((highlight) => (
               <View
                 key={highlight.id}
                 className="gap-1 rounded-card border-3 border-ink bg-accent-yellowLight p-3"
               >
-                <Text className="text-body italic text-ink dark:text-paper">"{highlight.quote}"</Text>
+                <Text className="font-ui text-body italic text-ink dark:text-paper">"{highlight.quote}"</Text>
                 {highlight.note ? (
-                  <Text className="text-caption text-ink-soft dark:text-ink-faint">{highlight.note}</Text>
+                  <Text className="font-ui text-caption text-ink-soft dark:text-ink-faint">{highlight.note}</Text>
                 ) : null}
                 <Pressable onPress={() => handleRemoveHighlight(highlight.id)} className="self-start">
-                  <Text className="text-caption font-bold text-danger">Remove</Text>
+                  <Text className="font-ui text-caption font-bold text-danger">Remove</Text>
                 </Pressable>
               </View>
             ))}
-            <TextInput
-              value={newQuote}
-              onChangeText={setNewQuote}
-              placeholder="Quote"
-              placeholderTextColor="#A8A29E"
-              multiline
-              className="rounded-card border-3 border-ink p-3 text-body text-ink dark:text-paper"
-            />
-            <TextInput
-              value={newNote}
-              onChangeText={setNewNote}
-              placeholder="Note (optional)"
-              placeholderTextColor="#A8A29E"
-              multiline
-              className="rounded-card border-3 border-ink p-3 text-body text-ink dark:text-paper"
-            />
-            <BrutalButton pill variant="primary" onPress={handleAddHighlight} className="self-start">
-              <Text className="text-caption font-extrabold text-ink">Save highlight</Text>
-            </BrutalButton>
+            <TextField shape="box" value={newQuote} onChangeText={setNewQuote} placeholder="Quote" multiline />
+            <TextField shape="box" value={newNote} onChangeText={setNewNote} placeholder="Note (optional)" multiline />
+            <Button pill variant="primary" onPress={handleAddHighlight} className="self-start">
+              <Text className="font-ui text-caption font-extrabold text-ink">Save highlight</Text>
+            </Button>
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }

@@ -1,8 +1,6 @@
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -18,13 +16,17 @@ import { CONTENT_TYPE_LABELS } from "../src/constants/contentTypeLabels";
 import { FeedEmptyState } from "../src/components/feed/FeedEmptyState";
 import { FeedErrorState } from "../src/components/feed/FeedErrorState";
 import { FeedListItem } from "../src/components/feed/FeedListItem";
+import { Chip } from "../src/components/ui/Chip";
+import { Fab } from "../src/components/ui/Fab";
+import { Screen } from "../src/components/ui/Screen";
+import { TextField } from "../src/components/ui/TextField";
 import { useContentList } from "../src/hooks/useContentList";
 import { logSinceBundleStart } from "../src/perf";
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+import { useTheme } from "../src/theme/useTheme";
 
 export default function FeedScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const queryClient = useQueryClient();
   const [archived, setArchived] = useState(false);
   const [search, setSearch] = useState("");
@@ -38,8 +40,6 @@ export default function FeedScreen() {
   });
   const tagChips = useMemo(() => getAllTagsList(), [data]);
   const typeChips = useMemo(() => getPresentContentTypesList(), [data]);
-  const fabScale = useSharedValue(1);
-  const fabStyle = useAnimatedStyle(() => ({ transform: [{ scale: fabScale.value }] }));
 
   useEffect(() => {
     if (!isLoading) logSinceBundleStart("Feed screen: first content rendered");
@@ -67,37 +67,21 @@ export default function FeedScreen() {
   const keyExtractor = useCallback((item: ContentItem) => item.id, []);
 
   return (
-    <SafeAreaView className="flex-1 bg-paper dark:bg-surface-dark">
+    <Screen>
       <View className="flex-row items-center justify-between px-5 pb-2 pt-4">
-        <Text className="text-display text-ink dark:text-paper">Ohara</Text>
-        <Pressable onPress={() => router.push("/settings")}>
-          <Text className="text-caption text-ink-soft dark:text-ink-faint">Settings</Text>
+        <Text className="font-heading text-display text-ink dark:text-paper">Ohara</Text>
+        <Pressable onPress={() => router.push("/settings")} accessibilityRole="button">
+          <Text className="font-ui text-caption text-ink-soft dark:text-ink-faint">Settings</Text>
         </Pressable>
       </View>
 
       <View className="flex-row gap-2 px-5 pb-2">
-        <Pressable
-          className={`rounded-pill border-3 border-ink px-4 py-1.5 ${archived ? "bg-paper dark:bg-surface-dark" : "bg-brand"}`}
-          onPress={() => setArchived(false)}
-        >
-          <Text className="text-caption font-bold text-ink">Active</Text>
-        </Pressable>
-        <Pressable
-          className={`rounded-pill border-3 border-ink px-4 py-1.5 ${archived ? "bg-brand" : "bg-paper dark:bg-surface-dark"}`}
-          onPress={() => setArchived(true)}
-        >
-          <Text className="text-caption font-bold text-ink">Archived</Text>
-        </Pressable>
+        <Chip size="md" label="Active" selected={!archived} onPress={() => setArchived(false)} />
+        <Chip size="md" label="Archived" selected={archived} onPress={() => setArchived(true)} />
       </View>
 
       <View className="px-5 pb-2">
-        <TextInput
-          value={search}
-          onChangeText={setSearch}
-          placeholder="Search your library"
-          placeholderTextColor="#A8A29E"
-          className="rounded-pill border-3 border-ink px-4 py-2 text-body text-ink dark:text-paper"
-        />
+        <TextField value={search} onChangeText={setSearch} placeholder="Search your library" />
       </View>
 
       {(typeChips.length > 0 || tagChips.length > 0) && (
@@ -111,25 +95,18 @@ export default function FeedScreen() {
           {typeChips.map((type) => {
             const selected = contentType === type;
             return (
-              <Pressable
+              <Chip
                 key={`type-${type}`}
-                className={`rounded-pill border-2 border-ink px-3 py-1 ${selected ? "bg-brand" : "bg-paper dark:bg-surface-dark"}`}
+                label={CONTENT_TYPE_LABELS[type]}
+                selected={selected}
                 onPress={() => setContentType(selected ? null : type)}
-              >
-                <Text className="text-caption font-bold text-ink">{CONTENT_TYPE_LABELS[type]}</Text>
-              </Pressable>
+              />
             );
           })}
           {tagChips.map((chip) => {
             const selected = tag === chip;
             return (
-              <Pressable
-                key={chip}
-                className={`rounded-pill border-2 border-ink px-3 py-1 ${selected ? "bg-accent-violet" : "bg-paper dark:bg-surface-dark"}`}
-                onPress={() => setTag(selected ? null : chip)}
-              >
-                <Text className="text-caption font-bold text-ink">{chip}</Text>
-              </Pressable>
+              <Chip key={chip} tone="tag" label={chip} selected={selected} onPress={() => setTag(selected ? null : chip)} />
             );
           })}
         </ScrollView>
@@ -137,8 +114,8 @@ export default function FeedScreen() {
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center gap-3">
-          <ActivityIndicator color="#1C1917" size="large" />
-          <Text className="text-caption font-bold text-ink-soft dark:text-ink-faint">
+          <ActivityIndicator color={colors.text} size="large" />
+          <Text className="font-ui text-caption font-bold text-ink-soft dark:text-ink-faint">
             Loading your library...
           </Text>
         </View>
@@ -147,7 +124,7 @@ export default function FeedScreen() {
       ) : !data || data.length === 0 ? (
         archived ? (
           <View className="flex-1 items-center justify-center p-8">
-            <Text className="text-center text-body text-ink-soft dark:text-ink-faint">Nothing archived yet.</Text>
+            <Text className="text-center font-ui text-body text-ink-soft dark:text-ink-faint">Nothing archived yet.</Text>
           </View>
         ) : (
           <FeedEmptyState />
@@ -157,38 +134,12 @@ export default function FeedScreen() {
           data={data}
           keyExtractor={keyExtractor}
           contentContainerStyle={{ padding: 20, gap: 12 }}
-          refreshControl={<RefreshControl tintColor="#1C1917" refreshing={isFetching} onRefresh={refetch} />}
+          refreshControl={<RefreshControl tintColor={colors.text} colors={[colors.text]} refreshing={isFetching} onRefresh={refetch} />}
           renderItem={renderItem}
         />
       )}
 
-      <View pointerEvents="box-none" className="absolute bottom-8 right-6">
-        <View
-          pointerEvents="none"
-          style={{
-            position: "absolute",
-            top: 5,
-            left: 5,
-            right: -5,
-            bottom: -5,
-            backgroundColor: "#1C1917",
-            borderRadius: 999,
-          }}
-        />
-        <AnimatedPressable
-          className="h-14 w-14 items-center justify-center rounded-full border-3 border-ink bg-brand"
-          style={fabStyle}
-          onPressIn={() => {
-            fabScale.value = withSpring(0.9);
-          }}
-          onPressOut={() => {
-            fabScale.value = withSpring(1);
-          }}
-          onPress={handleOpenCapture}
-        >
-          <Text className="text-3xl font-extrabold leading-none text-ink">+</Text>
-        </AnimatedPressable>
-      </View>
-    </SafeAreaView>
+      <Fab onPress={handleOpenCapture} accessibilityLabel="Save a link" />
+    </Screen>
   );
 }

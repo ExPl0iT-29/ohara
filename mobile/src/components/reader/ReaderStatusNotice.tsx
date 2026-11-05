@@ -18,13 +18,13 @@ export function ReaderStatusNotice({ variant, url, onRetry }: ReaderStatusNotice
         variant === "failed" ? "bg-danger/20" : "bg-paper dark:bg-surface-dark"
       }`}
     >
-      <Text className="text-body text-ink-soft dark:text-ink-faint">{COPY[variant]}</Text>
+      <Text className="font-ui text-body text-ink-soft dark:text-ink-faint">{COPY[variant]}</Text>
       <Pressable onPress={() => Linking.openURL(url)}>
-        <Text className="text-body font-extrabold text-ink underline">Open original ↗</Text>
+        <Text className="font-ui text-body font-extrabold text-ink underline">Open original ↗</Text>
       </Pressable>
       {variant === "failed" && onRetry && (
         <Pressable onPress={onRetry}>
-          <Text className="text-body font-extrabold text-ink underline">Retry</Text>
+          <Text className="font-ui text-body font-extrabold text-ink underline">Retry</Text>
         </Pressable>
       )}
     </View>

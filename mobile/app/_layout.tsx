@@ -11,6 +11,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { getSetting } from "../src/db/settings";
 import { reprocessStuckContent } from "../src/processing/processContent";
 import { logSinceBundleStart } from "../src/perf";
+import { useTheme } from "../src/theme/useTheme";
 
 const queryClient = new QueryClient();
 
@@ -47,8 +48,8 @@ function OnboardingRedirect() {
 }
 
 export default function RootLayout() {
-  const { setColorScheme, colorScheme } = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { setColorScheme } = useColorScheme();
+  const { colors, fonts } = useTheme();
 
   useEffect(() => {
     logSinceBundleStart("RootLayout mounted");
@@ -68,9 +69,10 @@ export default function RootLayout() {
   }, [setColorScheme]);
 
   const headerOptions = {
-    headerStyle: { backgroundColor: isDark ? "#161412" : "#FAF9F6" },
-    headerTintColor: isDark ? "#FAF9F6" : "#1C1917",
-    headerTitleStyle: { color: isDark ? "#FAF9F6" : "#1C1917" },
+    headerStyle: { backgroundColor: colors.background },
+    headerTintColor: colors.text,
+    headerTitleStyle: { color: colors.text, fontFamily: fonts.heading },
+    contentStyle: { backgroundColor: colors.background },
   };
 
   return (

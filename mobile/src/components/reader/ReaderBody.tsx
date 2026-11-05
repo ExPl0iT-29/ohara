@@ -1,32 +1,27 @@
-import { useColorScheme } from "nativewind";
 import { Text, useWindowDimensions } from "react-native";
-import RenderHtml from "react-native-render-html";
+import RenderHtml, { defaultSystemFonts } from "react-native-render-html";
+
+import { useTheme, type Theme } from "../../theme/useTheme";
 
 interface ReaderBodyProps {
   extractedText: string | null;
 }
 
-const PALETTE = {
-  light: { text: "#1C1917", soft: "#57534E", link: "#3B6FD6" },
-  dark: { text: "#FAF9F6", soft: "#A8A29E", link: "#8FB4F5" },
-};
-
-function buildTagsStyles(theme: "light" | "dark") {
-  const { text, soft, link } = PALETTE[theme];
+function buildTagsStyles({ colors, fonts }: Theme) {
   return {
-    body: { color: text, fontSize: 16, lineHeight: 26 },
+    body: { color: colors.text, fontSize: 16, lineHeight: 26, fontFamily: fonts.reading },
     p: { marginBottom: 16 },
     img: { borderRadius: 16, marginVertical: 16 },
-    h1: { fontSize: 24, fontWeight: "700", marginBottom: 12, marginTop: 20 },
-    h2: { fontSize: 20, fontWeight: "700", marginBottom: 12, marginTop: 20 },
-    h3: { fontSize: 18, fontWeight: "700", marginBottom: 10, marginTop: 16 },
-    a: { color: link },
+    h1: { fontSize: 24, fontWeight: "700", marginBottom: 12, marginTop: 20, fontFamily: fonts.heading },
+    h2: { fontSize: 20, fontWeight: "700", marginBottom: 12, marginTop: 20, fontFamily: fonts.heading },
+    h3: { fontSize: 18, fontWeight: "700", marginBottom: 10, marginTop: 16, fontFamily: fonts.heading },
+    a: { color: colors.link },
     blockquote: {
       borderLeftWidth: 3,
-      borderLeftColor: link,
+      borderLeftColor: colors.link,
       paddingLeft: 16,
       marginLeft: 0,
-      color: soft,
+      color: colors.textSoft,
     },
     li: { marginBottom: 6 },
   } as const;
@@ -34,14 +29,13 @@ function buildTagsStyles(theme: "light" | "dark") {
 
 export function ReaderBody({ extractedText }: ReaderBodyProps) {
   const { width } = useWindowDimensions();
-  const { colorScheme } = useColorScheme();
-  const theme = colorScheme === "dark" ? "dark" : "light";
+  const theme = useTheme();
   if (!extractedText) return null;
 
   const isHtml = /<[a-z][\s\S]*>/i.test(extractedText);
   if (!isHtml) {
     return (
-      <Text className="text-body leading-loose text-ink dark:text-paper" style={{ maxWidth: 680 }}>
+      <Text className="font-reading text-body leading-loose text-ink dark:text-paper" style={{ maxWidth: 680 }}>
         {extractedText}
       </Text>
     );
@@ -52,6 +46,8 @@ export function ReaderBody({ extractedText }: ReaderBodyProps) {
       contentWidth={Math.min(width - 40, 680)}
       source={{ html: extractedText }}
       tagsStyles={buildTagsStyles(theme)}
+      // The renderer drops font families it does not know about, so register the theme's.
+      systemFonts={[...defaultSystemFonts, theme.fonts.reading, theme.fonts.heading]}
     />
   );
 }

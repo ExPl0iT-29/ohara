@@ -11,6 +11,7 @@ import Animated, {
 
 import type { ContentItem } from "../../api/content";
 import { CONTENT_TYPE_LABELS } from "../../constants/contentTypeLabels";
+import { useTheme } from "../../theme/useTheme";
 import { FeedStatusBadge } from "./FeedStatusBadge";
 
 interface FeedListItemProps {
@@ -26,33 +27,39 @@ const OPEN_THRESHOLD = REVEAL_WIDTH / 2;
 
 function ActionButton({
   label,
+  accessibilityLabel,
   bg,
   onPress,
 }: {
   label: string;
+  accessibilityLabel: string;
   bg: string;
   onPress: () => void;
 }) {
+  const { colors } = useTheme();
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
       style={{
         width: ACTION_SIZE,
         height: ACTION_SIZE,
         borderRadius: ACTION_SIZE / 2,
         borderWidth: 3,
-        borderColor: "#1C1917",
+        borderColor: colors.line,
         backgroundColor: bg,
         alignItems: "center",
         justifyContent: "center",
       }}
     >
-      <Text className="text-caption font-extrabold text-ink">{label}</Text>
+      <Text className="font-ui text-caption font-extrabold text-ink">{label}</Text>
     </Pressable>
   );
 }
 
 function FeedListItemBase({ item, onPress, onToggleArchive }: FeedListItemProps) {
+  const { colors } = useTheme();
   const translateX = useSharedValue(0);
   const isArchived = !!item.archivedAt;
 
@@ -115,13 +122,14 @@ function FeedListItemBase({ item, onPress, onToggleArchive }: FeedListItemProps)
             },
           ]}
         >
-          <ActionButton label="Open" bg="#5B8DEF" onPress={handleOpen} />
+          <ActionButton label="Open" accessibilityLabel="Open" bg={colors.actionOpen} onPress={handleOpen} />
           <ActionButton
             label={isArchived ? "Unarc" : "Arc"}
-            bg="#FFC933"
+            accessibilityLabel={isArchived ? "Unarchive" : "Archive"}
+            bg={colors.actionArchive}
             onPress={handleArchiveToggle}
           />
-          <ActionButton label="Share" bg="#34D399" onPress={handleShare} />
+          <ActionButton label="Share" accessibilityLabel="Share" bg={colors.actionShare} onPress={handleShare} />
         </Animated.View>
 
         <View
@@ -132,7 +140,7 @@ function FeedListItemBase({ item, onPress, onToggleArchive }: FeedListItemProps)
             left: 4,
             right: -4,
             bottom: -4,
-            backgroundColor: "#1C1917",
+            backgroundColor: colors.shadow,
             borderRadius: 16,
           }}
         />
@@ -142,16 +150,16 @@ function FeedListItemBase({ item, onPress, onToggleArchive }: FeedListItemProps)
               className="gap-2 rounded-card border-3 border-ink bg-paper p-4 active:opacity-90 dark:bg-surface-dark"
               onPress={() => onPress(item.id)}
             >
-              <Text className="text-body font-bold text-ink dark:text-paper" numberOfLines={2}>
+              <Text className="font-ui text-body font-bold text-ink dark:text-paper" numberOfLines={2}>
                 {item.title ?? item.url}
               </Text>
-              <Text className="text-caption text-ink-faint" numberOfLines={1}>
+              <Text className="font-ui text-caption text-ink-faint" numberOfLines={1}>
                 {item.url}
               </Text>
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center gap-2">
                   <View className="self-start rounded-pill border-2 border-ink bg-accent-yellow px-2 py-0.5">
-                    <Text className="text-caption font-bold text-ink">
+                    <Text className="font-ui text-caption font-bold text-ink">
                       {CONTENT_TYPE_LABELS[item.contentType]}
                     </Text>
                   </View>
