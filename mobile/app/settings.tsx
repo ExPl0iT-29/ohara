@@ -5,13 +5,14 @@ import { useRouter } from "expo-router";
 import { useColorScheme } from "nativewind";
 import { useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { exportBackup, importBackup } from "../src/backup/backup";
 import { setSetting } from "../src/db/settings";
-import { BrutalButton } from "../src/components/ui/BrutalButton";
-import { BrutalCard } from "../src/components/ui/BrutalCard";
+import { Button } from "../src/components/ui/Button";
+import { Card } from "../src/components/ui/Card";
+import { Chip } from "../src/components/ui/Chip";
 import { PRIVACY_POLICY_URL } from "../src/constants/links";
+import { Screen } from "../src/components/ui/Screen";
 
 const THEME_OPTIONS = ["light", "dark", "system"] as const;
 
@@ -54,68 +55,64 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-paper dark:bg-surface-dark">
+    <Screen>
       <View className="gap-4 p-5">
-        <Text className="text-title text-ink dark:text-paper">Appearance</Text>
+        <Text className="font-heading text-title text-ink dark:text-paper">Appearance</Text>
         <View className="flex-row gap-2">
           {THEME_OPTIONS.map((option) => (
-            <Pressable
+            <Chip
               key={option}
+              size="md"
+              label={option}
+              selected={colorScheme === option || (option === "system" && colorScheme === undefined)}
               onPress={() => {
                 setColorScheme(option);
                 setSetting("theme", option);
               }}
-              className={`rounded-pill border-3 border-ink px-3 py-1.5 ${
-                colorScheme === option || (option === "system" && colorScheme === undefined)
-                  ? "bg-brand"
-                  : "bg-paper dark:bg-surface-dark"
-              }`}
-            >
-              <Text className="text-caption font-bold text-ink">{option}</Text>
-            </Pressable>
+            />
           ))}
         </View>
 
-        <Text className="mt-4 text-title text-ink dark:text-paper">Backup</Text>
-        <Text className="text-body text-ink-soft dark:text-ink-faint">
+        <Text className="font-heading mt-4 text-title text-ink dark:text-paper">Backup</Text>
+        <Text className="font-ui text-body text-ink-soft dark:text-ink-faint">
           Export your whole library as JSON, or import a backup (or a plain list of URLs saved from your PC).
         </Text>
 
-        <BrutalButton variant="primary" disabled={busy} onPress={handleExport}>
-          <Text className="text-center text-body font-extrabold text-ink">Export library</Text>
-        </BrutalButton>
+        <Button variant="primary" disabled={busy} onPress={handleExport}>
+          <Text className="font-ui text-center text-body font-extrabold text-ink">Export library</Text>
+        </Button>
 
-        <BrutalCard>
+        <Card>
           <Pressable
             className="p-4 active:opacity-80 disabled:opacity-40"
             disabled={busy}
             onPress={handleImport}
           >
-            <Text className="text-center text-body font-bold text-ink dark:text-paper">Import from file</Text>
+            <Text className="font-ui text-center text-body font-bold text-ink dark:text-paper">Import from file</Text>
           </Pressable>
-        </BrutalCard>
+        </Card>
 
-        <BrutalCard>
+        <Card>
           <Pressable className="p-4 active:opacity-80" onPress={() => router.push("/stats")}>
-            <Text className="text-center text-body font-bold text-ink dark:text-paper">Library stats</Text>
+            <Text className="font-ui text-center text-body font-bold text-ink dark:text-paper">Library stats</Text>
           </Pressable>
-        </BrutalCard>
+        </Card>
 
-        <Text className="mt-4 text-title text-ink dark:text-paper">About</Text>
-        <Text className="text-body text-ink-soft dark:text-ink-faint">
+        <Text className="font-heading mt-4 text-title text-ink dark:text-paper">About</Text>
+        <Text className="font-ui text-body text-ink-soft dark:text-ink-faint">
           Ohara keeps everything on your phone. No account, no ads, no tracking.
         </Text>
 
-        <BrutalCard>
+        <Card>
           <Pressable className="p-4 active:opacity-80" onPress={handleOpenPrivacy}>
-            <Text className="text-center text-body font-bold text-ink dark:text-paper">Privacy policy</Text>
+            <Text className="font-ui text-center text-body font-bold text-ink dark:text-paper">Privacy policy</Text>
           </Pressable>
-        </BrutalCard>
+        </Card>
 
-        <Text className="text-center text-caption text-ink-soft dark:text-ink-faint">
+        <Text className="font-ui text-center text-caption text-ink-soft dark:text-ink-faint">
           Version {Constants.expoConfig?.version ?? "1.0.0"}
         </Text>
       </View>
-    </SafeAreaView>
+    </Screen>
   );
 }

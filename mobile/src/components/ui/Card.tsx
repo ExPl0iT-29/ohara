@@ -1,16 +1,20 @@
 import type { ReactNode } from "react";
 import { View } from "react-native";
 
+import { useTheme } from "../../theme/useTheme";
+
 const SHADOW_OFFSET = 4;
 
-interface BrutalCardProps {
+interface CardProps {
   children: ReactNode;
-  /** Folder-tab accent color shown peeking above the card (collection cards). */
+  /** Folder-tab accent colour shown peeking above the card (collection cards). */
   tabColor?: string;
   className?: string;
 }
 
-export function BrutalCard({ children, tabColor, className = "" }: BrutalCardProps) {
+/** A raised surface for grouped content. */
+export function Card({ children, tabColor, className = "" }: CardProps) {
+  const { colors } = useTheme();
   return (
     <View style={{ paddingTop: tabColor ? 10 : 0 }}>
       {tabColor && (
@@ -23,7 +27,7 @@ export function BrutalCard({ children, tabColor, className = "" }: BrutalCardPro
             height: 18,
             backgroundColor: tabColor,
             borderWidth: 3,
-            borderColor: "#1C1917",
+            borderColor: colors.line,
             borderBottomWidth: 0,
             borderTopLeftRadius: 8,
             borderTopRightRadius: 8,
@@ -39,13 +43,11 @@ export function BrutalCard({ children, tabColor, className = "" }: BrutalCardPro
             left: SHADOW_OFFSET,
             right: -SHADOW_OFFSET,
             bottom: -SHADOW_OFFSET,
-            backgroundColor: "#1C1917",
+            backgroundColor: colors.shadow,
             borderRadius: 16,
           }}
         />
-        <View
-          className={`rounded-card border-3 border-ink bg-paper dark:bg-surface-dark ${className}`}
-        >
+        <View className={`rounded-card border-3 border-ink bg-paper dark:bg-surface-dark ${className}`}>
           {children}
         </View>
       </View>

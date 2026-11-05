@@ -1,12 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { captureContent, findByUrl, type ContentType } from "../src/api/content";
 import { useCaptureContent } from "../src/hooks/useCaptureContent";
-import { BrutalButton } from "../src/components/ui/BrutalButton";
+import { Button } from "../src/components/ui/Button";
+import { Chip } from "../src/components/ui/Chip";
+import { TextField } from "../src/components/ui/TextField";
+import { Screen } from "../src/components/ui/Screen";
 
 const CONTENT_TYPES: ContentType[] = [
   "blog",
@@ -56,12 +58,12 @@ export default function CaptureScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-paper dark:bg-surface-dark">
+    <Screen>
       <ScrollView contentContainerStyle={{ padding: 20, gap: 20 }}>
-        <TextInput
-          className="rounded-card border-3 border-ink bg-paper p-4 text-body text-ink dark:bg-surface-dark dark:text-paper"
+        <TextField
+          shape="box"
+          className="p-4"
           placeholder="https://example.com/article&#10;(paste multiple, one per line)"
-          placeholderTextColor="#A8A29E"
           autoCapitalize="none"
           autoCorrect={false}
           multiline
@@ -71,9 +73,9 @@ export default function CaptureScreen() {
 
         {existing && (
           <View className="gap-2 rounded-card border-3 border-ink bg-accent-mintLight p-4">
-            <Text className="text-body font-semibold text-ink dark:text-paper">Already saved.</Text>
+            <Text className="font-ui text-body font-semibold text-ink dark:text-paper">Already saved.</Text>
             <Pressable onPress={() => router.replace(`/content/${existing.id}`)} className="self-start">
-              <Text className="text-caption font-bold text-ink underline">Open existing item</Text>
+              <Text className="font-ui text-caption font-bold text-ink underline">Open existing item</Text>
             </Pressable>
           </View>
         )}
@@ -81,41 +83,39 @@ export default function CaptureScreen() {
         {!isBulk && (
           <View className="flex-row flex-wrap gap-2">
             {CONTENT_TYPES.map((type) => (
-              <Pressable
+              <Chip
                 key={type}
+                size="md"
+                label={type}
+                selected={contentType === type}
                 onPress={() => setContentType(contentType === type ? undefined : type)}
-                className={`rounded-pill border-3 border-ink px-3 py-1.5 ${
-                  contentType === type ? "bg-brand" : "bg-paper dark:bg-surface-dark"
-                }`}
-              >
-                <Text className="text-caption font-bold text-ink">{type}</Text>
-              </Pressable>
+              />
             ))}
           </View>
         )}
 
         {isBulk && (
-          <Text className="text-caption text-ink-soft dark:text-ink-faint">
+          <Text className="font-ui text-caption text-ink-soft dark:text-ink-faint">
             {lines.length} links will be saved as "other" — open each individually to set its type.
           </Text>
         )}
 
         {mutation.isError && (
-          <Text className="text-caption font-bold text-danger">
+          <Text className="font-ui text-caption font-bold text-danger">
             Couldn't save that link. Check the URL and try again.
           </Text>
         )}
 
-        <BrutalButton
+        <Button
           variant="primary"
           onPress={handleSubmit}
           disabled={lines.length === 0 || mutation.isPending || isBulkSaving || !!existing}
         >
-          <Text className="text-center text-body font-extrabold text-ink">
+          <Text className="font-ui text-center text-body font-extrabold text-ink">
             {mutation.isPending || isBulkSaving ? "Saving..." : isBulk ? `Save ${lines.length} links` : "Save"}
           </Text>
-        </BrutalButton>
+        </Button>
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }

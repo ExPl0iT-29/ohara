@@ -1,3 +1,5 @@
+const { colors, fonts } = require("./src/theme/tokens");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: "class",
@@ -5,43 +7,11 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
-      colors: {
-        paper: "#FAF3E1",
-        surface: {
-          DEFAULT: "#FAF3E1",
-          dark: "#161412",
-        },
-        ink: {
-          DEFAULT: "#1C1917",
-          soft: "#57534E",
-          faint: "#A8A29E",
-        },
-        brand: {
-          DEFAULT: "#FFC933",
-          dark: "#E6A800",
-          light: "#FFF3D1",
-        },
-        accent: {
-          yellow: "#FFC933",
-          yellowLight: "#FFF3D1",
-          pink: "#FF5C8A",
-          pinkLight: "#FFE1EA",
-          violet: "#8B5CF6",
-          violetLight: "#EDE4FF",
-          mint: "#34D399",
-          mintLight: "#D6F5E8",
-          blue: "#5B8DEF",
-          blueLight: "#E1E9FB",
-        },
-        line: "#1C1917",
-        danger: {
-          DEFAULT: "#FF4D6D",
-          light: "#FFE1E7",
-        },
-        amber: {
-          DEFAULT: "#E6A800",
-          light: "#FFF3D1",
-        },
+      colors,
+      fontFamily: {
+        heading: [fonts.heading],
+        ui: [fonts.ui],
+        reading: [fonts.reading],
       },
       fontSize: {
         display: ["30px", { lineHeight: "34px", fontWeight: "800", letterSpacing: "-0.3px" }],

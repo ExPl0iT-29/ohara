@@ -2,31 +2,37 @@ import type { ReactNode } from "react";
 import { Pressable } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
+import { useTheme } from "../../theme/useTheme";
+
 const SHADOW_OFFSET = 4;
 
-const VARIANT_BG: Record<string, string> = {
+const VARIANT_BG: Record<ButtonVariant, string> = {
   primary: "bg-brand",
   destructive: "bg-danger",
   neutral: "bg-paper dark:bg-surface-dark",
 };
 
-interface BrutalButtonProps {
+type ButtonVariant = "primary" | "destructive" | "neutral";
+
+interface ButtonProps {
   children: ReactNode;
   onPress?: () => void;
-  variant?: "primary" | "destructive" | "neutral";
+  variant?: ButtonVariant;
   pill?: boolean;
   disabled?: boolean;
   className?: string;
 }
 
-export function BrutalButton({
+/** The app's button. Pressing slides the face onto its hard-offset shadow. */
+export function Button({
   children,
   onPress,
   variant = "neutral",
   pill = false,
   disabled = false,
   className = "",
-}: BrutalButtonProps) {
+}: ButtonProps) {
+  const { colors } = useTheme();
   const pressed = useSharedValue(0);
 
   const shadowStyle = useAnimatedStyle(() => ({
@@ -62,7 +68,7 @@ export function BrutalButton({
             left: SHADOW_OFFSET,
             right: -SHADOW_OFFSET,
             bottom: -SHADOW_OFFSET,
-            backgroundColor: "#1C1917",
+            backgroundColor: colors.shadow,
             borderRadius: pill ? 999 : 12,
           },
         ]}

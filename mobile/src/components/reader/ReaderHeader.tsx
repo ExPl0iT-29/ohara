@@ -37,9 +37,9 @@ export function ReaderHeader({
         </Pressable>
       )}
       <Pressable onPress={openOriginal}>
-        <Text className="text-display text-ink dark:text-paper">{title ?? url}</Text>
+        <Text className="font-heading text-display text-ink dark:text-paper">{title ?? url}</Text>
       </Pressable>
-      {byline.length > 0 && <Text className="text-caption text-ink-faint">{byline}</Text>}
+      {byline.length > 0 && <Text className="font-ui text-caption text-ink-faint">{byline}</Text>}
     </View>
   );
 }
