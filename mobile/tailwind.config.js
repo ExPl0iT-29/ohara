@@ -14,13 +14,15 @@ module.exports = {
         reading: [fonts.reading],
       },
       fontSize: {
-        display: ["30px", { lineHeight: "34px", fontWeight: "800", letterSpacing: "-0.3px" }],
-        title: ["22px", { lineHeight: "26px", fontWeight: "800" }],
+        display: ["28px", { lineHeight: "34px", fontWeight: "700", letterSpacing: "-0.2px" }],
+        title: ["20px", { lineHeight: "26px", fontWeight: "600" }],
         body: ["16px", { lineHeight: "24px" }],
-        caption: ["13px", { lineHeight: "18px", fontWeight: "600" }],
+        caption: ["13px", { lineHeight: "18px", fontWeight: "500" }],
+        eyebrow: ["11px", { lineHeight: "14px", fontWeight: "600", letterSpacing: "1.2px" }],
+        reading: ["18px", { lineHeight: "30px" }],
       },
       borderRadius: {
-        card: "16px",
+        card: "12px",
         pill: "999px",
       },
       borderWidth: {

@@ -1,72 +1,75 @@
 // Design tokens: the single source for every colour and font in the app.
 // CommonJS so tailwind.config.js can require it; typed by tokens.d.ts.
-// A visual direction changes this file and the primitives in src/components/ui/, not screens.
+// Direction: Quiet Shelf — calm editorial. Cool paper, deep blue-grey ink,
+// one teal accent, hairline rules, a serif for reading.
 
 /** Colours exposed to NativeWind class names (bg-paper, text-ink, border-line, ...). */
 const colors = {
-  paper: "#FAF3E1",
-  surface: { DEFAULT: "#FAF3E1", dark: "#161412" },
-  ink: { DEFAULT: "#1C1917", soft: "#57534E", faint: "#A8A29E" },
-  brand: { DEFAULT: "#FFC933", dark: "#E6A800", light: "#FFF3D1" },
+  // Screen background in light mode; also the main text colour in dark mode (dark:text-paper).
+  paper: "#F6F7F4",
+  surface: { DEFAULT: "#F6F7F4", dark: "#121616" },
+  // Raised surfaces: cards, fields, sheets.
+  raised: { DEFAULT: "#FFFFFF", dark: "#1A1F1F" },
+  ink: { DEFAULT: "#1F2A2E", soft: "#5F6B71", faint: "#98A2A6" },
+  brand: { DEFAULT: "#2F6F73", dark: "#24585B", light: "#DCEBE6", deep: "#1F3634", bright: "#7FC4C0" },
   accent: {
-    yellow: "#FFC933",
-    yellowLight: "#FFF3D1",
-    pink: "#FF5C8A",
-    pinkLight: "#FFE1EA",
-    violet: "#8B5CF6",
-    violetLight: "#EDE4FF",
-    mint: "#34D399",
-    mintLight: "#D6F5E8",
-    blue: "#5B8DEF",
-    blueLight: "#E1E9FB",
+    yellow: "#C8A04A",
+    yellowLight: "#F4EBD3",
+    pink: "#B5677A",
+    pinkLight: "#F3E2E6",
+    violet: "#5B6C8F",
+    violetLight: "#E4E8F1",
+    mint: "#3D7A57",
+    mintLight: "#DCEBE0",
+    blue: "#3F6E9C",
+    blueLight: "#E0E9F2",
   },
-  line: "#1C1917",
-  danger: { DEFAULT: "#FF4D6D", light: "#FFE1E7" },
-  amber: { DEFAULT: "#E6A800", light: "#FFF3D1" },
+  line: { DEFAULT: "#E1E5E2", dark: "#2A3130" },
+  danger: { DEFAULT: "#B4232F", light: "#F7E1E2", deep: "#3A1E21", bright: "#F08A93" },
+  amber: { DEFAULT: "#8A5A00", light: "#F6EDD6", bright: "#E3B65C" },
 };
 
 /**
- * Font families. Android resolves a family name to assets/fonts/<name>.ttf, and
- * <name>_bold.ttf / <name>_italic.ttf for weight >= 600 and italics.
- * "sans-serif" is the platform default (Roboto).
+ * Font families, registered natively in MainApplication.kt from res/font/*.xml,
+ * so fontWeight and italics select the real faces.
  */
 const fonts = {
-  heading: "sans-serif",
-  ui: "sans-serif",
-  reading: "sans-serif",
+  heading: "Literata",
+  ui: "InstrumentSans",
+  reading: "Literata",
 };
 
 /** Colours for places class names cannot reach (native props, shadows, HTML renderer, header). */
 const palettes = {
   light: {
     background: colors.paper,
-    surface: colors.paper,
+    surface: colors.raised.DEFAULT,
     text: colors.ink.DEFAULT,
     textSoft: colors.ink.soft,
     textFaint: colors.ink.faint,
-    line: colors.line,
-    shadow: colors.ink.DEFAULT,
+    line: colors.line.DEFAULT,
+    shadow: "rgba(31, 42, 46, 0.12)",
     accent: colors.brand.DEFAULT,
-    link: "#3B6FD6",
+    link: colors.brand.DEFAULT,
     highlight: colors.brand.light,
-    actionOpen: colors.accent.blue,
-    actionArchive: colors.accent.yellow,
+    actionOpen: colors.brand.DEFAULT,
+    actionArchive: colors.ink.soft,
     actionShare: colors.accent.mint,
   },
   dark: {
     background: colors.surface.dark,
-    surface: colors.surface.dark,
-    text: "#FAF9F6",
-    textSoft: colors.ink.faint,
-    textFaint: colors.ink.faint,
-    line: colors.line,
-    shadow: colors.ink.DEFAULT,
-    accent: colors.brand.DEFAULT,
-    link: "#8FB4F5",
-    highlight: colors.brand.light,
-    actionOpen: colors.accent.blue,
-    actionArchive: colors.accent.yellow,
-    actionShare: colors.accent.mint,
+    surface: colors.raised.dark,
+    text: "#E8ECEA",
+    textSoft: "#A3ADAA",
+    textFaint: "#707A77",
+    line: colors.line.dark,
+    shadow: "rgba(0, 0, 0, 0.4)",
+    accent: colors.brand.bright,
+    link: colors.brand.bright,
+    highlight: colors.brand.deep,
+    actionOpen: colors.brand.dark,
+    actionArchive: "#4A5458",
+    actionShare: "#2E5E43",
   },
 };
 

@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, SectionList, Text, View } from "react-native";
 
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -17,9 +17,11 @@ import { FeedEmptyState } from "../src/components/feed/FeedEmptyState";
 import { FeedErrorState } from "../src/components/feed/FeedErrorState";
 import { FeedListItem } from "../src/components/feed/FeedListItem";
 import { Chip } from "../src/components/ui/Chip";
+import { Eyebrow } from "../src/components/ui/Eyebrow";
 import { Fab } from "../src/components/ui/Fab";
 import { Screen } from "../src/components/ui/Screen";
 import { TextField } from "../src/components/ui/TextField";
+import { isInProgress } from "../src/format/itemMeta";
 import { useContentList } from "../src/hooks/useContentList";
 import { logSinceBundleStart } from "../src/perf";
 import { useTheme } from "../src/theme/useTheme";
@@ -65,32 +67,63 @@ export default function FeedScreen() {
     [handleOpenItem, handleToggleArchive],
   );
   const keyExtractor = useCallback((item: ContentItem) => item.id, []);
+  const isFiltered = !!search || !!tag || !!contentType;
+
+  // Unfiltered active library: unfinished items first, under their own heading.
+  const sections = useMemo(() => {
+    const items = data ?? [];
+    if (archived || isFiltered) return [{ title: archived ? "Archived" : "Results", data: items }];
+    const inProgress = items.filter(isInProgress);
+    const rest = items.filter((item) => !isInProgress(item));
+    return [
+      ...(inProgress.length ? [{ title: "Continue reading", data: inProgress }] : []),
+      ...(rest.length ? [{ title: inProgress.length ? "Recently saved" : "Saved", data: rest }] : []),
+    ];
+  }, [data, archived, isFiltered]);
 
   return (
     <Screen>
-      <View className="flex-row items-center justify-between px-5 pb-2 pt-4">
-        <Text className="font-heading text-display text-ink dark:text-paper">Ohara</Text>
-        <Pressable onPress={() => router.push("/settings")} accessibilityRole="button">
+      <View className="flex-row items-baseline justify-between px-5 pb-1 pt-5">
+        <Text className="font-heading text-display text-ink dark:text-paper">Library</Text>
+        <Pressable onPress={() => router.push("/settings")} accessibilityRole="button" hitSlop={12}>
           <Text className="font-ui text-caption text-ink-soft dark:text-ink-faint">Settings</Text>
         </Pressable>
       </View>
 
-      <View className="flex-row gap-2 px-5 pb-2">
-        <Chip size="md" label="Active" selected={!archived} onPress={() => setArchived(false)} />
-        <Chip size="md" label="Archived" selected={archived} onPress={() => setArchived(true)} />
+      <View className="mx-5 mt-3 flex-row gap-6 border-b border-line dark:border-line-dark">
+        {[
+          { label: "Active", value: false },
+          { label: "Archived", value: true },
+        ].map((tab) => {
+          const selected = archived === tab.value;
+          return (
+            <Pressable
+              key={tab.label}
+              onPress={() => setArchived(tab.value)}
+              accessibilityRole="tab"
+              accessibilityState={{ selected }}
+              className={`-mb-px pb-2.5 ${selected ? "border-b-2 border-ink dark:border-paper" : ""}`}
+            >
+              <Text
+                className={`font-ui text-caption ${selected ? "font-semibold text-ink dark:text-paper" : "text-ink-soft dark:text-ink-faint"}`}
+              >
+                {tab.label}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
 
-      <View className="px-5 pb-2">
-        <TextField value={search} onChangeText={setSearch} placeholder="Search your library" />
+      <View className="px-5 pb-2 pt-4">
+        <TextField value={search} onChangeText={setSearch} placeholder="Search titles and text" />
       </View>
 
       {(typeChips.length > 0 || tagChips.length > 0) && (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={{ flexGrow: 0, height: 40 }}
-          className="px-5 pb-2"
-          contentContainerStyle={{ gap: 8, alignItems: "center" }}
+          style={{ flexGrow: 0 }}
+          contentContainerStyle={{ gap: 8, alignItems: "center", paddingHorizontal: 20, paddingBottom: 8 }}
         >
           {typeChips.map((type) => {
             const selected = contentType === type;
@@ -114,28 +147,44 @@ export default function FeedScreen() {
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center gap-3">
-          <ActivityIndicator color={colors.text} size="large" />
-          <Text className="font-ui text-caption font-bold text-ink-soft dark:text-ink-faint">
-            Loading your library...
-          </Text>
+          <ActivityIndicator color={colors.accent} size="large" />
+          <Text className="font-ui text-caption text-ink-soft dark:text-ink-faint">Opening your library…</Text>
         </View>
       ) : error ? (
         <FeedErrorState onRetry={() => refetch()} />
       ) : !data || data.length === 0 ? (
-        archived ? (
-          <View className="flex-1 items-center justify-center p-8">
-            <Text className="text-center font-ui text-body text-ink-soft dark:text-ink-faint">Nothing archived yet.</Text>
+        isFiltered ? (
+          <View className="flex-1 justify-center gap-2 px-8">
+            <Text className="font-heading text-title text-ink dark:text-paper">No matches</Text>
+            <Text className="font-ui text-body text-ink-soft dark:text-ink-faint">
+              Nothing in your library matches that search or filter.
+            </Text>
+          </View>
+        ) : archived ? (
+          <View className="flex-1 justify-center gap-2 px-8">
+            <Text className="font-heading text-title text-ink dark:text-paper">Nothing archived yet</Text>
+            <Text className="font-ui text-body text-ink-soft dark:text-ink-faint">
+              Swipe an item left and choose Archive once you have finished with it.
+            </Text>
           </View>
         ) : (
           <FeedEmptyState />
         )
       ) : (
-        <FlatList
-          data={data}
+        <SectionList
+          sections={sections}
           keyExtractor={keyExtractor}
-          contentContainerStyle={{ padding: 20, gap: 12 }}
-          refreshControl={<RefreshControl tintColor={colors.text} colors={[colors.text]} refreshing={isFetching} onRefresh={refetch} />}
           renderItem={renderItem}
+          stickySectionHeadersEnabled={false}
+          renderSectionHeader={({ section }) => (
+            <View className="px-5 pb-1 pt-5">
+              <Eyebrow label={section.title} />
+            </View>
+          )}
+          contentContainerStyle={{ paddingBottom: 112 }}
+          refreshControl={
+            <RefreshControl tintColor={colors.accent} colors={[colors.accent]} refreshing={isFetching} onRefresh={refetch} />
+          }
         />
       )}
 

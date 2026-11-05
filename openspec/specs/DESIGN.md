@@ -12,15 +12,17 @@ Whenever designing a screen or component, refer to this document before implemen
 
 # Design Mission
 
-Ohara should feel like a bold, tactile personal library — playful and confident, not quiet and beige.
+Ohara should feel like a quiet, well-lit reading room you carry in your pocket.
 
-It is a save-and-read app, and it should look proud of that: chunky borders, punchy color, cards that feel like physical objects you can grab.
+It is a save-and-read app, and the reading is the product: the interface steps back so the words can come forward.
 
-Opening Ohara should feel energizing, like flipping through a well-organized sticker book, not like tiptoeing into a reading room.
+Opening Ohara should feel like opening a good book, not like opening an inbox.
 
-The interface has personality. It doesn't disappear — it invites.
+The interface is calm and precise. It does not perform; it makes reading easy.
 
-The goal is to make saving and reading fast, satisfying, and a little fun.
+The goal is to make saving effortless and reading genuinely better than the original web page.
+
+**Current direction: Quiet Shelf** (calm editorial).
 
 ---
 
@@ -28,20 +30,20 @@ The goal is to make saving and reading fast, satisfying, and a little fun.
 
 Every screen should evoke:
 
-* Energy
-* Playfulness
-* Confidence
+* Calm
+* Focus
 * Clarity
-* Delight
+* Trust
+* Quiet pleasure
 
 Avoid creating feelings of:
 
-* Sterility
-* Corporate blandness
-* Visual timidity
-* Overload from clutter (bold ≠ busy)
+* Urgency or guilt
+* Clutter
+* Decoration for its own sake
+* Visual noise around the text
 
-Ohara should feel like a tool the user is excited to open.
+Ohara should feel like a place the user wants to spend twenty minutes.
 
 ---
 
@@ -116,27 +118,26 @@ Advanced metadata, AI features, projects, and relationships should stay out of t
 
 ## Personality
 
-Neo-brutalist: thick black borders, hard offset drop shadows (no blur), bold saturated accent colors, chunky rounded-but-square shapes, confident condensed display type for headings.
-
-Think a well-made sticker or a physical folder with a colored tab — every element should look like it has weight and could be picked up.
+Calm editorial. Hairline rules instead of borders, flat surfaces instead of shadows, generous margins, one accent colour used sparingly. Closer to a well-set book or a good magazine than to an app dashboard.
 
 ---
 
 ## Typography
 
-Headings use a bold, condensed, high-contrast display face — confident, a little loud.
+Two faces, bundled with the app (both SIL OFL):
 
-Body/reading text stays highly readable — the reader view is the one place restraint wins over personality (see Reader Experience below).
+* **Literata** for titles and reading. It was designed for long-form reading on screens (it is the Google Play Books typeface). Reader body text is 18sp with a 30sp line height.
+* **Instrument Sans** for interface text: labels, captions, buttons, metadata.
 
-Generous spacing still applies. Never compress text in the reader.
+Small uppercase eyebrows (letter-spaced) label sections and sources. Never compress text in the reader.
 
 ---
 
 ## Color Philosophy
 
-Bold and saturated, not muted. A small palette of confident accent colors (e.g. warm yellow, hot pink, violet, mint) used deliberately per collection/category, against a warm off-white (not stark white) base and true-black borders/text.
+Muted and deliberate. A cool paper white (#F6F7F4) base, deep blue-grey ink (#1F2A2E), and a single teal accent (#2F6F73) for links, progress, selection and primary actions. Status colours (amber, red) appear only where something needs attention.
 
-Dark mode should keep the same energy — bold accents against a near-black surface, not a dimmed-down version of light mode.
+Dark mode is its own palette, not an inversion: near-black green-grey surfaces (#121616), soft off-white text, and a lighter teal (#7FC4C0) so the accent keeps its contrast.
 
 ---
 
@@ -152,7 +153,7 @@ Whenever available:
 * PDF preview
 * Repository avatar
 
-Cards are folder-tab shaped where they represent a collection, and image-forward where they represent content. Cards should feel like physical, grabbable objects — border + hard shadow, never flat.
+In the feed, imagery is a small square thumbnail beside the title, never a banner that pushes text down. Without an image, the content type's initial sits on a pale teal tile. In the reader, the hero image follows the title.
 
 Avoid walls of text.
 
@@ -414,21 +415,17 @@ The application should never make the user feel guilty for not reading.
 
 Products:
 
-Tuckii
+Matter
 
-Pop-art / neo-brutalist web design
+Instapaper
 
-Duolingo (confidence, color, character)
+Google Play Books
 
-Physical objects:
+Print:
 
-Sticker books
+Well-set books and literary magazines
 
-Folder tabs and physical filing
-
-Zines
-
-The goal is to create the feeling of a tactile, colorful, personal collection — not a sterile productivity tool.
+The goal is a calm, typographic, personal library that makes reading feel unhurried.
 
 ---
 
@@ -436,14 +433,14 @@ The goal is to create the feeling of a tactile, colorful, personal collection �
 
 When opening Ohara, the user should feel:
 
-"This is satisfying to use."
+"I can finally read this properly."
 
 Not:
 
-"This feels like a spreadsheet."
+"Another feed to get through."
 
-Confidence should replace timidity.
+Calm should replace urgency.
 
-Personality should replace blandness.
+Typography should replace decoration.
 
-If a design decision moves the product away from this feeling, it is the wrong decision.
+If a design decision makes the text harder to read or the screen louder, it is the wrong decision.

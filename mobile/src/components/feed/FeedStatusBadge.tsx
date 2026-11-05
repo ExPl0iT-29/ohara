@@ -8,25 +8,22 @@ interface FeedStatusBadgeProps {
   status: ContentStatus;
 }
 
-const BADGE_STYLES: Partial<Record<ContentStatus, string>> = {
-  pending: "bg-amber-light",
-  processing: "bg-amber-light",
-  failed: "bg-danger-light",
+const TONE: Partial<Record<ContentStatus, { dot: string; text: string }>> = {
+  pending: { dot: "bg-amber dark:bg-amber-bright", text: "text-amber dark:text-amber-bright" },
+  processing: { dot: "bg-amber dark:bg-amber-bright", text: "text-amber dark:text-amber-bright" },
+  failed: { dot: "bg-danger dark:bg-danger-bright", text: "text-danger dark:text-danger-bright" },
 };
 
-const BADGE_TEXT_STYLES: Partial<Record<ContentStatus, string>> = {
-  pending: "text-amber",
-  processing: "text-amber",
-  failed: "text-danger",
-};
-
+/** A quiet coloured dot and label for items that are not ready to read. */
 function FeedStatusBadgeBase({ status }: FeedStatusBadgeProps) {
   const label = STATUS_LABELS[status];
-  if (!label) return null;
+  const tone = TONE[status];
+  if (!label || !tone) return null;
 
   return (
-    <View className={`self-start rounded-pill border-2 border-ink px-2 py-0.5 ${BADGE_STYLES[status]}`}>
-      <Text className={`font-ui text-caption font-bold ${BADGE_TEXT_STYLES[status]}`}>{label}</Text>
+    <View className="flex-row items-center gap-1.5">
+      <View className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
+      <Text className={`font-ui text-caption ${tone.text}`}>{label}</Text>
     </View>
   );
 }

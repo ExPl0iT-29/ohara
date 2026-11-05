@@ -8,14 +8,13 @@ interface FeedErrorStateProps {
 
 export function FeedErrorState({ onRetry }: FeedErrorStateProps) {
   return (
-    <View className="flex-1 items-center justify-center gap-3 p-8">
-      <View className="mb-2 h-14 w-14 rounded-full border-3 border-ink bg-danger" />
-      <Text className="font-heading text-center text-title text-ink dark:text-paper">Couldn't load your feed</Text>
-      <Text className="font-ui text-center text-body text-ink-soft dark:text-ink-faint">
-        Check your connection and try again.
+    <View className="flex-1 justify-center gap-4 px-8">
+      <Text className="font-heading text-title text-ink dark:text-paper">Your library didn't load</Text>
+      <Text className="font-ui text-body text-ink-soft dark:text-ink-faint">
+        Something went wrong reading the saved items on this phone. Try again.
       </Text>
-      <View className="mt-2">
-        <Button pill label="Retry" onPress={onRetry} />
+      <View className="mt-2 self-start">
+        <Button pill label="Try again" onPress={onRetry} />
       </View>
     </View>
   );

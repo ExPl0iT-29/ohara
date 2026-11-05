@@ -1,21 +1,16 @@
 import { Pressable, Text } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-
-import { useTheme } from "../../theme/useTheme";
-
-const SHADOW_OFFSET = 4;
-
-const VARIANT_BG: Record<ButtonVariant, string> = {
-  primary: "bg-brand",
-  destructive: "bg-danger",
-  neutral: "bg-paper dark:bg-surface-dark",
-};
 
 type ButtonVariant = "primary" | "destructive" | "neutral";
 
+const VARIANT_BOX: Record<ButtonVariant, string> = {
+  primary: "bg-brand dark:bg-brand-bright",
+  destructive: "bg-danger dark:bg-danger-bright",
+  neutral: "border border-line bg-raised dark:border-line-dark dark:bg-raised-dark",
+};
+
 const VARIANT_TEXT: Record<ButtonVariant, string> = {
-  primary: "text-ink",
-  destructive: "text-ink",
+  primary: "text-white dark:text-surface-dark",
+  destructive: "text-white dark:text-surface-dark",
   neutral: "text-ink dark:text-paper",
 };
 
@@ -30,7 +25,7 @@ interface ButtonProps {
   className?: string;
 }
 
-/** The app's button. Pressing slides the face onto its hard-offset shadow. */
+/** The app's button: a flat, filled shape that dims slightly while pressed. */
 export function Button({
   label,
   size = "md",
@@ -40,62 +35,21 @@ export function Button({
   disabled = false,
   className = "",
 }: ButtonProps) {
-  const { colors } = useTheme();
-  const pressed = useSharedValue(0);
-
-  const shadowStyle = useAnimatedStyle(() => ({
-    opacity: 1 - pressed.value,
-  }));
-
-  const contentStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: pressed.value * SHADOW_OFFSET },
-      { translateY: pressed.value * SHADOW_OFFSET },
-    ],
-  }));
-
   return (
     <Pressable
       onPress={disabled ? undefined : onPress}
       disabled={disabled}
-      onPressIn={() => {
-        if (!disabled) pressed.value = withTiming(1, { duration: 80 });
-      }}
-      onPressOut={() => {
-        pressed.value = withTiming(0, { duration: 120 });
-      }}
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ disabled }}
-      style={{ position: "relative", opacity: disabled ? 0.4 : 1 }}
+      className={`items-center justify-center ${size === "sm" ? "px-4 py-2" : "px-5 py-3"} ${
+        pill ? "rounded-pill" : "rounded-card"
+      } ${VARIANT_BOX[variant]} active:opacity-80 ${className}`}
+      style={{ opacity: disabled ? 0.4 : 1 }}
     >
-      <Animated.View
-        pointerEvents="none"
-        style={[
-          shadowStyle,
-          {
-            position: "absolute",
-            top: SHADOW_OFFSET,
-            left: SHADOW_OFFSET,
-            right: -SHADOW_OFFSET,
-            bottom: -SHADOW_OFFSET,
-            backgroundColor: colors.shadow,
-            borderRadius: pill ? 999 : 12,
-          },
-        ]}
-      />
-      <Animated.View
-        className={`items-center justify-center border-3 border-ink ${size === "sm" ? "px-3 py-1.5" : "px-4 py-2.5"} ${
-          pill ? "rounded-pill" : "rounded-card"
-        } ${VARIANT_BG[variant]} ${className}`}
-        style={contentStyle}
-      >
-        <Text
-          className={`text-center font-ui font-extrabold ${size === "sm" ? "text-caption" : "text-body"} ${VARIANT_TEXT[variant]}`}
-        >
-          {label}
-        </Text>
-      </Animated.View>
+      <Text className={`text-center font-ui font-semibold ${size === "sm" ? "text-caption" : "text-body"} ${VARIANT_TEXT[variant]}`}>
+        {label}
+      </Text>
     </Pressable>
   );
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Literata (SIL OFL 1.1): reading and heading face for the Quiet Shelf direction. -->
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <font android:fontStyle="normal" android:fontWeight="400" android:font="@font/literata_regular"
+        app:fontStyle="normal" app:fontWeight="400" app:font="@font/literata_regular" />
+    <font android:fontStyle="italic" android:fontWeight="400" android:font="@font/literata_italic"
+        app:fontStyle="italic" app:fontWeight="400" app:font="@font/literata_italic" />
+    <font android:fontStyle="normal" android:fontWeight="600" android:font="@font/literata_semibold"
+        app:fontStyle="normal" app:fontWeight="600" app:font="@font/literata_semibold" />
+    <font android:fontStyle="normal" android:fontWeight="700" android:font="@font/literata_bold"
+        app:fontStyle="normal" app:fontWeight="700" app:font="@font/literata_bold" />
+    <font android:fontStyle="italic" android:fontWeight="700" android:font="@font/literata_bold_italic"
+        app:fontStyle="italic" app:fontWeight="700" app:font="@font/literata_bold_italic" />
+</font-family>

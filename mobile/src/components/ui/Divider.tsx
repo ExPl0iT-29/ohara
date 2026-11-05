@@ -1,6 +1,6 @@
 import { View } from "react-native";
 
-/** Separates major sections of a screen. */
+/** A hairline rule between sections. */
 export function Divider() {
-  return <View className="border-t-3 border-ink" />;
+  return <View className="border-t border-line dark:border-line-dark" />;
 }
