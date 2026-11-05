@@ -13,9 +13,9 @@ export function FeedEmptyState() {
       <Text className="font-ui text-center text-body text-ink-soft dark:text-ink-faint">
         Save your first link to start reading.
       </Text>
-      <Button pill variant="primary" onPress={() => router.push("/capture")} className="mt-2">
-        <Text className="font-ui text-body font-extrabold text-ink">Save a link</Text>
-      </Button>
+      <View className="mt-2">
+        <Button pill variant="primary" label="Save a link" onPress={() => router.push("/capture")} />
+      </View>
       <Text className="font-ui text-center text-caption text-ink-faint">
         Or share a link into Ohara from any app.
       </Text>

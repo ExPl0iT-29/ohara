@@ -1,4 +1,7 @@
-import { Linking, Pressable, Text, View } from "react-native";
+import { Linking, Text } from "react-native";
+
+import { Notice, noticeSoftText } from "../ui/Notice";
+import { TextButton } from "../ui/TextButton";
 
 interface ReaderStatusNoticeProps {
   variant: "preparing" | "failed";
@@ -12,21 +15,12 @@ const COPY = {
 };
 
 export function ReaderStatusNotice({ variant, url, onRetry }: ReaderStatusNoticeProps) {
+  const tone = variant === "failed" ? "danger" : "neutral";
   return (
-    <View
-      className={`gap-3 rounded-card border-3 border-ink p-4 ${
-        variant === "failed" ? "bg-danger/20" : "bg-paper dark:bg-surface-dark"
-      }`}
-    >
-      <Text className="font-ui text-body text-ink-soft dark:text-ink-faint">{COPY[variant]}</Text>
-      <Pressable onPress={() => Linking.openURL(url)}>
-        <Text className="font-ui text-body font-extrabold text-ink underline">Open original ↗</Text>
-      </Pressable>
-      {variant === "failed" && onRetry && (
-        <Pressable onPress={onRetry}>
-          <Text className="font-ui text-body font-extrabold text-ink underline">Retry</Text>
-        </Pressable>
-      )}
-    </View>
+    <Notice tone={tone}>
+      <Text className={`font-ui text-body ${noticeSoftText(tone)}`}>{COPY[variant]}</Text>
+      <TextButton size="md" label="Open original ↗" onPress={() => void Linking.openURL(url)} />
+      {variant === "failed" && onRetry && <TextButton size="md" label="Retry" onPress={onRetry} />}
+    </Notice>
   );
 }

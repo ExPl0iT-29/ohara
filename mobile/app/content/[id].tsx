@@ -5,7 +5,6 @@ import {
   Linking,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  Pressable,
   ScrollView,
   Text,
   View,
@@ -26,7 +25,10 @@ import { ReaderHeader } from "../../src/components/reader/ReaderHeader";
 import { ReaderStatusNotice } from "../../src/components/reader/ReaderStatusNotice";
 import { useContentItem } from "../../src/hooks/useContentItem";
 import { Button } from "../../src/components/ui/Button";
+import { Divider } from "../../src/components/ui/Divider";
+import { Notice, noticeSoftText, noticeText } from "../../src/components/ui/Notice";
 import { Tag } from "../../src/components/ui/Tag";
+import { TextButton } from "../../src/components/ui/TextButton";
 import { TextField } from "../../src/components/ui/TextField";
 import { Screen } from "../../src/components/ui/Screen";
 
@@ -138,11 +140,9 @@ export default function ReaderScreen() {
         onMomentumScrollEnd={handleScrollEnd}
       >
         {header}
-        <Button pill onPress={handleToggleArchive} className="self-start px-3 py-1.5">
-          <Text className="font-ui text-caption font-bold text-ink">
-            {data.archivedAt ? "Unarchive" : "Archive"}
-          </Text>
-        </Button>
+        <View className="self-start">
+          <Button pill size="sm" label={data.archivedAt ? "Unarchive" : "Archive"} onPress={handleToggleArchive} />
+        </View>
 
         <View className="gap-2">
           <View className="flex-row flex-wrap gap-2">
@@ -159,9 +159,9 @@ export default function ReaderScreen() {
               onSubmitEditing={handleAddTag}
               placeholder="Add tag"
             />
-            <Pressable onPress={handleAddTag} className="justify-center px-2">
-              <Text className="font-ui text-caption font-bold text-ink underline">Add</Text>
-            </Pressable>
+            <View className="justify-center px-2">
+              <TextButton label="Add" onPress={handleAddTag} />
+            </View>
           </View>
         </View>
 
@@ -176,9 +176,7 @@ export default function ReaderScreen() {
             {data.description && (
               <Text className="font-ui text-body text-ink-soft dark:text-ink-faint">{data.description}</Text>
             )}
-            <Button pill variant="primary" onPress={() => Linking.openURL(data.url)}>
-              <Text className="font-ui text-caption font-extrabold text-ink">Open original link</Text>
-            </Button>
+            <Button pill size="sm" variant="primary" label="Open original link" onPress={() => Linking.openURL(data.url)} />
           </View>
         )}
         {data.status === "ready" && !data.isStub && (
@@ -187,27 +185,23 @@ export default function ReaderScreen() {
           </>
         )}
         {data.status === "ready" && (
-          <View className="gap-3 border-t-3 border-ink pt-4">
-            <Text className="font-ui text-body font-semibold text-ink dark:text-paper">Highlights</Text>
+          <View className="gap-3">
+            <Divider />
+            <Text className="font-heading text-title text-ink dark:text-paper">Highlights</Text>
             {data.highlights.map((highlight) => (
-              <View
-                key={highlight.id}
-                className="gap-1 rounded-card border-3 border-ink bg-accent-yellowLight p-3"
-              >
-                <Text className="font-ui text-body italic text-ink dark:text-paper">"{highlight.quote}"</Text>
+              <Notice key={highlight.id} tone="highlight" compact>
+                <Text className={`font-reading text-body italic ${noticeText("highlight")}`}>"{highlight.quote}"</Text>
                 {highlight.note ? (
-                  <Text className="font-ui text-caption text-ink-soft dark:text-ink-faint">{highlight.note}</Text>
+                  <Text className={`font-ui text-caption ${noticeSoftText("highlight")}`}>{highlight.note}</Text>
                 ) : null}
-                <Pressable onPress={() => handleRemoveHighlight(highlight.id)} className="self-start">
-                  <Text className="font-ui text-caption font-bold text-danger">Remove</Text>
-                </Pressable>
-              </View>
+                <TextButton label="Remove" tone="danger" onPress={() => handleRemoveHighlight(highlight.id)} />
+              </Notice>
             ))}
             <TextField shape="box" value={newQuote} onChangeText={setNewQuote} placeholder="Quote" multiline />
             <TextField shape="box" value={newNote} onChangeText={setNewNote} placeholder="Note (optional)" multiline />
-            <Button pill variant="primary" onPress={handleAddHighlight} className="self-start">
-              <Text className="font-ui text-caption font-extrabold text-ink">Save highlight</Text>
-            </Button>
+            <View className="self-start">
+              <Button pill size="sm" variant="primary" label="Save highlight" onPress={handleAddHighlight} />
+            </View>
           </View>
         )}
       </ScrollView>

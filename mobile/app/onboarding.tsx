@@ -37,9 +37,7 @@ export default function OnboardingScreen() {
           </View>
         </Card>
 
-        <Button pill variant="primary" onPress={getStarted}>
-          <Text className="font-ui text-body font-extrabold text-ink">Get started</Text>
-        </Button>
+        <Button pill variant="primary" label="Get started" onPress={getStarted} />
       </View>
     </Screen>
   );
