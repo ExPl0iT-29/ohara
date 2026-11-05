@@ -78,9 +78,7 @@ export default function SettingsScreen() {
           Export your whole library as JSON, or import a backup (or a plain list of URLs saved from your PC).
         </Text>
 
-        <Button variant="primary" disabled={busy} onPress={handleExport}>
-          <Text className="font-ui text-center text-body font-extrabold text-ink">Export library</Text>
-        </Button>
+        <Button variant="primary" label="Export library" disabled={busy} onPress={handleExport} />
 
         <Card>
           <Pressable

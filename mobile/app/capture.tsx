@@ -1,12 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 import { captureContent, findByUrl, type ContentType } from "../src/api/content";
 import { useCaptureContent } from "../src/hooks/useCaptureContent";
 import { Button } from "../src/components/ui/Button";
 import { Chip } from "../src/components/ui/Chip";
+import { Notice, noticeText } from "../src/components/ui/Notice";
+import { TextButton } from "../src/components/ui/TextButton";
 import { TextField } from "../src/components/ui/TextField";
 import { Screen } from "../src/components/ui/Screen";
 
@@ -72,12 +74,10 @@ export default function CaptureScreen() {
         />
 
         {existing && (
-          <View className="gap-2 rounded-card border-3 border-ink bg-accent-mintLight p-4">
-            <Text className="font-ui text-body font-semibold text-ink dark:text-paper">Already saved.</Text>
-            <Pressable onPress={() => router.replace(`/content/${existing.id}`)} className="self-start">
-              <Text className="font-ui text-caption font-bold text-ink underline">Open existing item</Text>
-            </Pressable>
-          </View>
+          <Notice tone="success">
+            <Text className={`font-ui text-body font-semibold ${noticeText("success")}`}>Already saved.</Text>
+            <TextButton label="Open existing item" onPress={() => router.replace(`/content/${existing.id}`)} />
+          </Notice>
         )}
 
         {!isBulk && (
@@ -108,13 +108,10 @@ export default function CaptureScreen() {
 
         <Button
           variant="primary"
+          label={mutation.isPending || isBulkSaving ? "Saving..." : isBulk ? `Save ${lines.length} links` : "Save"}
           onPress={handleSubmit}
           disabled={lines.length === 0 || mutation.isPending || isBulkSaving || !!existing}
-        >
-          <Text className="font-ui text-center text-body font-extrabold text-ink">
-            {mutation.isPending || isBulkSaving ? "Saving..." : isBulk ? `Save ${lines.length} links` : "Save"}
-          </Text>
-        </Button>
+        />
       </ScrollView>
     </Screen>
   );

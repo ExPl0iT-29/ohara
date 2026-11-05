@@ -9,6 +9,7 @@ Three visual directions (Quiet Shelf, Material Expressive, refined neo-brutalism
 - Add `mobile/src/theme/tokens.js` as the single source of colours and font families, used by Tailwind and by a `useTheme()` hook for native props (spinners, placeholders, header, shadows, the HTML reader).
 - Add font-role classes (`font-heading`, `font-ui`, `font-reading`) to every text style. They map to the system font today, so nothing looks different.
 - Rename `BrutalButton` / `BrutalCard` to `Button` / `Card`, and add `Chip`, `Tag`, `TextField`, `Screen` and `Fab` primitives that screens now use instead of inline styling.
+- `Button` renders its own label; `Notice`, `TextButton` and `Divider` replace hand-styled notices, underlined links and section rules.
 - Fix the onboarding copy that still said Ohara "summarizes" links.
 - No visual change apart from the stack header now using the same paper colour as the screens (it used a slightly different off-white).
 

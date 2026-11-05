@@ -1,5 +1,4 @@
-import type { ReactNode } from "react";
-import { Pressable } from "react-native";
+import { Pressable, Text } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import { useTheme } from "../../theme/useTheme";
@@ -14,8 +13,16 @@ const VARIANT_BG: Record<ButtonVariant, string> = {
 
 type ButtonVariant = "primary" | "destructive" | "neutral";
 
+const VARIANT_TEXT: Record<ButtonVariant, string> = {
+  primary: "text-ink",
+  destructive: "text-ink",
+  neutral: "text-ink dark:text-paper",
+};
+
 interface ButtonProps {
-  children: ReactNode;
+  label: string;
+  /** "sm" for inline actions, "md" for a screen's main action. */
+  size?: "sm" | "md";
   onPress?: () => void;
   variant?: ButtonVariant;
   pill?: boolean;
@@ -25,7 +32,8 @@ interface ButtonProps {
 
 /** The app's button. Pressing slides the face onto its hard-offset shadow. */
 export function Button({
-  children,
+  label,
+  size = "md",
   onPress,
   variant = "neutral",
   pill = false,
@@ -56,6 +64,9 @@ export function Button({
       onPressOut={() => {
         pressed.value = withTiming(0, { duration: 120 });
       }}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled }}
       style={{ position: "relative", opacity: disabled ? 0.4 : 1 }}
     >
       <Animated.View
@@ -74,12 +85,16 @@ export function Button({
         ]}
       />
       <Animated.View
-        className={`items-center justify-center border-3 border-ink px-4 py-2.5 ${
+        className={`items-center justify-center border-3 border-ink ${size === "sm" ? "px-3 py-1.5" : "px-4 py-2.5"} ${
           pill ? "rounded-pill" : "rounded-card"
         } ${VARIANT_BG[variant]} ${className}`}
         style={contentStyle}
       >
-        {children}
+        <Text
+          className={`text-center font-ui font-extrabold ${size === "sm" ? "text-caption" : "text-body"} ${VARIANT_TEXT[variant]}`}
+        >
+          {label}
+        </Text>
       </Animated.View>
     </Pressable>
   );

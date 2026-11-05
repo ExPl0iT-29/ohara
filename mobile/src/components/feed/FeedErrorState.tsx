@@ -14,9 +14,9 @@ export function FeedErrorState({ onRetry }: FeedErrorStateProps) {
       <Text className="font-ui text-center text-body text-ink-soft dark:text-ink-faint">
         Check your connection and try again.
       </Text>
-      <Button pill onPress={onRetry} className="mt-2">
-        <Text className="font-ui text-body font-extrabold text-ink">Retry</Text>
-      </Button>
+      <View className="mt-2">
+        <Button pill label="Retry" onPress={onRetry} />
+      </View>
     </View>
   );
 }
