@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, RefreshControl, ScrollView, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -15,11 +16,16 @@ import {
 import { CONTENT_TYPE_LABELS } from "../src/constants/contentTypeLabels";
 import { FeedEmptyState } from "../src/components/feed/FeedEmptyState";
 import { FeedErrorState } from "../src/components/feed/FeedErrorState";
-import { FeedListItem } from "../src/components/feed/FeedListItem";
+import { BOTTOM_NAV_HEIGHT, BottomNav } from "../src/components/feed/BottomNav";
+import { ContinueCard } from "../src/components/feed/ContinueCard";
+import { FeedListItem, type RowPosition } from "../src/components/feed/FeedListItem";
 import { Chip } from "../src/components/ui/Chip";
+import { Eyebrow } from "../src/components/ui/Eyebrow";
 import { Fab } from "../src/components/ui/Fab";
+import { IconButton } from "../src/components/ui/IconButton";
 import { Screen } from "../src/components/ui/Screen";
 import { TextField } from "../src/components/ui/TextField";
+import { isInProgress } from "../src/format/itemMeta";
 import { useContentList } from "../src/hooks/useContentList";
 import { logSinceBundleStart } from "../src/perf";
 import { useTheme } from "../src/theme/useTheme";
@@ -27,6 +33,7 @@ import { useTheme } from "../src/theme/useTheme";
 export default function FeedScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
   const [archived, setArchived] = useState(false);
   const [search, setSearch] = useState("");
@@ -58,88 +65,125 @@ export default function FeedScreen() {
     },
     [queryClient],
   );
+  const isFiltered = !!search || !!tag || !!contentType;
+  // Unfiltered active library: the latest unfinished item becomes a hero card.
+  const continueItem = useMemo(
+    () => (archived || isFiltered ? undefined : (data ?? []).find(isInProgress)),
+    [data, archived, isFiltered],
+  );
+  const rows = useMemo(
+    () => (data ?? []).filter((item) => item.id !== continueItem?.id),
+    [data, continueItem],
+  );
+  const positionOf = useCallback(
+    (index: number): RowPosition => {
+      if (rows.length === 1) return "single";
+      if (index === 0) return "first";
+      return index === rows.length - 1 ? "last" : "middle";
+    },
+    [rows.length],
+  );
   const renderItem = useCallback(
-    ({ item }: { item: ContentItem }) => (
-      <FeedListItem item={item} onPress={handleOpenItem} onToggleArchive={handleToggleArchive} />
+    ({ item, index }: { item: ContentItem; index: number }) => (
+      <FeedListItem item={item} position={positionOf(index)} onPress={handleOpenItem} onToggleArchive={handleToggleArchive} />
     ),
-    [handleOpenItem, handleToggleArchive],
+    [handleOpenItem, handleToggleArchive, positionOf],
   );
   const keyExtractor = useCallback((item: ContentItem) => item.id, []);
+  const navSpace = BOTTOM_NAV_HEIGHT + insets.bottom;
 
   return (
-    <Screen>
-      <View className="flex-row items-center justify-between px-5 pb-2 pt-4">
-        <Text className="font-heading text-display text-ink dark:text-paper">Ohara</Text>
-        <Pressable onPress={() => router.push("/settings")} accessibilityRole="button">
-          <Text className="font-ui text-caption text-ink-soft dark:text-ink-faint">Settings</Text>
-        </Pressable>
+    <Screen edges={["top", "left", "right"]}>
+      <View className="flex-row items-center gap-3 px-4 pb-2 pt-3">
+        <View className="flex-1">
+          <TextField value={search} onChangeText={setSearch} placeholder="Search your library" returnKeyType="search" />
+        </View>
+        <IconButton glyph="⚙" accessibilityLabel="Settings" onPress={() => router.push("/settings")} />
       </View>
 
-      <View className="flex-row gap-2 px-5 pb-2">
-        <Chip size="md" label="Active" selected={!archived} onPress={() => setArchived(false)} />
-        <Chip size="md" label="Archived" selected={archived} onPress={() => setArchived(true)} />
-      </View>
-
-      <View className="px-5 pb-2">
-        <TextField value={search} onChangeText={setSearch} placeholder="Search your library" />
-      </View>
+      <Text className="px-5 pb-3 pt-2 font-heading text-display text-ink dark:text-paper">{archived ? "Archive" : "Library"}</Text>
 
       {(typeChips.length > 0 || tagChips.length > 0) && (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={{ flexGrow: 0, height: 40 }}
-          className="px-5 pb-2"
-          contentContainerStyle={{ gap: 8, alignItems: "center" }}
+          style={{ flexGrow: 0 }}
+          contentContainerStyle={{ gap: 8, alignItems: "center", paddingHorizontal: 16, paddingBottom: 12 }}
         >
           {typeChips.map((type) => {
             const selected = contentType === type;
             return (
-              <Chip
-                key={`type-${type}`}
-                label={CONTENT_TYPE_LABELS[type]}
-                selected={selected}
-                onPress={() => setContentType(selected ? null : type)}
-              />
+              <Chip key={`type-${type}`} label={CONTENT_TYPE_LABELS[type]} selected={selected} onPress={() => setContentType(selected ? null : type)} />
             );
           })}
           {tagChips.map((chip) => {
             const selected = tag === chip;
-            return (
-              <Chip key={chip} tone="tag" label={chip} selected={selected} onPress={() => setTag(selected ? null : chip)} />
-            );
+            return <Chip key={chip} tone="tag" label={chip} selected={selected} onPress={() => setTag(selected ? null : chip)} />;
           })}
         </ScrollView>
       )}
 
       {isLoading ? (
-        <View className="flex-1 items-center justify-center gap-3">
-          <ActivityIndicator color={colors.text} size="large" />
-          <Text className="font-ui text-caption font-bold text-ink-soft dark:text-ink-faint">
-            Loading your library...
-          </Text>
+        <View className="flex-1 items-center justify-center gap-3" style={{ paddingBottom: navSpace }}>
+          <ActivityIndicator color={colors.accent} size="large" />
+          <Text className="font-ui text-caption text-ink-soft dark:text-ink-faint">Opening your library…</Text>
         </View>
       ) : error ? (
-        <FeedErrorState onRetry={() => refetch()} />
+        <View className="flex-1" style={{ paddingBottom: navSpace }}>
+          <FeedErrorState onRetry={() => refetch()} />
+        </View>
       ) : !data || data.length === 0 ? (
-        archived ? (
-          <View className="flex-1 items-center justify-center p-8">
-            <Text className="text-center font-ui text-body text-ink-soft dark:text-ink-faint">Nothing archived yet.</Text>
-          </View>
-        ) : (
-          <FeedEmptyState />
-        )
+        <View className="flex-1" style={{ paddingBottom: navSpace }}>
+          {isFiltered ? (
+            <View className="flex-1 items-center justify-center gap-2 px-8">
+              <Text className="text-center font-heading text-title text-ink dark:text-paper">No matches</Text>
+              <Text className="text-center font-ui text-body text-ink-soft dark:text-ink-faint">
+                Nothing in your library matches that search or filter.
+              </Text>
+            </View>
+          ) : archived ? (
+            <View className="flex-1 items-center justify-center gap-2 px-8">
+              <Text className="text-center font-heading text-title text-ink dark:text-paper">Nothing archived yet</Text>
+              <Text className="text-center font-ui text-body text-ink-soft dark:text-ink-faint">
+                Swipe an item left and choose Archive once you have finished with it.
+              </Text>
+            </View>
+          ) : (
+            <FeedEmptyState />
+          )}
+        </View>
       ) : (
         <FlatList
-          data={data}
+          data={rows}
           keyExtractor={keyExtractor}
-          contentContainerStyle={{ padding: 20, gap: 12 }}
-          refreshControl={<RefreshControl tintColor={colors.text} colors={[colors.text]} refreshing={isFetching} onRefresh={refetch} />}
           renderItem={renderItem}
+          ListHeaderComponent={
+            continueItem ? (
+              <View>
+                <ContinueCard item={continueItem} onPress={handleOpenItem} />
+                {rows.length > 0 && (
+                  <View className="px-5 pb-2">
+                    <Eyebrow label="Recently saved" />
+                  </View>
+                )}
+              </View>
+            ) : null
+          }
+          contentContainerStyle={{ paddingBottom: navSpace + 96 }}
+          refreshControl={
+            <RefreshControl tintColor={colors.accent} colors={[colors.accent]} refreshing={isFetching} onRefresh={refetch} />
+          }
         />
       )}
 
-      <Fab onPress={handleOpenCapture} accessibilityLabel="Save a link" />
+      <Fab onPress={handleOpenCapture} accessibilityLabel="Save a link" bottomOffset={navSpace + 16} />
+      <BottomNav
+        destinations={[
+          { key: "library", label: "Library", glyph: "▤", selected: !archived, onPress: () => setArchived(false) },
+          { key: "archive", label: "Archive", glyph: "⇣", selected: archived, onPress: () => setArchived(true) },
+          { key: "settings", label: "Settings", glyph: "⚙", selected: false, onPress: () => router.push("/settings") },
+        ]}
+      />
     </Screen>
   );
 }

@@ -12,15 +12,15 @@ Whenever designing a screen or component, refer to this document before implemen
 
 # Design Mission
 
-Ohara should feel like a bold, tactile personal library — playful and confident, not quiet and beige.
+Ohara should feel like it was made for Android: familiar in the hand, expressive in the details.
 
-It is a save-and-read app, and it should look proud of that: chunky borders, punchy color, cards that feel like physical objects you can grab.
+It is a save-and-read app built on Google's Material 3 Expressive language, so navigation, buttons and lists behave the way Android users already expect, while shape, colour and motion give it a personality of its own.
 
-Opening Ohara should feel energizing, like flipping through a well-organized sticker book, not like tiptoeing into a reading room.
+Opening Ohara should feel effortless and a little delightful, never unfamiliar.
 
-The interface has personality. It doesn't disappear — it invites.
+The goal is to make saving and reading fast, trustworthy and pleasant.
 
-The goal is to make saving and reading fast, satisfying, and a little fun.
+**Current direction: Material Expressive.**
 
 ---
 
@@ -28,20 +28,20 @@ The goal is to make saving and reading fast, satisfying, and a little fun.
 
 Every screen should evoke:
 
-* Energy
-* Playfulness
-* Confidence
-* Clarity
-* Delight
+* Familiarity
+* Ease
+* Responsiveness
+* Warmth
+* Delight in small moments
 
 Avoid creating feelings of:
 
-* Sterility
-* Corporate blandness
-* Visual timidity
-* Overload from clutter (bold ≠ busy)
+* Generic template apps
+* Visual noise
+* Unfamiliar navigation
+* Motion for its own sake
 
-Ohara should feel like a tool the user is excited to open.
+Ohara should feel like a well-made first-party Android app.
 
 ---
 
@@ -116,27 +116,25 @@ Advanced metadata, AI features, projects, and relationships should stay out of t
 
 ## Personality
 
-Neo-brutalist: thick black borders, hard offset drop shadows (no blur), bold saturated accent colors, chunky rounded-but-square shapes, confident condensed display type for headings.
+Material 3 Expressive. Tonal surfaces instead of borders, large rounded containers (24–28dp), a deliberate variety of shapes, spring motion, and standard Android patterns: a search bar at the top, filter chips, a navigation bar, and an extended floating action button.
 
-Think a well-made sticker or a physical folder with a colored tab — every element should look like it has weight and could be picked up.
+Shape carries meaning: each content type has its own thumbnail silhouette (circle for video, arch for PDFs and papers, leaf for articles, squircle for docs and code), so the list reads at a glance.
 
 ---
 
 ## Typography
 
-Headings use a bold, condensed, high-contrast display face — confident, a little loud.
+Android's own Roboto, so nothing is bundled and text matches the system. Headlines are set heavy (800) and large; body and reading text are 16–17sp with generous line height. Labels are sentence case.
 
-Body/reading text stays highly readable — the reader view is the one place restraint wins over personality (see Reader Experience below).
-
-Generous spacing still applies. Never compress text in the reader.
+Never compress text in the reader.
 
 ---
 
 ## Color Philosophy
 
-Bold and saturated, not muted. A small palette of confident accent colors (e.g. warm yellow, hot pink, violet, mint) used deliberately per collection/category, against a warm off-white (not stark white) base and true-black borders/text.
+A Material 3 tonal palette generated from a teal seed (#006A60). Primary for the main actions and progress, primary container for selection and the reader header, tertiary (warm yellow) for the Save button and highlights, error red only for failures.
 
-Dark mode should keep the same energy — bold accents against a near-black surface, not a dimmed-down version of light mode.
+Dark mode uses the matching dark tonal roles (primary #84D5C6 on #0E1513), not a dimmed light theme.
 
 ---
 
@@ -152,7 +150,7 @@ Whenever available:
 * PDF preview
 * Repository avatar
 
-Cards are folder-tab shaped where they represent a collection, and image-forward where they represent content. Cards should feel like physical, grabbable objects — border + hard shadow, never flat.
+Thumbnails are cropped into the content type's shape; without an image, the shape is filled with its tonal colour and the type's initial. The latest unfinished item gets a large Continue card.
 
 Avoid walls of text.
 
@@ -414,21 +412,13 @@ The application should never make the user feel guilty for not reading.
 
 Products:
 
-Tuckii
+Android 16 system apps
 
-Pop-art / neo-brutalist web design
+Google Play Books
 
-Duolingo (confidence, color, character)
+Gmail and Google Keep (Material 3 Expressive)
 
-Physical objects:
-
-Sticker books
-
-Folder tabs and physical filing
-
-Zines
-
-The goal is to create the feeling of a tactile, colorful, personal collection — not a sterile productivity tool.
+The goal is an app that feels native to Android and still has its own voice.
 
 ---
 
@@ -436,14 +426,14 @@ The goal is to create the feeling of a tactile, colorful, personal collection �
 
 When opening Ohara, the user should feel:
 
-"This is satisfying to use."
+"This just works, and it's nice to use."
 
 Not:
 
-"This feels like a spreadsheet."
+"Where is everything?"
 
-Confidence should replace timidity.
+Familiarity should replace friction.
 
-Personality should replace blandness.
+Expressive details should replace blandness.
 
-If a design decision moves the product away from this feeling, it is the wrong decision.
+If a design decision breaks an Android convention without a clear reading benefit, it is the wrong decision.

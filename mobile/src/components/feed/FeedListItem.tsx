@@ -1,85 +1,80 @@
+import { Image } from "expo-image";
 import { memo } from "react";
 import { Pressable, Share, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, {
-  FadeInDown,
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
+import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 
 import type { ContentItem } from "../../api/content";
 import { CONTENT_TYPE_LABELS } from "../../constants/contentTypeLabels";
+import { metaLine } from "../../format/itemMeta";
 import { useTheme } from "../../theme/useTheme";
 import { FeedStatusBadge } from "./FeedStatusBadge";
+import { thumbnailShape, thumbnailTone } from "./shapes";
+
+/** Where a row sits in its group; the group's outer corners are large, inner ones small. */
+export type RowPosition = "single" | "first" | "middle" | "last";
 
 interface FeedListItemProps {
   item: ContentItem;
   onPress: (id: string) => void;
   onToggleArchive?: (item: ContentItem) => void;
+  position?: RowPosition;
 }
 
-const ACTION_SIZE = 52;
-const ACTION_GAP = 10;
+const ACTION_SIZE = 48;
+const ACTION_GAP = 8;
 const REVEAL_WIDTH = ACTION_SIZE * 3 + ACTION_GAP * 4;
 const OPEN_THRESHOLD = REVEAL_WIDTH / 2;
+const THUMB = 48;
+const OUTER = 24;
+const INNER = 6;
 
-function ActionButton({
-  label,
-  accessibilityLabel,
-  bg,
-  onPress,
-}: {
-  label: string;
-  accessibilityLabel: string;
-  bg: string;
-  onPress: () => void;
-}) {
-  const { colors } = useTheme();
+function cornerStyle(position: RowPosition) {
+  const top = position === "single" || position === "first" ? OUTER : INNER;
+  const bottom = position === "single" || position === "last" ? OUTER : INNER;
+  return { borderTopLeftRadius: top, borderTopRightRadius: top, borderBottomLeftRadius: bottom, borderBottomRightRadius: bottom };
+}
+
+function ActionButton({ glyph, label, bg, onPress }: { glyph: string; label: string; bg: string; onPress: () => void }) {
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      style={{
-        width: ACTION_SIZE,
-        height: ACTION_SIZE,
-        borderRadius: ACTION_SIZE / 2,
-        borderWidth: 3,
-        borderColor: colors.line,
-        backgroundColor: bg,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
+      accessibilityLabel={label}
+      style={{ width: ACTION_SIZE, height: ACTION_SIZE, borderRadius: 16, backgroundColor: bg, alignItems: "center", justifyContent: "center" }}
     >
-      <Text className="font-ui text-caption font-extrabold text-ink">{label}</Text>
+      <Text className="font-ui text-[18px] text-ink dark:text-paper">{glyph}</Text>
     </Pressable>
   );
 }
 
-function FeedListItemBase({ item, onPress, onToggleArchive }: FeedListItemProps) {
+function Thumbnail({ item }: { item: ContentItem }) {
+  const shape = thumbnailShape(item.contentType);
+  if (item.heroImage) {
+    return (
+      <Image
+        source={{ uri: item.heroImage }}
+        style={[{ width: THUMB, height: THUMB }, shape]}
+        contentFit="cover"
+        cachePolicy="memory-disk"
+        transition={150}
+      />
+    );
+  }
+  return (
+    <View style={[{ width: THUMB, height: THUMB }, shape]} className={`items-center justify-center ${thumbnailTone(item.contentType)}`}>
+      <Text className="font-ui text-body font-bold text-ink dark:text-paper">{CONTENT_TYPE_LABELS[item.contentType].charAt(0)}</Text>
+    </View>
+  );
+}
+
+function FeedListItemBase({ item, onPress, onToggleArchive, position = "single" }: FeedListItemProps) {
   const { colors } = useTheme();
   const translateX = useSharedValue(0);
   const isArchived = !!item.archivedAt;
 
   const closeSwipe = () => {
-    translateX.value = withSpring(0);
-  };
-
-  const handleOpen = () => {
-    closeSwipe();
-    onPress(item.id);
-  };
-
-  const handleArchiveToggle = () => {
-    closeSwipe();
-    onToggleArchive?.(item);
-  };
-
-  const handleShare = () => {
-    closeSwipe();
-    void Share.share({ message: item.url, url: item.url });
+    translateX.value = withSpring(0, { damping: 18 });
   };
 
   const pan = Gesture.Pan()
@@ -89,82 +84,54 @@ function FeedListItemBase({ item, onPress, onToggleArchive }: FeedListItemProps)
       translateX.value = Math.max(-REVEAL_WIDTH, Math.min(0, event.translationX));
     })
     .onEnd(() => {
-      const shouldOpen = translateX.value < -OPEN_THRESHOLD;
-      translateX.value = withSpring(shouldOpen ? -REVEAL_WIDTH : 0);
+      translateX.value = withSpring(translateX.value < -OPEN_THRESHOLD ? -REVEAL_WIDTH : 0, { damping: 18 });
     });
 
-  const cardStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
-  }));
-
-  const actionsStyle = useAnimatedStyle(() => ({
-    opacity: Math.min(1, -translateX.value / OPEN_THRESHOLD),
-  }));
+  const rowStyle = useAnimatedStyle(() => ({ transform: [{ translateX: translateX.value }] }));
+  const actionsStyle = useAnimatedStyle(() => ({ opacity: Math.min(1, -translateX.value / OPEN_THRESHOLD) }));
 
   return (
-    <Animated.View entering={FadeInDown}>
+    <Animated.View entering={FadeInDown.springify().damping(18)} className="mx-4" style={{ marginBottom: 3 }}>
       <View style={{ position: "relative" }}>
         <Animated.View
           pointerEvents="box-none"
           style={[
             actionsStyle,
-            {
-              position: "absolute",
-              top: 0,
-              bottom: 0,
-              right: 0,
-              zIndex: 1,
-              elevation: 1,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: ACTION_GAP,
-              paddingRight: ACTION_GAP,
-            },
+            { position: "absolute", top: 0, bottom: 0, right: 0, flexDirection: "row", alignItems: "center", gap: ACTION_GAP, paddingRight: ACTION_GAP },
           ]}
         >
-          <ActionButton label="Open" accessibilityLabel="Open" bg={colors.actionOpen} onPress={handleOpen} />
+          <ActionButton glyph="↗" label="Open" bg={colors.actionOpen} onPress={() => { closeSwipe(); onPress(item.id); }} />
           <ActionButton
-            label={isArchived ? "Unarc" : "Arc"}
-            accessibilityLabel={isArchived ? "Unarchive" : "Archive"}
+            glyph={isArchived ? "↺" : "⇣"}
+            label={isArchived ? "Unarchive" : "Archive"}
             bg={colors.actionArchive}
-            onPress={handleArchiveToggle}
+            onPress={() => { closeSwipe(); onToggleArchive?.(item); }}
           />
-          <ActionButton label="Share" accessibilityLabel="Share" bg={colors.actionShare} onPress={handleShare} />
+          <ActionButton
+            glyph="⤴"
+            label="Share"
+            bg={colors.actionShare}
+            onPress={() => { closeSwipe(); void Share.share({ message: item.url, url: item.url }); }}
+          />
         </Animated.View>
 
-        <View
-          pointerEvents="none"
-          style={{
-            position: "absolute",
-            top: 4,
-            left: 4,
-            right: -4,
-            bottom: -4,
-            backgroundColor: colors.shadow,
-            borderRadius: 16,
-          }}
-        />
         <GestureDetector gesture={pan}>
-          <Animated.View style={[cardStyle, { zIndex: 2 }]}>
+          <Animated.View style={rowStyle}>
             <Pressable
-              className="gap-2 rounded-card border-3 border-ink bg-paper p-4 active:opacity-90 dark:bg-surface-dark"
               onPress={() => onPress(item.id)}
+              accessibilityRole="button"
+              style={cornerStyle(position)}
+              className="flex-row items-center gap-4 bg-raised px-4 py-3.5 active:bg-raised-high dark:bg-raised-dark dark:active:bg-raised-highDark"
             >
-              <Text className="font-ui text-body font-bold text-ink dark:text-paper" numberOfLines={2}>
-                {item.title ?? item.url}
-              </Text>
-              <Text className="font-ui text-caption text-ink-faint" numberOfLines={1}>
-                {item.url}
-              </Text>
-              <View className="flex-row items-center justify-between">
-                <View className="flex-row items-center gap-2">
-                  <View className="self-start rounded-pill border-2 border-ink bg-accent-yellow px-2 py-0.5">
-                    <Text className="font-ui text-caption font-bold text-ink">
-                      {CONTENT_TYPE_LABELS[item.contentType]}
-                    </Text>
-                  </View>
-                  <FeedStatusBadge status={item.status} />
-                </View>
+              <Thumbnail item={item} />
+              <View className="flex-1 gap-1">
+                <Text className="font-ui text-body font-semibold text-ink dark:text-paper" numberOfLines={2}>
+                  {item.title ?? item.url}
+                </Text>
+                <Text className="font-ui text-caption text-ink-soft dark:text-ink-faint" numberOfLines={1}>
+                  {metaLine(item)}
+                </Text>
+                <FeedStatusBadge status={item.status} />
               </View>
             </Pressable>
           </Animated.View>

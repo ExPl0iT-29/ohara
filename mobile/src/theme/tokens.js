@@ -1,72 +1,86 @@
 // Design tokens: the single source for every colour and font in the app.
 // CommonJS so tailwind.config.js can require it; typed by tokens.d.ts.
-// A visual direction changes this file and the primitives in src/components/ui/, not screens.
+// Direction: Material Expressive — Material 3 tonal palette from a teal seed,
+// large rounded shapes, Android's own Roboto.
 
-/** Colours exposed to NativeWind class names (bg-paper, text-ink, border-line, ...). */
+/** Colours exposed to NativeWind class names. Names follow the app's tokens; comments give the M3 role. */
 const colors = {
-  paper: "#FAF3E1",
-  surface: { DEFAULT: "#FAF3E1", dark: "#161412" },
-  ink: { DEFAULT: "#1C1917", soft: "#57534E", faint: "#A8A29E" },
-  brand: { DEFAULT: "#FFC933", dark: "#E6A800", light: "#FFF3D1" },
-  accent: {
-    yellow: "#FFC933",
-    yellowLight: "#FFF3D1",
-    pink: "#FF5C8A",
-    pinkLight: "#FFE1EA",
-    violet: "#8B5CF6",
-    violetLight: "#EDE4FF",
-    mint: "#34D399",
-    mintLight: "#D6F5E8",
-    blue: "#5B8DEF",
-    blueLight: "#E1E9FB",
+  // background (light); also onSurface text in dark mode via dark:text-paper.
+  paper: "#F4FBF8",
+  surface: { DEFAULT: "#F4FBF8", dark: "#0E1513" },
+  // surfaceContainer / surfaceContainerHigh.
+  raised: { DEFAULT: "#E6F0EC", dark: "#1A211F", high: "#DAE5E1", highDark: "#252B2A" },
+  // onSurface / onSurfaceVariant / outline.
+  ink: { DEFAULT: "#161D1B", soft: "#3F4946", faint: "#7C8784" },
+  // primary, primaryContainer, onPrimaryContainer and their dark roles.
+  brand: {
+    DEFAULT: "#006A60",
+    dark: "#00201C",
+    light: "#CCE8E1",
+    deep: "#005048",
+    bright: "#84D5C6",
+    onDeep: "#A0F2E2",
+    onBright: "#003731",
   },
-  line: "#1C1917",
-  danger: { DEFAULT: "#FF4D6D", light: "#FFE1E7" },
-  amber: { DEFAULT: "#E6A800", light: "#FFF3D1" },
+  accent: {
+    // tertiaryContainer (FAB, highlights)
+    yellow: "#F9DF8F",
+    yellowLight: "#FFF1C9",
+    yellowDeep: "#3F3300",
+    yellowOnDeep: "#FFDF9E",
+    pink: "#FFD9E2",
+    pinkLight: "#FFECF0",
+    violet: "#D9E2FF",
+    violetLight: "#ECF0FF",
+    mint: "#B7EFC5",
+    mintLight: "#DDF6E3",
+    blue: "#CDE5FF",
+    blueLight: "#E7F2FF",
+  },
+  // outlineVariant
+  line: { DEFAULT: "#BEC9C5", dark: "#3F4946" },
+  danger: { DEFAULT: "#BA1A1A", light: "#FFDAD6", deep: "#93000A", bright: "#FFB4AB" },
+  amber: { DEFAULT: "#7A5900", light: "#FFDF9E", bright: "#F5BF48" },
 };
 
-/**
- * Font families. Android resolves a family name to assets/fonts/<name>.ttf, and
- * <name>_bold.ttf / <name>_italic.ttf for weight >= 600 and italics.
- * "sans-serif" is the platform default (Roboto).
- */
+/** Android's system Roboto; weights 100–900 are built in, so nothing is bundled. */
 const fonts = {
   heading: "sans-serif",
   ui: "sans-serif",
   reading: "sans-serif",
 };
 
-/** Colours for places class names cannot reach (native props, shadows, HTML renderer, header). */
+/** Colours for places class names cannot reach (native props, swipe actions, HTML renderer, header). */
 const palettes = {
   light: {
     background: colors.paper,
-    surface: colors.paper,
+    surface: colors.raised.DEFAULT,
     text: colors.ink.DEFAULT,
     textSoft: colors.ink.soft,
     textFaint: colors.ink.faint,
-    line: colors.line,
-    shadow: colors.ink.DEFAULT,
+    line: colors.line.DEFAULT,
+    shadow: "rgba(0, 0, 0, 0.18)",
     accent: colors.brand.DEFAULT,
-    link: "#3B6FD6",
+    link: colors.brand.DEFAULT,
     highlight: colors.brand.light,
-    actionOpen: colors.accent.blue,
+    actionOpen: colors.brand.light,
     actionArchive: colors.accent.yellow,
-    actionShare: colors.accent.mint,
+    actionShare: colors.accent.blue,
   },
   dark: {
     background: colors.surface.dark,
-    surface: colors.surface.dark,
-    text: "#FAF9F6",
-    textSoft: colors.ink.faint,
-    textFaint: colors.ink.faint,
-    line: colors.line,
-    shadow: colors.ink.DEFAULT,
-    accent: colors.brand.DEFAULT,
-    link: "#8FB4F5",
-    highlight: colors.brand.light,
-    actionOpen: colors.accent.blue,
-    actionArchive: colors.accent.yellow,
-    actionShare: colors.accent.mint,
+    surface: colors.raised.dark,
+    text: "#DDE4E1",
+    textSoft: "#BEC9C5",
+    textFaint: "#899390",
+    line: colors.line.dark,
+    shadow: "rgba(0, 0, 0, 0.5)",
+    accent: colors.brand.bright,
+    link: colors.brand.bright,
+    highlight: colors.brand.deep,
+    actionOpen: colors.brand.deep,
+    actionArchive: colors.accent.yellowDeep,
+    actionShare: "#004A77",
   },
 };
 

@@ -5,15 +5,16 @@ interface TagProps {
   onPress?: () => void;
 }
 
-/** A user tag on an item; pressing it removes the tag. */
+/** Material 3 input chip for a user tag; pressing it removes the tag. */
 export function Tag({ label, onPress }: TagProps) {
   return (
     <Pressable
       onPress={onPress}
       accessibilityLabel={`Remove tag ${label}`}
-      className="rounded-pill border-2 border-ink bg-accent-violetLight px-3 py-1"
+      className="h-8 flex-row items-center gap-2 rounded-[8px] bg-raised-high px-3 dark:bg-raised-highDark"
     >
-      <Text className="font-ui text-caption font-bold text-ink">{label} ×</Text>
+      <Text className="font-ui text-caption text-ink dark:text-paper">#{label}</Text>
+      <Text className="font-ui text-caption text-ink-soft dark:text-ink-faint">✕</Text>
     </Pressable>
   );
 }

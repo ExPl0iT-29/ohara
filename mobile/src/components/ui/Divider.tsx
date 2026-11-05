@@ -1,6 +1,6 @@
 import { View } from "react-native";
 
-/** Separates major sections of a screen. */
+/** Material 3 divider (outline variant). */
 export function Divider() {
-  return <View className="border-t-3 border-ink" />;
+  return <View className="h-px bg-line dark:bg-line-dark" />;
 }

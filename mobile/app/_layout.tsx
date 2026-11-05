@@ -71,8 +71,9 @@ export default function RootLayout() {
   const headerOptions = {
     headerStyle: { backgroundColor: colors.background },
     headerTintColor: colors.text,
-    headerTitleStyle: { color: colors.text, fontFamily: fonts.heading },
+    headerTitleStyle: { color: colors.text, fontFamily: fonts.heading, fontSize: 22 },
     contentStyle: { backgroundColor: colors.background },
+    headerShadowVisible: false,
   };
 
   return (

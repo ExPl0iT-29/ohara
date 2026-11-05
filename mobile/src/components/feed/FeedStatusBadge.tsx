@@ -8,25 +8,21 @@ interface FeedStatusBadgeProps {
   status: ContentStatus;
 }
 
-const BADGE_STYLES: Partial<Record<ContentStatus, string>> = {
-  pending: "bg-amber-light",
-  processing: "bg-amber-light",
-  failed: "bg-danger-light",
+const TONE: Partial<Record<ContentStatus, { box: string; text: string }>> = {
+  pending: { box: "bg-amber-light dark:bg-[#5C4300]", text: "text-amber dark:text-amber-bright" },
+  processing: { box: "bg-amber-light dark:bg-[#5C4300]", text: "text-amber dark:text-amber-bright" },
+  failed: { box: "bg-danger-light dark:bg-danger-deep", text: "text-danger dark:text-danger-bright" },
 };
 
-const BADGE_TEXT_STYLES: Partial<Record<ContentStatus, string>> = {
-  pending: "text-amber",
-  processing: "text-amber",
-  failed: "text-danger",
-};
-
+/** Small tonal label for items that are not ready to read. */
 function FeedStatusBadgeBase({ status }: FeedStatusBadgeProps) {
   const label = STATUS_LABELS[status];
-  if (!label) return null;
+  const tone = TONE[status];
+  if (!label || !tone) return null;
 
   return (
-    <View className={`self-start rounded-pill border-2 border-ink px-2 py-0.5 ${BADGE_STYLES[status]}`}>
-      <Text className={`font-ui text-caption font-bold ${BADGE_TEXT_STYLES[status]}`}>{label}</Text>
+    <View className={`self-start rounded-[6px] px-2 py-0.5 ${tone.box}`}>
+      <Text className={`font-ui text-[11px] font-semibold leading-[16px] ${tone.text}`}>{label}</Text>
     </View>
   );
 }

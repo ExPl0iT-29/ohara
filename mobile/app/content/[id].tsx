@@ -1,14 +1,13 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRef, useState } from "react";
-import {
-  Linking,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { Linking, NativeScrollEvent, NativeSyntheticEvent, Text, View } from "react-native";
+import Animated, {
+  useAnimatedRef,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
 
 import {
   addHighlight,
@@ -30,6 +29,8 @@ import { Notice, noticeSoftText, noticeText } from "../../src/components/ui/Noti
 import { Tag } from "../../src/components/ui/Tag";
 import { TextButton } from "../../src/components/ui/TextButton";
 import { TextField } from "../../src/components/ui/TextField";
+import { Eyebrow } from "../../src/components/ui/Eyebrow";
+import { IconButton } from "../../src/components/ui/IconButton";
 import { Screen } from "../../src/components/ui/Screen";
 
 export default function ReaderScreen() {
@@ -39,7 +40,16 @@ export default function ReaderScreen() {
   const [newTag, setNewTag] = useState("");
   const [newQuote, setNewQuote] = useState("");
   const [newNote, setNewNote] = useState("");
-  const scrollViewRef = useRef<ScrollView>(null);
+  const router = useRouter();
+  const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
+  const readProgress = useSharedValue(0);
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      const scrollable = event.contentSize.height - event.layoutMeasurement.height;
+      readProgress.value = scrollable > 0 ? Math.min(1, Math.max(0, event.contentOffset.y / scrollable)) : 0;
+    },
+  });
+  const progressStyle = useAnimatedStyle(() => ({ width: `${readProgress.value * 100}%` }));
   const contentHeightRef = useRef(0);
   const hasRestoredRef = useRef(false);
 
@@ -106,7 +116,7 @@ export default function ReaderScreen() {
   if (isLoading) {
     return (
       <Screen>
-        <Text className="font-ui p-5 text-body text-ink-soft dark:text-ink-faint">Loading...</Text>
+        <Text className="p-6 font-ui text-body text-ink-soft dark:text-ink-faint">Opening…</Text>
       </Screen>
     );
   }
@@ -114,83 +124,97 @@ export default function ReaderScreen() {
   if (error || !data) {
     return (
       <Screen>
-        <Text className="font-ui p-5 text-body text-danger">Not found</Text>
+        <View className="gap-2 p-6">
+          <Text className="font-heading text-title text-ink dark:text-paper">This item isn't in your library</Text>
+          <Text className="font-ui text-body text-ink-soft dark:text-ink-faint">It may have been removed, or the backup it came from was incomplete.</Text>
+        </View>
       </Screen>
     );
   }
 
-  const header = (
-    <ReaderHeader
-      title={data.title}
-      url={data.url}
-      heroImage={data.heroImage}
-      author={data.author}
-      source={data.source}
-      readingTime={data.readingTime}
-    />
-  );
-
   return (
     <Screen>
-      <ScrollView
+      <View className="flex-row items-center justify-between px-4 pb-2 pt-2">
+        <IconButton glyph="←" accessibilityLabel="Back" onPress={() => router.back()} />
+        <IconButton glyph="↗" accessibilityLabel="Open the original page" onPress={() => void Linking.openURL(data.url)} />
+      </View>
+      <View className="mx-4 h-1 overflow-hidden rounded-pill bg-raised dark:bg-raised-dark" importantForAccessibility="no-hide-descendants">
+        <Animated.View className="h-full rounded-pill bg-brand dark:bg-brand-bright" style={progressStyle} />
+      </View>
+      <Animated.ScrollView
         ref={scrollViewRef}
-        contentContainerStyle={{ padding: 20, gap: 20 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 48, gap: 24 }}
         onContentSizeChange={handleContentSizeChange}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
         onScrollEndDrag={handleScrollEnd}
         onMomentumScrollEnd={handleScrollEnd}
       >
-        {header}
-        <View className="self-start">
-          <Button pill size="sm" label={data.archivedAt ? "Unarchive" : "Archive"} onPress={handleToggleArchive} />
-        </View>
+        <ReaderHeader
+          title={data.title}
+          url={data.url}
+          heroImage={data.heroImage}
+          author={data.author}
+          source={data.source}
+          readingTime={data.readingTime}
+        />
 
-        <View className="gap-2">
-          <View className="flex-row flex-wrap gap-2">
-            {data.tags.map((tag) => (
-              <Tag key={tag} label={tag} onPress={() => handleRemoveTag(tag)} />
-            ))}
+        {(data.status === "pending" || data.status === "processing") && (
+          <ReaderStatusNotice variant="preparing" url={data.url} />
+        )}
+        {data.status === "failed" && <ReaderStatusNotice variant="failed" url={data.url} onRetry={handleRetry} />}
+        {data.status === "ready" && data.isStub && (
+          <View className="gap-4 px-2">
+            {data.description && (
+              <Text className="font-reading text-reading text-ink-soft dark:text-ink-faint">{data.description}</Text>
+            )}
+            <View className="self-start">
+              <Button pill variant="primary" label="Open original" onPress={() => Linking.openURL(data.url)} />
+            </View>
           </View>
-          <View className="flex-row gap-2">
+        )}
+        {data.status === "ready" && !data.isStub && (
+          <View className="px-2">
+            <ReaderBody extractedText={data.extractedText} />
+          </View>
+        )}
+
+        <Divider />
+
+        <View className="gap-3 px-2">
+          <Eyebrow label="Tags" />
+          {data.tags.length > 0 && (
+            <View className="flex-row flex-wrap gap-2">
+              {data.tags.map((tag) => (
+                <Tag key={tag} label={tag} onPress={() => handleRemoveTag(tag)} />
+              ))}
+            </View>
+          )}
+          <View className="flex-row items-center gap-2">
             <TextField
               shape="pillSmall"
               className="flex-1"
               value={newTag}
               onChangeText={setNewTag}
               onSubmitEditing={handleAddTag}
-              placeholder="Add tag"
+              placeholder="Add a tag"
+              returnKeyType="done"
             />
-            <View className="justify-center px-2">
-              <TextButton label="Add" onPress={handleAddTag} />
-            </View>
+            <Button size="sm" pill label="Add" onPress={handleAddTag} />
           </View>
         </View>
 
-        {(data.status === "pending" || data.status === "processing") && (
-          <ReaderStatusNotice variant="preparing" url={data.url} />
-        )}
-        {data.status === "failed" && (
-          <ReaderStatusNotice variant="failed" url={data.url} onRetry={handleRetry} />
-        )}
-        {data.status === "ready" && data.isStub && (
-          <View className="gap-4">
-            {data.description && (
-              <Text className="font-ui text-body text-ink-soft dark:text-ink-faint">{data.description}</Text>
-            )}
-            <Button pill size="sm" variant="primary" label="Open original link" onPress={() => Linking.openURL(data.url)} />
-          </View>
-        )}
-        {data.status === "ready" && !data.isStub && (
-          <>
-            <ReaderBody extractedText={data.extractedText} />
-          </>
-        )}
         {data.status === "ready" && (
-          <View className="gap-3">
-            <Divider />
-            <Text className="font-heading text-title text-ink dark:text-paper">Highlights</Text>
+          <View className="gap-3 px-2">
+            <Eyebrow label="Highlights" />
+            {data.highlights.length === 0 && (
+              <Text className="font-ui text-caption text-ink-soft dark:text-ink-faint">
+                Copy a passage you want to keep and save it here with a note.
+              </Text>
+            )}
             {data.highlights.map((highlight) => (
               <Notice key={highlight.id} tone="highlight" compact>
-                <Text className={`font-reading text-body italic ${noticeText("highlight")}`}>"{highlight.quote}"</Text>
+                <Text className={`font-reading text-body ${noticeText("highlight")}`}>“{highlight.quote}”</Text>
                 {highlight.note ? (
                   <Text className={`font-ui text-caption ${noticeSoftText("highlight")}`}>{highlight.note}</Text>
                 ) : null}
@@ -204,7 +228,11 @@ export default function ReaderScreen() {
             </View>
           </View>
         )}
-      </ScrollView>
+
+        <View className="self-start px-2">
+          <Button pill label={data.archivedAt ? "Move back to library" : "Archive"} onPress={handleToggleArchive} />
+        </View>
+      </Animated.ScrollView>
     </Screen>
   );
 }

@@ -2,31 +2,30 @@ import { Pressable, Text } from "react-native";
 
 type ChipTone = "brand" | "tag";
 
-const SELECTED_BG: Record<ChipTone, string> = {
-  brand: "bg-brand",
-  tag: "bg-accent-violet",
-};
-
 interface ChipProps {
   label: string;
   selected?: boolean;
   onPress?: () => void;
-  /** Which accent marks the selected state: content filters use brand, user tags use tag. */
+  /** Content filters use brand; user tags use tag, shown with a leading #. */
   tone?: ChipTone;
   size?: "sm" | "md";
 }
 
-/** A selectable pill used for filters, tabs and content-type pickers. */
+/** Material 3 filter chip: outlined at rest, tonal with a check when selected. */
 export function Chip({ label, selected = false, onPress, tone = "brand", size = "sm" }: ChipProps) {
-  const shape = size === "md" ? "border-3 px-4 py-1.5" : "border-2 px-3 py-1";
+  const box = selected
+    ? "border-transparent bg-brand-light dark:bg-brand-deep"
+    : "border-ink-faint bg-transparent dark:border-line-dark";
+  const text = selected ? "text-brand-dark dark:text-brand-onDeep" : "text-ink-soft dark:text-ink-faint";
+  const name = tone === "tag" ? `#${label}` : label;
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
       accessibilityState={{ selected }}
-      className={`rounded-pill border-ink ${shape} ${selected ? SELECTED_BG[tone] : "bg-paper dark:bg-surface-dark"}`}
+      className={`flex-row items-center justify-center border ${size === "md" ? "h-10 rounded-[12px] px-4" : "h-8 rounded-[8px] px-3"} ${box}`}
     >
-      <Text className="font-ui text-caption font-bold text-ink">{label}</Text>
+      <Text className={`font-ui text-caption ${text}`}>{selected ? `✓  ${name}` : name}</Text>
     </Pressable>
   );
 }

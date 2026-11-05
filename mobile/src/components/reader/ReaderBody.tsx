@@ -9,18 +9,20 @@ interface ReaderBodyProps {
 
 function buildTagsStyles({ colors, fonts }: Theme) {
   return {
-    body: { color: colors.text, fontSize: 16, lineHeight: 26, fontFamily: fonts.reading },
-    p: { marginBottom: 16 },
-    img: { borderRadius: 16, marginVertical: 16 },
-    h1: { fontSize: 24, fontWeight: "700", marginBottom: 12, marginTop: 20, fontFamily: fonts.heading },
-    h2: { fontSize: 20, fontWeight: "700", marginBottom: 12, marginTop: 20, fontFamily: fonts.heading },
-    h3: { fontSize: 18, fontWeight: "700", marginBottom: 10, marginTop: 16, fontFamily: fonts.heading },
-    a: { color: colors.link },
+    body: { color: colors.text, fontSize: 17, lineHeight: 28, letterSpacing: 0.1, fontFamily: fonts.reading },
+    p: { marginTop: 0, marginBottom: 16 },
+    img: { borderRadius: 20, marginVertical: 16 },
+    h1: { fontSize: 26, lineHeight: 32, fontWeight: "800", marginTop: 28, marginBottom: 12, fontFamily: fonts.heading },
+    h2: { fontSize: 22, lineHeight: 28, fontWeight: "700", marginTop: 24, marginBottom: 10, fontFamily: fonts.heading },
+    h3: { fontSize: 18, lineHeight: 24, fontWeight: "700", marginTop: 20, marginBottom: 8, fontFamily: fonts.heading },
+    a: { color: colors.link, fontWeight: "600" },
     blockquote: {
-      borderLeftWidth: 3,
-      borderLeftColor: colors.link,
-      paddingLeft: 16,
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      paddingHorizontal: 16,
+      paddingVertical: 4,
       marginLeft: 0,
+      marginVertical: 8,
       color: colors.textSoft,
     },
     li: { marginBottom: 6 },
@@ -35,7 +37,7 @@ export function ReaderBody({ extractedText }: ReaderBodyProps) {
   const isHtml = /<[a-z][\s\S]*>/i.test(extractedText);
   if (!isHtml) {
     return (
-      <Text className="font-reading text-body leading-loose text-ink dark:text-paper" style={{ maxWidth: 680 }}>
+      <Text className="font-reading text-reading text-ink dark:text-paper" style={{ maxWidth: 680 }}>
         {extractedText}
       </Text>
     );
