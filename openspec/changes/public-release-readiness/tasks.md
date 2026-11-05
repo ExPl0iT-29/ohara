@@ -19,6 +19,8 @@
 - [ ] 3.2 Serve the page at a stable HTTPS URL (enable GitHub Pages on `main` /docs). Verify `https://expl0it-29.github.io/ohara/privacy/` loads in a browser with no login.
 - [ ] 3.3 Add an About and privacy entry to `mobile/app/settings.tsx` that opens the policy URL with `expo-linking`, with a calm message if the open fails. Verify on a device that it opens the browser and that the app does not crash with no browser or no connection.
 
+- [x] 3.4 Publish terms (`docs/terms/`) and support (`docs/support/`) pages and link them from Settings beside the privacy policy; make Settings scroll. Verify the type-check passes and the Android bundle exports.
+
 ## 4. Play Console setup
 
 - [ ] 4.1 Create the app in Play Console with ID `com.ember.ohara` (double-check the ID on the creation screen before confirming), enable Play App Signing, and upload the first bundle to the internal testing track. Verify the internal test install works on a real device.
