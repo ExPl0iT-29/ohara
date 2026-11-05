@@ -28,7 +28,7 @@ None.
 
 ## Impact
 
-- **Config:** `mobile/app.json` (`android.package`, `android.versionCode`, name), new `mobile/eas.json` for the production app-bundle profile, signing credentials managed outside the repo.
+- **Config:** `mobile/app.json` (`android.package`, `android.versionCode`, name), Gradle release build from the committed `mobile/android/` (see `gradle-native-build`), signing credentials managed outside the repo.
 - **Mobile:** one new Settings row and an opener for the policy URL.
 - **Web:** a static privacy policy page on a stable HTTPS host (landing-page domain when it exists).
 - **Docs:** README release section, `docs/launch/` store-listing checklist.

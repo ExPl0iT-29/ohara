@@ -69,13 +69,16 @@ openspec/             specs + change history (source of truth for product behavi
 <details>
 <summary><strong>Setup steps</strong></summary>
 
+Needs Node, JDK 17+ and the Android SDK. Android only.
+
 ```bash
 cd mobile
 npm install
-npx expo run:android   # or run:ios
+npm start          # Metro dev server (fast refresh)
+npm run android    # = cd android && ./gradlew installDebug
 ```
 
-No environment file or API keys are needed.
+No environment file or API keys are needed. The native project in `mobile/android/` is committed and built with Gradle only — **do not run `expo prebuild`**, it would overwrite it. Native settings (application ID, version, permissions, signing) are edited in `mobile/android/`, not `app.json`.
 
 </details>
 
@@ -83,15 +86,15 @@ No environment file or API keys are needed.
 
 ## Releasing to Google Play
 
-Application ID: `com.ember.ohara` (permanent once uploaded). Version name is `expo.version`; bump `expo.android.versionCode` by one for every upload.
+Application ID: `com.ember.ohara` (permanent once uploaded). For every upload, raise `versionCode` in `mobile/android/app/build.gradle` by one, and keep `versionName` and `expo.version` in `mobile/app.json` in step (Settings shows the latter).
 
 ```bash
-cd mobile
-npm install -g eas-cli
-eas build --platform android --profile production   # signed .aab for Play
+cd mobile/android
+./gradlew bundleRelease     # → app/build/outputs/bundle/release/app-release.aab
+./gradlew assembleRelease   # → release APK for local testing
 ```
 
-Fallback without EAS: `npx expo prebuild --platform android`, then build a bundle from `mobile/android` with Gradle (`./gradlew bundleRelease`) using your own upload keystore. Never commit keystores or passwords.
+Signing uses your Play upload key from `~/.gradle/gradle.properties` or environment variables — see [`mobile/android/SIGNING.md`](mobile/android/SIGNING.md). Without it the build is debug-signed (with a warning) and Play will reject it. Never commit keystores or passwords.
 
 **Moving a library from the old private build (`com.explooit.mobile`):** the new ID installs as a separate app. In the old app go to Settings → Export library, save or share the JSON file, open the new app, go to Settings → Import from file, check your items, then uninstall the old app.
 
