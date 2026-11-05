@@ -53,3 +53,14 @@ The project SHALL treat any change that adds accounts, analytics, crash reportin
 #### Scenario: A future change adds a network service
 - **WHEN** a proposed change introduces any off-device data flow
 - **THEN** its tasks include updating the policy and Data safety answers before release
+
+### Requirement: In-App Links To Terms And Support
+The system SHALL show Terms of use and Help and support entries next to the privacy policy entry in Settings, each opening its public page in the system browser.
+
+#### Scenario: Opening the support page
+- **WHEN** a user taps Help and support in Settings
+- **THEN** the support page opens in the system browser
+
+#### Scenario: Page cannot be opened
+- **WHEN** the system cannot open one of these pages
+- **THEN** the app shows a calm message with the page's address, without crashing

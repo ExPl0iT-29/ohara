@@ -4,14 +4,14 @@ import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import { useColorScheme } from "nativewind";
 import { useState } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 
 import { exportBackup, importBackup } from "../src/backup/backup";
 import { setSetting } from "../src/db/settings";
 import { Button } from "../src/components/ui/Button";
 import { Card } from "../src/components/ui/Card";
 import { Chip } from "../src/components/ui/Chip";
-import { PRIVACY_POLICY_URL } from "../src/constants/links";
+import { PRIVACY_POLICY_URL, SUPPORT_URL, TERMS_URL } from "../src/constants/links";
 import { Screen } from "../src/components/ui/Screen";
 
 const THEME_OPTIONS = ["light", "dark", "system"] as const;
@@ -46,17 +46,18 @@ export default function SettingsScreen() {
     }
   };
 
-  const handleOpenPrivacy = async () => {
+  const openPage = async (url: string, name: string) => {
     try {
-      await Linking.openURL(PRIVACY_POLICY_URL);
+      await Linking.openURL(url);
     } catch {
-      Alert.alert("Couldn't open the privacy policy", `You can read it at ${PRIVACY_POLICY_URL}`);
+      Alert.alert(`Couldn't open the ${name}`, `You can read it at ${url}`);
     }
   };
 
+
   return (
     <Screen>
-      <View className="gap-4 p-5">
+      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40, gap: 16 }}>
         <Text className="font-heading text-title text-ink dark:text-paper">Appearance</Text>
         <View className="flex-row gap-2">
           {THEME_OPTIONS.map((option) => (
@@ -101,16 +102,22 @@ export default function SettingsScreen() {
           Ohara keeps everything on your phone. No account, no ads, no tracking.
         </Text>
 
-        <Card>
-          <Pressable className="p-4 active:opacity-80" onPress={handleOpenPrivacy}>
-            <Text className="font-ui text-center text-body font-bold text-ink dark:text-paper">Privacy policy</Text>
-          </Pressable>
-        </Card>
+        {[
+          { label: "Privacy policy", url: PRIVACY_POLICY_URL, name: "privacy policy" },
+          { label: "Terms of use", url: TERMS_URL, name: "terms of use" },
+          { label: "Help and support", url: SUPPORT_URL, name: "support page" },
+        ].map((page) => (
+          <Card key={page.label}>
+            <Pressable className="p-4 active:opacity-80" accessibilityRole="link" onPress={() => void openPage(page.url, page.name)}>
+              <Text className="font-ui text-center text-body font-bold text-ink dark:text-paper">{page.label}</Text>
+            </Pressable>
+          </Card>
+        ))}
 
         <Text className="font-ui text-center text-caption text-ink-soft dark:text-ink-faint">
           Version {Constants.expoConfig?.version ?? "1.0.0"}
         </Text>
-      </View>
+      </ScrollView>
     </Screen>
   );
 }

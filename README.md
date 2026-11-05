@@ -98,9 +98,9 @@ Signing uses your Play upload key from `~/.gradle/gradle.properties` or environm
 
 **Moving a library from the old private build (`com.explooit.mobile`):** the new ID installs as a separate app. In the old app go to Settings → Export library, save or share the JSON file, open the new app, go to Settings → Import from file, check your items, then uninstall the old app.
 
-**Privacy policy:** `docs/privacy/index.html`, served by GitHub Pages (enable Pages for the `main` branch `/docs` folder) at `https://expl0it-29.github.io/ohara/privacy/`. The in-app link lives in `mobile/src/constants/links.ts`. Any change that adds accounts, analytics, ads, cloud or AI must update the policy and the Play Data safety form first.
+**Website:** `docs/` is the public site (landing, privacy, terms, support), served by GitHub Pages from the `main` branch `/docs` folder at `https://expl0it-29.github.io/ohara/`. The in-app links live in `mobile/src/constants/links.ts`. After each site deploy, run `scripts/indexnow-submit.sh`. Any change that adds accounts, analytics, ads, cloud or AI must update the policy and the Play Data safety form first.
 
-The launch sequence (internal, closed, production testing, ASO, landing page) is in [`docs/launch/launch-plan.md`](docs/launch/launch-plan.md).
+The launch sequence is in [`docs/launch/launch-plan.md`](docs/launch/launch-plan.md); store listing copy, marketing drafts, the data-handling record and the checklist status are alongside it.
 
 <hr>
 

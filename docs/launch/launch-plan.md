@@ -54,9 +54,9 @@ Nothing below starts until both OpenSpec changes are implemented, reviewed and a
 
 | Element | Plan |
 |---|---|
-| Title (30 chars) | `Ohara: Read Later` |
-| Short description (80) | `Save links, read them clean and offline. No account, no ads, no tracking.` |
-| Keywords to work into the full description naturally | read later, offline reader, save articles, Pocket alternative, reading list, bookmark, article saver, private |
+| Title (30 chars) | `Ohara: Read Later & Offline` |
+| Short description (80) | `Save articles, videos and PDFs, then read them clean and offline. No account.` |
+| Keywords to work into the full description naturally | read later, offline reading, save articles, reading list, bookmarks, reader view, private (see `store-listing.md`). Competitor names such as Pocket stay **out** of the Play listing (metadata policy); use them on the website, Reddit and Product Hunt. |
 | Full description | Lead with the problem (too many open tabs), then 5 bullets: one-tap share, clean reader, works offline, tags/highlights/search, export your library. Close with the privacy promise. No keyword stuffing. |
 | Screenshots | 1 feed, 2 reader, 3 share-sheet capture, 4 highlights, 5 search/tags, 6 "No data collected" or export. Each with a 5-word caption. Reuse the neo-brutalist look as the visual identity. |
 | Icon / feature graphic | Existing icon; feature graphic matches the banner in `docs/assets/banner.jpg` |
@@ -127,4 +127,4 @@ Use Play Console only: installs, uninstall rate, day-7 and day-30 retention, cra
 | Day-one crash on an unusual device | Internal and closed phases on varied devices; staged rollout |
 | Policy and app drift out of sync | Disclosure check required on every future change (see `privacy-disclosure` spec) |
 | Brand clash or confusion around "Ohara" | Search Play and the web before creating the listing |
-| Listing says "Pocket alternative" and draws a takedown or complaint | Describe it as an alternative in prose; avoid the Pocket logo or name in the title or icon |
+| Competitor names in the Play listing trigger a metadata-policy rejection | Keep Pocket, Omnivore and Instapaper out of all Play listing text; use them only on the website, Reddit and Product Hunt |
