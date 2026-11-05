@@ -11,9 +11,9 @@ export function Tag({ label, onPress }: TagProps) {
     <Pressable
       onPress={onPress}
       accessibilityLabel={`Remove tag ${label}`}
-      className="rounded-pill border-2 border-ink bg-accent-violetLight px-3 py-1"
+      className="rounded-pill border-2 border-line bg-accent-violetLight px-3 py-1 dark:border-line-dark dark:bg-accent-violetDeep"
     >
-      <Text className="font-ui text-caption font-bold text-ink">{label} ×</Text>
+      <Text className="font-ui text-caption font-bold text-ink dark:text-paper">#{label}  ×</Text>
     </Pressable>
   );
 }

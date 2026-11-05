@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, RefreshControl, ScrollView, Text, View } from "react-native";
 
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -18,6 +18,7 @@ import { FeedErrorState } from "../src/components/feed/FeedErrorState";
 import { FeedListItem } from "../src/components/feed/FeedListItem";
 import { Chip } from "../src/components/ui/Chip";
 import { Fab } from "../src/components/ui/Fab";
+import { IconButton } from "../src/components/ui/IconButton";
 import { Screen } from "../src/components/ui/Screen";
 import { TextField } from "../src/components/ui/TextField";
 import { useContentList } from "../src/hooks/useContentList";
@@ -58,39 +59,43 @@ export default function FeedScreen() {
     },
     [queryClient],
   );
+  const isFiltered = !!search || !!tag || !!contentType;
+  const featureFirst = !archived && !isFiltered;
   const renderItem = useCallback(
-    ({ item }: { item: ContentItem }) => (
-      <FeedListItem item={item} onPress={handleOpenItem} onToggleArchive={handleToggleArchive} />
+    ({ item, index }: { item: ContentItem; index: number }) => (
+      <FeedListItem
+        item={item}
+        featured={featureFirst && index === 0}
+        onPress={handleOpenItem}
+        onToggleArchive={handleToggleArchive}
+      />
     ),
-    [handleOpenItem, handleToggleArchive],
+    [featureFirst, handleOpenItem, handleToggleArchive],
   );
   const keyExtractor = useCallback((item: ContentItem) => item.id, []);
 
   return (
     <Screen>
-      <View className="flex-row items-center justify-between px-5 pb-2 pt-4">
+      <View className="flex-row items-center justify-between px-5 pb-3 pt-4">
         <Text className="font-heading text-display text-ink dark:text-paper">Ohara</Text>
-        <Pressable onPress={() => router.push("/settings")} accessibilityRole="button">
-          <Text className="font-ui text-caption text-ink-soft dark:text-ink-faint">Settings</Text>
-        </Pressable>
+        <IconButton glyph="⚙" accessibilityLabel="Settings" onPress={() => router.push("/settings")} />
       </View>
 
-      <View className="flex-row gap-2 px-5 pb-2">
+      <View className="flex-row gap-2 px-5 pb-3">
         <Chip size="md" label="Active" selected={!archived} onPress={() => setArchived(false)} />
         <Chip size="md" label="Archived" selected={archived} onPress={() => setArchived(true)} />
       </View>
 
       <View className="px-5 pb-2">
-        <TextField value={search} onChangeText={setSearch} placeholder="Search your library" />
+        <TextField value={search} onChangeText={setSearch} placeholder="Search titles and text" returnKeyType="search" />
       </View>
 
       {(typeChips.length > 0 || tagChips.length > 0) && (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={{ flexGrow: 0, height: 40 }}
-          className="px-5 pb-2"
-          contentContainerStyle={{ gap: 8, alignItems: "center" }}
+          style={{ flexGrow: 0 }}
+          contentContainerStyle={{ gap: 8, alignItems: "center", paddingHorizontal: 20, paddingTop: 4, paddingBottom: 8 }}
         >
           {typeChips.map((type) => {
             const selected = contentType === type;
@@ -115,16 +120,24 @@ export default function FeedScreen() {
       {isLoading ? (
         <View className="flex-1 items-center justify-center gap-3">
           <ActivityIndicator color={colors.text} size="large" />
-          <Text className="font-ui text-caption font-bold text-ink-soft dark:text-ink-faint">
-            Loading your library...
-          </Text>
+          <Text className="font-ui text-caption font-bold text-ink-soft dark:text-ink-faint">Opening your library…</Text>
         </View>
       ) : error ? (
         <FeedErrorState onRetry={() => refetch()} />
       ) : !data || data.length === 0 ? (
-        archived ? (
-          <View className="flex-1 items-center justify-center p-8">
-            <Text className="text-center font-ui text-body text-ink-soft dark:text-ink-faint">Nothing archived yet.</Text>
+        isFiltered ? (
+          <View className="flex-1 items-center justify-center gap-2 p-8">
+            <Text className="text-center font-heading text-title text-ink dark:text-paper">No matches</Text>
+            <Text className="text-center font-ui text-body text-ink-soft dark:text-ink-faint">
+              Nothing in your library matches that search or filter.
+            </Text>
+          </View>
+        ) : archived ? (
+          <View className="flex-1 items-center justify-center gap-2 p-8">
+            <Text className="text-center font-heading text-title text-ink dark:text-paper">Nothing archived yet</Text>
+            <Text className="text-center font-ui text-body text-ink-soft dark:text-ink-faint">
+              Swipe an item left and tap DONE once you have finished with it.
+            </Text>
           </View>
         ) : (
           <FeedEmptyState />
@@ -133,7 +146,7 @@ export default function FeedScreen() {
         <FlatList
           data={data}
           keyExtractor={keyExtractor}
-          contentContainerStyle={{ padding: 20, gap: 12 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 112, gap: 14 }}
           refreshControl={<RefreshControl tintColor={colors.text} colors={[colors.text]} refreshing={isFetching} onRefresh={refetch} />}
           renderItem={renderItem}
         />

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bricolage Grotesque (SIL OFL 1.1): heading and interface face for the refined neo-brutalist direction. -->
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <font android:fontStyle="normal" android:fontWeight="400" android:font="@font/bricolage_grotesque_regular"
+        app:fontStyle="normal" app:fontWeight="400" app:font="@font/bricolage_grotesque_regular" />
+    <font android:fontStyle="normal" android:fontWeight="500" android:font="@font/bricolage_grotesque_medium"
+        app:fontStyle="normal" app:fontWeight="500" app:font="@font/bricolage_grotesque_medium" />
+    <font android:fontStyle="normal" android:fontWeight="600" android:font="@font/bricolage_grotesque_semibold"
+        app:fontStyle="normal" app:fontWeight="600" app:font="@font/bricolage_grotesque_semibold" />
+    <font android:fontStyle="normal" android:fontWeight="700" android:font="@font/bricolage_grotesque_bold"
+        app:fontStyle="normal" app:fontWeight="700" app:font="@font/bricolage_grotesque_bold" />
+    <font android:fontStyle="normal" android:fontWeight="800" android:font="@font/bricolage_grotesque_extrabold"
+        app:fontStyle="normal" app:fontWeight="800" app:font="@font/bricolage_grotesque_extrabold" />
+</font-family>

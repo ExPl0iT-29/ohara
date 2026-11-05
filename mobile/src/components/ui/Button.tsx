@@ -3,15 +3,15 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-na
 
 import { useTheme } from "../../theme/useTheme";
 
-const SHADOW_OFFSET = 4;
+const SHADOW_OFFSET = 3;
+
+type ButtonVariant = "primary" | "destructive" | "neutral";
 
 const VARIANT_BG: Record<ButtonVariant, string> = {
   primary: "bg-brand",
   destructive: "bg-danger",
-  neutral: "bg-paper dark:bg-surface-dark",
+  neutral: "bg-raised dark:bg-raised-dark",
 };
-
-type ButtonVariant = "primary" | "destructive" | "neutral";
 
 const VARIANT_TEXT: Record<ButtonVariant, string> = {
   primary: "text-ink",
@@ -42,57 +42,42 @@ export function Button({
 }: ButtonProps) {
   const { colors } = useTheme();
   const pressed = useSharedValue(0);
+  const radius = pill ? 999 : 12;
 
-  const shadowStyle = useAnimatedStyle(() => ({
-    opacity: 1 - pressed.value,
-  }));
-
-  const contentStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: pressed.value * SHADOW_OFFSET },
-      { translateY: pressed.value * SHADOW_OFFSET },
-    ],
+  const shadowStyle = useAnimatedStyle(() => ({ opacity: 1 - pressed.value }));
+  const faceStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: pressed.value * SHADOW_OFFSET }, { translateY: pressed.value * SHADOW_OFFSET }],
   }));
 
   return (
     <Pressable
       onPress={disabled ? undefined : onPress}
       disabled={disabled}
-      onPressIn={() => {
-        if (!disabled) pressed.value = withTiming(1, { duration: 80 });
-      }}
-      onPressOut={() => {
-        pressed.value = withTiming(0, { duration: 120 });
-      }}
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ disabled }}
+      onPressIn={() => {
+        if (!disabled) pressed.value = withTiming(1, { duration: 70 });
+      }}
+      onPressOut={() => {
+        pressed.value = withTiming(0, { duration: 110 });
+      }}
       style={{ position: "relative", opacity: disabled ? 0.4 : 1 }}
     >
       <Animated.View
         pointerEvents="none"
         style={[
           shadowStyle,
-          {
-            position: "absolute",
-            top: SHADOW_OFFSET,
-            left: SHADOW_OFFSET,
-            right: -SHADOW_OFFSET,
-            bottom: -SHADOW_OFFSET,
-            backgroundColor: colors.shadow,
-            borderRadius: pill ? 999 : 12,
-          },
+          { position: "absolute", top: SHADOW_OFFSET, left: SHADOW_OFFSET, right: -SHADOW_OFFSET, bottom: -SHADOW_OFFSET, backgroundColor: colors.shadow, borderRadius: radius },
         ]}
       />
       <Animated.View
-        className={`items-center justify-center border-3 border-ink ${size === "sm" ? "px-3 py-1.5" : "px-4 py-2.5"} ${
-          pill ? "rounded-pill" : "rounded-card"
+        className={`items-center justify-center border-2.5 border-line dark:border-line-dark ${size === "sm" ? "px-3.5 py-1.5" : "px-5 py-3"} ${
+          pill ? "rounded-pill" : "rounded-xl"
         } ${VARIANT_BG[variant]} ${className}`}
-        style={contentStyle}
+        style={faceStyle}
       >
-        <Text
-          className={`text-center font-ui font-extrabold ${size === "sm" ? "text-caption" : "text-body"} ${VARIANT_TEXT[variant]}`}
-        >
+        <Text className={`text-center font-ui font-extrabold ${size === "sm" ? "text-caption" : "text-body"} ${VARIANT_TEXT[variant]}`}>
           {label}
         </Text>
       </Animated.View>

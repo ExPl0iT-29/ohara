@@ -22,6 +22,8 @@ The interface has personality. It doesn't disappear — it invites.
 
 The goal is to make saving and reading fast, satisfying, and a little fun.
 
+**Current direction: Refined neo-brutalism.**
+
 ---
 
 # Emotional Goals
@@ -116,17 +118,24 @@ Advanced metadata, AI features, projects, and relationships should stay out of t
 
 ## Personality
 
-Neo-brutalist: thick black borders, hard offset drop shadows (no blur), bold saturated accent colors, chunky rounded-but-square shapes, confident condensed display type for headings.
+Neo-brutalist, refined: firm 2.5dp lines, crisp hard offset shadows (no blur), bold saturated accents, chunky rounded-but-square shapes, and a confident display face for headings.
 
 Think a well-made sticker or a physical folder with a colored tab — every element should look like it has weight and could be picked up.
+
+Refinements over the first version:
+
+* **One shadow depth per level.** Cards and the FAB sit on 4dp shadows, buttons on 3dp, icon buttons on 2dp. Chips, fields and notices are flat.
+* **Colour means something.** Accent colour marks content type (yellow articles, pink video, violet PDFs and papers, mint docs and code, blue social posts); yellow is also the primary action.
+* **Fewer colours per screen.** The feed's lead item gets a full card; the rest are compact rows.
 
 ---
 
 ## Typography
 
-Headings use a bold, condensed, high-contrast display face — confident, a little loud.
+Two faces, bundled with the app (both SIL OFL):
 
-Body/reading text stays highly readable — the reader view is the one place restraint wins over personality (see Reader Experience below).
+* **Bricolage Grotesque** for headings and interface text: characterful, heavy at 800 for titles, still readable at caption sizes.
+* **Literata** for reader body text. The reader is the one place restraint wins over personality: a calm serif at 17sp with a 29sp line height, never boxed or shadowed.
 
 Generous spacing still applies. Never compress text in the reader.
 
@@ -134,9 +143,9 @@ Generous spacing still applies. Never compress text in the reader.
 
 ## Color Philosophy
 
-Bold and saturated, not muted. A small palette of confident accent colors (e.g. warm yellow, hot pink, violet, mint) used deliberately per collection/category, against a warm off-white (not stark white) base and true-black borders/text.
+Bold and saturated, not muted. Warm yellow, hot pink, violet, mint and blue against a warm paper base (#FAF3E1) and true-black lines and text.
 
-Dark mode should keep the same energy — bold accents against a near-black surface, not a dimmed-down version of light mode.
+Dark mode keeps the same energy: bold accents on a near-black surface (#161412), with lines in warm off-white (#E9E1CC) so borders stay visible, and pale accent tints replaced by deep ones so text keeps its contrast.
 
 ---
 
@@ -152,7 +161,7 @@ Whenever available:
 * PDF preview
 * Repository avatar
 
-Cards are folder-tab shaped where they represent a collection, and image-forward where they represent content. Cards should feel like physical, grabbable objects — border + hard shadow, never flat.
+Cards are folder-tab shaped where they represent a collection, and image-forward where they represent content. The feed's lead card shows its hero image (or a band in its type colour); compact rows show a small image or a type-coloured tile. Cards should feel like physical, grabbable objects — line + hard shadow, never flat.
 
 Avoid walls of text.
 
@@ -415,6 +424,8 @@ The application should never make the user feel guilty for not reading.
 Products:
 
 Tuckii
+
+Gumroad
 
 Pop-art / neo-brutalist web design
 

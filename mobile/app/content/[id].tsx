@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import {
   Linking,
@@ -30,6 +30,8 @@ import { Notice, noticeSoftText, noticeText } from "../../src/components/ui/Noti
 import { Tag } from "../../src/components/ui/Tag";
 import { TextButton } from "../../src/components/ui/TextButton";
 import { TextField } from "../../src/components/ui/TextField";
+import { Eyebrow } from "../../src/components/ui/Eyebrow";
+import { IconButton } from "../../src/components/ui/IconButton";
 import { Screen } from "../../src/components/ui/Screen";
 
 export default function ReaderScreen() {
@@ -39,6 +41,7 @@ export default function ReaderScreen() {
   const [newTag, setNewTag] = useState("");
   const [newQuote, setNewQuote] = useState("");
   const [newNote, setNewNote] = useState("");
+  const router = useRouter();
   const scrollViewRef = useRef<ScrollView>(null);
   const contentHeightRef = useRef(0);
   const hasRestoredRef = useRef(false);
@@ -106,7 +109,7 @@ export default function ReaderScreen() {
   if (isLoading) {
     return (
       <Screen>
-        <Text className="font-ui p-5 text-body text-ink-soft dark:text-ink-faint">Loading...</Text>
+        <Text className="p-5 font-ui text-body text-ink-soft dark:text-ink-faint">Opening…</Text>
       </Screen>
     );
   }
@@ -114,83 +117,88 @@ export default function ReaderScreen() {
   if (error || !data) {
     return (
       <Screen>
-        <Text className="font-ui p-5 text-body text-danger">Not found</Text>
+        <View className="gap-2 p-5">
+          <Text className="font-heading text-title text-ink dark:text-paper">This item isn't in your library</Text>
+          <Text className="font-ui text-body text-ink-soft dark:text-ink-faint">It may have been removed, or the backup it came from was incomplete.</Text>
+        </View>
       </Screen>
     );
   }
 
-  const header = (
-    <ReaderHeader
-      title={data.title}
-      url={data.url}
-      heroImage={data.heroImage}
-      author={data.author}
-      source={data.source}
-      readingTime={data.readingTime}
-    />
-  );
-
   return (
     <Screen>
+      <View className="flex-row items-center justify-between px-5 pb-1 pt-2">
+        <IconButton glyph="←" accessibilityLabel="Back" onPress={() => router.back()} />
+        <IconButton glyph="↗" accessibilityLabel="Open the original page" onPress={() => void Linking.openURL(data.url)} />
+      </View>
       <ScrollView
         ref={scrollViewRef}
-        contentContainerStyle={{ padding: 20, gap: 20 }}
+        contentContainerStyle={{ padding: 20, paddingBottom: 48, gap: 22 }}
         onContentSizeChange={handleContentSizeChange}
         onScrollEndDrag={handleScrollEnd}
         onMomentumScrollEnd={handleScrollEnd}
       >
-        {header}
-        <View className="self-start">
-          <Button pill size="sm" label={data.archivedAt ? "Unarchive" : "Archive"} onPress={handleToggleArchive} />
-        </View>
+        <ReaderHeader
+          title={data.title}
+          url={data.url}
+          heroImage={data.heroImage}
+          author={data.author}
+          source={data.source}
+          readingTime={data.readingTime}
+        />
 
-        <View className="gap-2">
-          <View className="flex-row flex-wrap gap-2">
-            {data.tags.map((tag) => (
-              <Tag key={tag} label={tag} onPress={() => handleRemoveTag(tag)} />
-            ))}
+        {(data.status === "pending" || data.status === "processing") && (
+          <ReaderStatusNotice variant="preparing" url={data.url} />
+        )}
+        {data.status === "failed" && <ReaderStatusNotice variant="failed" url={data.url} onRetry={handleRetry} />}
+        {data.status === "ready" && data.isStub && (
+          <View className="gap-4">
+            {data.description && (
+              <Text className="font-reading text-reading text-ink-soft dark:text-ink-faint">{data.description}</Text>
+            )}
+            <View className="self-start">
+              <Button pill variant="primary" label="Open original link" onPress={() => Linking.openURL(data.url)} />
+            </View>
           </View>
-          <View className="flex-row gap-2">
+        )}
+        {data.status === "ready" && !data.isStub && <ReaderBody extractedText={data.extractedText} />}
+
+        <Divider />
+
+        <View className="gap-3">
+          <Eyebrow label="Tags" />
+          {data.tags.length > 0 && (
+            <View className="flex-row flex-wrap gap-2">
+              {data.tags.map((tag) => (
+                <Tag key={tag} label={tag} onPress={() => handleRemoveTag(tag)} />
+              ))}
+            </View>
+          )}
+          <View className="flex-row items-center gap-3">
             <TextField
               shape="pillSmall"
               className="flex-1"
               value={newTag}
               onChangeText={setNewTag}
               onSubmitEditing={handleAddTag}
-              placeholder="Add tag"
+              placeholder="Add a tag"
+              returnKeyType="done"
             />
-            <View className="justify-center px-2">
-              <TextButton label="Add" onPress={handleAddTag} />
-            </View>
+            <TextButton label="Add" onPress={handleAddTag} />
           </View>
         </View>
 
-        {(data.status === "pending" || data.status === "processing") && (
-          <ReaderStatusNotice variant="preparing" url={data.url} />
-        )}
-        {data.status === "failed" && (
-          <ReaderStatusNotice variant="failed" url={data.url} onRetry={handleRetry} />
-        )}
-        {data.status === "ready" && data.isStub && (
-          <View className="gap-4">
-            {data.description && (
-              <Text className="font-ui text-body text-ink-soft dark:text-ink-faint">{data.description}</Text>
-            )}
-            <Button pill size="sm" variant="primary" label="Open original link" onPress={() => Linking.openURL(data.url)} />
-          </View>
-        )}
-        {data.status === "ready" && !data.isStub && (
-          <>
-            <ReaderBody extractedText={data.extractedText} />
-          </>
-        )}
         {data.status === "ready" && (
           <View className="gap-3">
-            <Divider />
-            <Text className="font-heading text-title text-ink dark:text-paper">Highlights</Text>
+            <Eyebrow label="Highlights" />
+            {data.highlights.length === 0 && (
+              <Text className="font-ui text-caption text-ink-soft dark:text-ink-faint">
+                Copy a passage you want to keep and save it here with a note.
+              </Text>
+            )}
             {data.highlights.map((highlight) => (
               <Notice key={highlight.id} tone="highlight" compact>
-                <Text className={`font-reading text-body italic ${noticeText("highlight")}`}>"{highlight.quote}"</Text>
+                <Text className={`font-reading text-body italic ${noticeText("highlight")}`}>“{highlight.quote}”</Text>
                 {highlight.note ? (
                   <Text className={`font-ui text-caption ${noticeSoftText("highlight")}`}>{highlight.note}</Text>
                 ) : null}
@@ -204,6 +212,10 @@ export default function ReaderScreen() {
             </View>
           </View>
         )}
+
+        <View className="self-start">
+          <Button pill size="sm" label={data.archivedAt ? "Move back to library" : "Archive"} onPress={handleToggleArchive} />
+        </View>
       </ScrollView>
     </Screen>
   );

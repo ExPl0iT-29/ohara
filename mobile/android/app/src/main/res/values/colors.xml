@@ -1,5 +1,7 @@
 <resources>
   <color name="splashscreen_background">#FFFFFF</color>
   <color name="iconBackground">#FAF9F6</color>
-  <color name="colorPrimary">#023c69</color>
+  <color name="colorPrimary">#1C1917</color>
+  <!-- Window behind React screens; matches tokens.js paper / surface.dark. -->
+  <color name="appBackground">#FAF3E1</color>
 </resources>

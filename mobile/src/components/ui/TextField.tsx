@@ -2,13 +2,15 @@ import { TextInput, type TextInputProps } from "react-native";
 
 import { useTheme } from "../../theme/useTheme";
 
+const FIELD = "border-2.5 border-line bg-raised dark:border-line-dark dark:bg-raised-dark";
+
 const SHAPES = {
   /** Single-line rounded field: search. */
-  pill: "rounded-pill border-3 border-ink px-4 py-2 text-body",
+  pill: `rounded-pill px-4 py-2.5 text-body ${FIELD}`,
   /** Compact single-line field: inline tag entry. */
-  pillSmall: "rounded-pill border-2 border-ink px-3 py-1.5 text-caption",
+  pillSmall: `rounded-pill px-3 py-1.5 text-caption ${FIELD}`,
   /** Box for multi-line entry: links, quotes, notes. */
-  box: "rounded-card border-3 border-ink bg-paper p-3 text-body dark:bg-surface-dark",
+  box: `rounded-card p-3 text-body ${FIELD}`,
 } as const;
 
 interface TextFieldProps extends TextInputProps {
@@ -16,12 +18,14 @@ interface TextFieldProps extends TextInputProps {
   className?: string;
 }
 
-/** The app's text input, with theme-aware placeholder colour. */
+/** The app's text input, with theme-aware placeholder, cursor and selection colours. */
 export function TextField({ shape = "pill", className = "", ...props }: TextFieldProps) {
   const { colors } = useTheme();
   return (
     <TextInput
       placeholderTextColor={colors.textFaint}
+      cursorColor={colors.text}
+      selectionColor={colors.accent}
       className={`font-ui text-ink dark:text-paper ${SHAPES[shape]} ${className}`}
       {...props}
     />

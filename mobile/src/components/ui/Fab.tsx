@@ -10,7 +10,7 @@ interface FabProps {
   accessibilityLabel: string;
 }
 
-/** Floating "save a link" button, pinned bottom-right. */
+/** Floating "save a link" button: a yellow tile on a hard shadow that springs when pressed. */
 export function Fab({ onPress, accessibilityLabel }: FabProps) {
   const { colors } = useTheme();
   const scale = useSharedValue(1);
@@ -20,22 +20,22 @@ export function Fab({ onPress, accessibilityLabel }: FabProps) {
     <View pointerEvents="box-none" className="absolute bottom-8 right-6">
       <View
         pointerEvents="none"
-        style={{ position: "absolute", top: 5, left: 5, right: -5, bottom: -5, backgroundColor: colors.shadow, borderRadius: 999 }}
+        style={{ position: "absolute", top: 4, left: 4, right: -4, bottom: -4, backgroundColor: colors.shadow, borderRadius: 18 }}
       />
       <AnimatedPressable
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}
-        className="h-14 w-14 items-center justify-center rounded-full border-3 border-ink bg-brand"
-        style={style}
+        onPress={onPress}
         onPressIn={() => {
           scale.value = withSpring(0.9);
         }}
         onPressOut={() => {
           scale.value = withSpring(1);
         }}
-        onPress={onPress}
+        className="h-14 w-14 items-center justify-center rounded-[18px] border-2.5 border-line bg-brand dark:border-line-dark"
+        style={style}
       >
-        <Text className="font-heading text-3xl font-extrabold leading-none text-ink">+</Text>
+        <Text className="font-heading text-[30px] font-extrabold leading-[32px] text-ink">+</Text>
       </AnimatedPressable>
     </View>
   );

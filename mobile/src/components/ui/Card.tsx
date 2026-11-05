@@ -2,8 +2,7 @@ import type { ReactNode } from "react";
 import { View } from "react-native";
 
 import { useTheme } from "../../theme/useTheme";
-
-const SHADOW_OFFSET = 4;
+import { HardShadow } from "./HardShadow";
 
 interface CardProps {
   children: ReactNode;
@@ -12,7 +11,7 @@ interface CardProps {
   className?: string;
 }
 
-/** A raised surface for grouped content. */
+/** A raised surface: 2.5dp line, 4dp hard shadow. */
 export function Card({ children, tabColor, className = "" }: CardProps) {
   const { colors } = useTheme();
   return (
@@ -26,7 +25,7 @@ export function Card({ children, tabColor, className = "" }: CardProps) {
             right: 40,
             height: 18,
             backgroundColor: tabColor,
-            borderWidth: 3,
+            borderWidth: 2.5,
             borderColor: colors.line,
             borderBottomWidth: 0,
             borderTopLeftRadius: 8,
@@ -34,23 +33,9 @@ export function Card({ children, tabColor, className = "" }: CardProps) {
           }}
         />
       )}
-      <View style={{ position: "relative" }}>
-        <View
-          pointerEvents="none"
-          style={{
-            position: "absolute",
-            top: SHADOW_OFFSET,
-            left: SHADOW_OFFSET,
-            right: -SHADOW_OFFSET,
-            bottom: -SHADOW_OFFSET,
-            backgroundColor: colors.shadow,
-            borderRadius: 16,
-          }}
-        />
-        <View className={`rounded-card border-3 border-ink bg-paper dark:bg-surface-dark ${className}`}>
-          {children}
-        </View>
-      </View>
+      <HardShadow radius={14}>
+        <View className={`rounded-card border-2.5 border-line bg-raised dark:border-line-dark dark:bg-raised-dark ${className}`}>{children}</View>
+      </HardShadow>
     </View>
   );
 }
